@@ -1,0 +1,86 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.editor-root {
+    .tree-item {
+        height: 28px;
+        padding: 0 8px 0 10px;
+        border-radius: @e-r-sm;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        transition: background 0.08s;
+        margin: 1px 0;
+        color: @e-text;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            border-radius: 2px;
+            background: transparent;
+            transition: background 0.1s;
+        }
+
+        &:hover {
+            background: @e-surface-hover;
+        }
+
+        &.selected {
+            background: @e-surface-sel;
+            color: @e-primary;
+
+            &::before {
+                background: @e-primary;
+            }
+
+            .tree-item-icon {
+                color: @e-primary;
+            }
+
+            .tree-item-toggle {
+                color: @e-primary;
+            }
+        }
+
+        &.dragging {
+            opacity: 0.3;
+        }
+
+        &:hover .tree-item-actions,
+        &.selected .tree-item-actions {
+            opacity: 1;
+        }
+    }
+
+    .tree-item-label {
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tree-item-icon {
+        width: 16px;
+        .flex-center();
+        color: @e-text-soft;
+        flex-shrink: 0;
+    }
+
+    .tree-item-actions {
+        display: flex;
+        gap: 2px;
+        opacity: 0;
+        transition: opacity 0.1s;
+    }
+}

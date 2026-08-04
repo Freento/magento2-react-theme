@@ -1,0 +1,88 @@
+@import (reference) "../abstracts/tokens";
+
+.nf-section {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 120px 24px 160px;
+    text-align: center;
+}
+
+.nf-eyebrow {
+    display: inline-block;
+    font-size: @fs-sm;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: @ink-2;
+    margin-bottom: 18px;
+}
+
+.nf-title {
+    font-size: 40px;
+    font-weight: 600;
+    color: @ink;
+    letter-spacing: -0.02em;
+    line-height: @lh-tight;
+    margin: 0 0 16px;
+}
+
+.nf-text {
+    color: @ink-2;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 auto 32px;
+    max-width: 44ch;
+}
+
+.nf-actions {
+    display: inline-flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: @fs-base;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 14px 22px;
+    border-radius: @radius;
+    text-decoration: none;
+    transition: background @t-med, color @t-med, border-color @t-med;
+
+    &--primary {
+        background: @ink;
+        color: @bg;
+        border: 1px solid @ink;
+
+        &:hover {
+            background: @black;
+            color: @bg;
+        }
+    }
+
+    &--ghost {
+        background: transparent;
+        color: @ink;
+        border: 1px solid @border;
+
+        &:hover {
+            background: @surface;
+            border-color: @ink;
+        }
+    }
+}
+
+@media (max-width: @screen__600) {
+    .nf-section {
+        padding: 80px 16px 120px;
+    }
+
+    .nf-title {
+        font-size: 30px;
+    }
+}

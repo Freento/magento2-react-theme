@@ -1,0 +1,34 @@
+@import (reference) "../abstracts/tokens";
+
+.authnet-communicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    font-family: @font;
+    color: @ink-2;
+    text-align: center;
+    padding: @space-5;
+
+    .authnet-communicator__icon {
+        font-size: 2rem;
+        margin-bottom: @space-4;
+    }
+
+    .authnet-communicator__title {
+        margin: 0 0 @space-4 0;
+        color: @ink;
+    }
+
+    .authnet-communicator__text {
+        margin: 0;
+        font-size: @fs-base;
+    }
+
+    .authnet-communicator__note {
+        margin: @space-2 0 0 0;
+        font-size: @fs-sm;
+        opacity: 0.7;
+    }
+}

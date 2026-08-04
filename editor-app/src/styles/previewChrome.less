@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;600;700&display=swap');
+
+body {
+  margin: 0;
+}
+
+.preview-chrome {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+  color: #333333;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.preview-chrome,
+.preview-chrome *,
+.preview-chrome *::before,
+.preview-chrome *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.preview-chrome main {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
+@media (max-width: 768px) {
+  .preview-chrome main { padding: 0 16px; }
+  .preview-chrome .editor-core-page { padding: 0 !important; }
+}
+
+.preview-chrome h1,
+.preview-chrome h2,
+.preview-chrome h3,
+.preview-chrome h4,
+.preview-chrome h5,
+.preview-chrome h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+.preview-chrome h1 { font-size: 48px; font-weight: 700; }
+.preview-chrome h2 { font-size: 36px; }
+.preview-chrome h3 { font-size: 24px; }
+
+.preview-chrome .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+  .preview-chrome h1 { font-size: 32px; }
+  .preview-chrome h2 { font-size: 28px; }
+  .preview-chrome h3 { font-size: 20px; }
+  .preview-chrome .container { padding: 0; }
+}
+
+.preview-chrome .header-bottom {
+  width: 100%;
+  margin-left: 0;
+}

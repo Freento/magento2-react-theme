@@ -1,0 +1,96 @@
+@import (reference) "../abstracts/tokens";
+
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px 0;
+}
+
+.pager-list {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pager-btn,
+.pager-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    background: transparent;
+    border: 1px solid @border;
+    border-radius: @radius;
+    color: @ink;
+    font: inherit;
+    font-size: @fs-13;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: border-color @t-fast, background @t-fast, color @t-fast;
+}
+
+.pager-btn {
+    padding: 0 14px;
+}
+
+.pager-num {
+    min-width: 36px;
+    padding: 0 10px;
+}
+
+.pager-btn:hover:not(:disabled),
+.pager-num:hover:not(.is-current) {
+    border-color: @ink;
+    background: @surface;
+}
+
+.pager-num.is-current {
+    background: @ink;
+    border-color: @ink;
+    color: @bg;
+    cursor: default;
+}
+
+.pager-btn:disabled {
+    color: @ink-2;
+    border-color: @border;
+    cursor: not-allowed;
+    background: transparent;
+
+    svg {
+        opacity: 0.5;
+    }
+}
+
+.pager-gap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 36px;
+    color: @ink-2;
+    font-size: @fs-base;
+    user-select: none;
+}
+
+@media (max-width: @screen__600) {
+    .pager {
+        gap: 8px;
+    }
+
+    .pager-btn span {
+        display: none;
+    }
+
+    .pager-btn {
+        padding: 0 12px;
+    }
+}

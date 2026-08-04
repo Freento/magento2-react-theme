@@ -1,0 +1,156 @@
+{
+  "title": "About Us",
+  "path": "/about",
+  "blocks": [
+    {
+      "id": "about-title",
+      "component": "Heading",
+      "props": {
+        "text": "About Us",
+        "level": 1,
+        "textAlign": "left",
+        "fontSize": 44,
+        "letterSpacing": "-0.02em"
+      },
+      "style": {
+        "marginTop": 40,
+        "marginBottom": 20
+      }
+    },
+    {
+      "id": "about-lead",
+      "component": "Text",
+      "props": {
+        "text": "We're a small team building a thoughtful shopping experience — carefully curated products, transparent pricing, and a checkout that doesn't get in your way.",
+        "fontSize": 18,
+        "lineHeight": 1.6,
+        "color": "#6B6B6B"
+      },
+      "style": {
+        "marginBottom": 48,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "about-mission-h",
+      "component": "Heading",
+      "props": {
+        "text": "Our Mission",
+        "level": 2,
+        "textAlign": "left",
+        "fontSize": 26
+      },
+      "style": {
+        "marginBottom": 12
+      }
+    },
+    {
+      "id": "about-mission-body",
+      "component": "Text",
+      "props": {
+        "text": "To deliver the best possible shopping experience by offering a focused selection of high-quality products at fair prices, backed by support that actually solves problems.",
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333"
+      },
+      "style": {
+        "marginBottom": 48,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "about-why-h",
+      "component": "Heading",
+      "props": {
+        "text": "Why shop with us",
+        "level": 2,
+        "textAlign": "left",
+        "fontSize": 26
+      },
+      "style": {
+        "marginBottom": 20
+      }
+    },
+    {
+      "id": "about-why-grid",
+      "component": "Grid",
+      "props": {
+        "direction": "grid",
+        "columns": 2,
+        "rowGap": 12,
+        "columnGap": 32
+      },
+      "style": {
+        "marginBottom": 64
+      },
+      "children": [
+        {
+          "id": "why-1",
+          "component": "Text",
+          "props": {
+            "text": "✓  Curated selection of quality products",
+            "fontSize": 15,
+            "lineHeight": 1.5,
+            "color": "#111"
+          },
+          "style": {}
+        },
+        {
+          "id": "why-2",
+          "component": "Text",
+          "props": {
+            "text": "✓  Competitive, transparent pricing",
+            "fontSize": 15,
+            "lineHeight": 1.5,
+            "color": "#111"
+          },
+          "style": {}
+        },
+        {
+          "id": "why-3",
+          "component": "Text",
+          "props": {
+            "text": "✓  Fast, tracked shipping",
+            "fontSize": 15,
+            "lineHeight": 1.5,
+            "color": "#111"
+          },
+          "style": {}
+        },
+        {
+          "id": "why-4",
+          "component": "Text",
+          "props": {
+            "text": "✓  Secure payment processing",
+            "fontSize": 15,
+            "lineHeight": 1.5,
+            "color": "#111"
+          },
+          "style": {}
+        },
+        {
+          "id": "why-5",
+          "component": "Text",
+          "props": {
+            "text": "✓  Easy 30-day returns",
+            "fontSize": 15,
+            "lineHeight": 1.5,
+            "color": "#111"
+          },
+          "style": {}
+        },
+        {
+          "id": "why-6",
+          "component": "Text",
+          "props": {
+            "text": "✓  Real human support",
+            "fontSize": 15,
+            "lineHeight": 1.5,
+            "color": "#111"
+          },
+          "style": {}
+        }
+      ]
+    }
+  ]
+}

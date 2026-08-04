@@ -1,0 +1,54 @@
+{
+  "name": "simple-ecommerce",
+  "version": "1.0.0",
+  "description": "Simple React e-commerce app (SPA + build-time prerender)",
+  "type": "module",
+  "workspaces": [
+    "editor-app",
+    "editor-app/packages/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "dev:storefront": "node server.dev.js",
+    "dev:editor": "npm --workspace editor-app run dev",
+    "build": "npm run build:client && npm run build:server && npm run build:prerender",
+    "build:client": "vite build --outDir dist/client --manifest",
+    "build:server": "vite build --ssr src/entry-server.jsx --outDir dist/server",
+    "build:prerender": "node scripts/prerender.js",
+    "start": "node --env-file=.env server.prod.js",
+    "preview": "npm run build && npm run start"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.7.7",
+    "compression": "^1.7.4",
+    "dotenv": "^16.4.5",
+    "editor-core": "*",
+    "express": "^4.19.2",
+    "graphql": "^16.6.0",
+    "http-proxy-middleware": "^3.0.0",
+    "mysql2": "^3.11.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.3",
+    "sirv": "^2.0.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.2.1",
+    "less": "^4.2.0",
+    "vite": "^6.3.0",
+    "vite-plugin-compression": "^0.5.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

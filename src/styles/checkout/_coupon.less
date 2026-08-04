@@ -1,0 +1,232 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.co-coupon {
+    margin-top: 16px;
+    padding: 22px 24px;
+    background: @bg;
+    border: 1px solid @border;
+    border-radius: @radius;
+}
+
+.co-coupon-title {
+    margin: 0 0 14px;
+    font-size: @fs-xs;
+    font-weight: 500;
+    letter-spacing: @tracking-eyebrow;
+    text-transform: uppercase;
+    color: @ink-2;
+}
+
+.co-coupon-form {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.co-coupon-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.co-coupon-apply {
+    width: auto;
+    height: 44px;
+    margin: 0;
+    flex-shrink: 0;
+    min-width: 110px;
+    gap: 8px;
+
+    &.is-loading {
+        opacity: 0.85;
+    }
+
+    &:disabled {
+        background: @ink;
+        border-color: @ink;
+        color: @bg;
+        cursor: not-allowed;
+    }
+}
+
+.co-coupon-applied {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.co-coupon-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 6px 6px 12px;
+    background: @surface;
+    border: 1px solid @border;
+    border-radius: @radius;
+    font-size: @fs-sm;
+    color: @ink;
+    max-width: 100%;
+}
+
+.co-coupon-chip-main {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.co-coupon-chip-icon {
+    display: none;
+}
+
+.co-coupon-chip-label {
+    font-size: @fs-2xs;
+    font-weight: 500;
+    letter-spacing: @tracking-eyebrow;
+    text-transform: uppercase;
+    color: @ink-2;
+}
+
+.co-coupon-chip-code {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    color: @ink;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 18ch;
+}
+
+.co-coupon-chip-meta {
+    font-size: @fs-sm;
+    font-variant-numeric: tabular-nums;
+    color: @sale;
+    font-weight: 500;
+}
+
+.co-coupon-chip-remove {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: @radius;
+    background: transparent;
+    border: 0;
+    color: @ink-2;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color @t-fast, background @t-fast;
+
+    &:hover {
+        color: @bg;
+        background: @ink;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: transparent;
+        color: @ink-2;
+    }
+}
+
+.co-coupon-chip-remove-x {
+    line-height: 1;
+}
+
+@media (max-width: @screen__xs) {
+    .co-coupon {
+        padding: 18px 16px;
+    }
+
+    .co-coupon-apply {
+        min-width: 92px;
+        padding: 0 14px;
+    }
+}
+
+.gpay-wrap {
+    margin-top: 16px;
+}
+
+.gpay-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 22px;
+    background: @black;
+    color: @bg;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background @t-fast, opacity @t-fast;
+
+    &:hover:not(:disabled) {
+        background: lighten(@black, 10%);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &.is-busy {
+        cursor: progress;
+    }
+}
+
+.gpay-unsupported {
+    margin: 12px 0 0;
+    padding: 12px 14px;
+    background: @surface;
+    border: 1px solid @border;
+    border-radius: @radius;
+    color: @ink-2;
+    font-size: @fs-13;
+}
+
+.gpay-error {
+    margin: 8px 0 0;
+    color: @sale;
+    font-size: @fs-13;
+}
+
+.gpay-skeleton {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 8px;
+    .shimmer(fade(@black, 6%), fade(@black, 12%), fade(@black, 6%), 1.2s linear infinite);
+}
+
+.hosted-field {
+    height: 44px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    &.braintree-hosted-fields-focused {
+        border-color: @ink;
+        box-shadow: @focus-ring;
+    }
+
+    &.braintree-hosted-fields-invalid {
+        border-color: @sale;
+    }
+}

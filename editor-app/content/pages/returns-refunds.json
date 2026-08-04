@@ -1,0 +1,24 @@
+{
+  "title": "Returns & Refunds",
+  "path": "/returns-refunds",
+  "blocks": [
+    {
+      "id": "rr-title",
+      "component": "Heading",
+      "props": {
+        "text": "Returns & Refunds",
+        "level": 1,
+        "textAlign": "left"
+      },
+      "style": {}
+    },
+    {
+      "id": "rr-body",
+      "component": "Html",
+      "props": {
+        "html": "<h2>Return Policy</h2>\n<p>We want you to be completely satisfied with your purchase. If you're not happy with your order, we're here to help.</p>\n\n<h3>Return Window</h3>\n<p>You have 30 days from the date of delivery to return most items for a full refund or exchange.</p>\n\n<h3>Return Conditions</h3>\n<p>To be eligible for a return, items must be:</p>\n<ul>\n  <li>In their original condition</li>\n  <li>Unworn and unused</li>\n  <li>In the original packaging</li>\n  <li>With all tags attached</li>\n</ul>\n\n<h3>How to Return an Item</h3>\n<ol>\n  <li>Contact our customer service team at support@example.com to initiate a return</li>\n  <li>Receive your return authorization and shipping label</li>\n  <li>Pack the item securely in its original packaging</li>\n  <li>Ship the item using the provided label</li>\n</ol>\n\n<h3>Refunds</h3>\n<p>Once we receive and inspect your return, we will process your refund within 5-7 business days. Refunds will be issued to the original payment method.</p>\n\n<h3>Exchanges</h3>\n<p>If you need a different size or color, we're happy to exchange your item. Contact us to arrange an exchange.</p>\n\n<h3>Non-Returnable Items</h3>\n<p>The following items cannot be returned:</p>\n<ul>\n  <li>Personalized or custom-made products</li>\n  <li>Perishable goods</li>\n  <li>Intimate or sanitary products</li>\n  <li>Sale or clearance items (unless defective)</li>\n</ul>"
+      },
+      "style": {}
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.auth-scrim {
+    position: fixed;
+    inset: 0;
+    background: fade(@ink, 40%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    animation: auth-scrim-in @t-med;
+}
+
+@keyframes auth-scrim-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.auth-modal {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: @bg;
+    border: 1px solid @border;
+    border-radius: @radius-lg;
+    padding: 36px 32px 28px;
+    box-shadow: 0 20px 40px fade(@black, 12%);
+    animation: auth-modal-in 240ms ease;
+}
+
+@keyframes auth-modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    .close-button();
+}
+
+.auth-head {
+    margin-bottom: 22px;
+}
+
+.auth-eyebrow {
+    display: block;
+    font-size: @fs-sm;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: @ink-2;
+    margin-bottom: 10px;
+}
+
+.auth-title {
+    margin: 0 0 8px;
+    font-size: 26px;
+    font-weight: 600;
+    color: @ink;
+    letter-spacing: -0.015em;
+    line-height: @lh-tight;
+}
+
+.auth-text {
+    margin: 0;
+    font-size: @fs-base;
+    line-height: @lh-relaxed;
+    color: @ink-2;
+}
+
+.auth-error {
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    background: @danger-bg;
+    border: 1px solid @sale;
+    color: @sale;
+    border-radius: @radius;
+    font-size: @fs-13;
+    line-height: 1.4;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.auth-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.auth-label {
+    font-size: @fs-sm;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: @ink;
+}
+
+.auth-helper {
+    font-size: @fs-sm;
+    color: @ink-2;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    font-size: @fs-sm;
+
+    &:hover {
+        color: @ink;
+    }
+}
+
+.auth-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid @border;
+    border-radius: @radius;
+    background: @bg;
+    color: @ink;
+    font: inherit;
+    font-size: @fs-base;
+    transition: border-color @t-fast, box-shadow @t-fast;
+
+    &::placeholder {
+        color: @ink-2;
+        opacity: 0.7;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: @ink;
+        box-shadow: @focus-ring;
+    }
+
+    &--error,
+    &--error:focus {
+        border-color: @danger;
+        box-shadow: 0 0 0 1px @danger;
+    }
+}
+
+.auth-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    @media (max-width: @screen__xs) {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Inline hint shown under a field (e.g. password length rule). */
+.auth-hint {
+    font-size: @fs-xs;
+    color: @ink-2;
+    letter-spacing: 0.02em;
+}
+
+.auth-submit {
+    .button(@height: 48px; @fs: @fs-base; @speed: @t-med);
+    width: 100%;
+    margin-top: 6px;
+
+    &:disabled {
+        background: @surface;
+        color: @ink-2;
+        border-color: @border;
+        cursor: not-allowed;
+    }
+}
+
+.auth-foot {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid @border;
+    text-align: center;
+    font-size: @fs-13;
+    color: @ink-2;
+}
+
+.auth-link {
+    .btn-reset();
+    padding: 0;
+    color: @ink;
+    font: inherit;
+    font-size: @fs-13;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 500;
+
+    &:hover {
+        color: @ink-2;
+    }
+}

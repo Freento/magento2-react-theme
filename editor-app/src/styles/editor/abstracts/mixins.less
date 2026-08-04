@@ -1,0 +1,9 @@
+// Editor style mixins.
+@import (reference) "tokens";
+
+// Center children both axes. Pass `flex` for block-level instead of inline.
+.flex-center(@display: inline-flex) {
+    display: @display;
+    align-items: center;
+    justify-content: center;
+}

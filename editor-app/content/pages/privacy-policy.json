@@ -1,0 +1,119 @@
+{
+  "title": "Privacy Policy",
+  "path": "/privacy-policy",
+  "blocks": [
+    {
+      "id": "pp-title",
+      "component": "Heading",
+      "props": {
+        "text": "Privacy Policy",
+        "level": 1,
+        "textAlign": "left",
+        "fontSize": 44,
+        "letterSpacing": "-0.02em"
+      },
+      "style": {
+        "marginTop": 40,
+        "marginBottom": 12
+      }
+    },
+    {
+      "id": "pp-updated",
+      "component": "Text",
+      "props": {
+        "text": "Last updated: January 2025",
+        "fontSize": 13,
+        "lineHeight": 1.5,
+        "color": "#6B6B6B",
+        "fontStyle": "italic"
+      },
+      "style": {
+        "marginBottom": 32
+      }
+    },
+    {
+      "id": "pp-lead",
+      "component": "Text",
+      "props": {
+        "text": "This Privacy Policy describes how we collect, use, and protect your personal information when you visit our website or make a purchase.",
+        "fontSize": 18,
+        "lineHeight": 1.6,
+        "color": "#6B6B6B"
+      },
+      "style": {
+        "marginBottom": 48,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "pp-collect-h",
+      "component": "Heading",
+      "props": { "text": "Information We Collect", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "pp-collect-intro",
+      "component": "Text",
+      "props": { "text": "We collect information that you provide directly to us, including:", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 12, "maxWidth": 720 }
+    },
+    { "id": "pp-collect-1", "component": "Text", "props": { "text": "•  Name and contact information", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-collect-2", "component": "Text", "props": { "text": "•  Billing and shipping addresses", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-collect-3", "component": "Text", "props": { "text": "•  Payment information", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-collect-4", "component": "Text", "props": { "text": "•  Order history", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-collect-5", "component": "Text", "props": { "text": "•  Account credentials", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": { "marginBottom": 48 } },
+    {
+      "id": "pp-use-h",
+      "component": "Heading",
+      "props": { "text": "How We Use Your Information", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "pp-use-intro",
+      "component": "Text",
+      "props": { "text": "We use the information we collect to:", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 12, "maxWidth": 720 }
+    },
+    { "id": "pp-use-1", "component": "Text", "props": { "text": "•  Process and fulfill your orders", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-use-2", "component": "Text", "props": { "text": "•  Communicate with you about your orders and account", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-use-3", "component": "Text", "props": { "text": "•  Send you marketing communications (with your consent)", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-use-4", "component": "Text", "props": { "text": "•  Improve our website and services", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "pp-use-5", "component": "Text", "props": { "text": "•  Comply with legal obligations", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": { "marginBottom": 48 } },
+    {
+      "id": "pp-security-h",
+      "component": "Heading",
+      "props": { "text": "Data Security", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "pp-security-body",
+      "component": "Text",
+      "props": { "text": "We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 48, "maxWidth": 720 }
+    },
+    {
+      "id": "pp-rights-h",
+      "component": "Heading",
+      "props": { "text": "Your Rights", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "pp-rights-body",
+      "component": "Text",
+      "props": { "text": "You have the right to access, correct, or delete your personal information. You may also opt out of marketing communications at any time.", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 48, "maxWidth": 720 }
+    },
+    {
+      "id": "pp-contact-h",
+      "component": "Heading",
+      "props": { "text": "Contact Us", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "pp-contact-body",
+      "component": "Text",
+      "props": { "text": "Questions about this Privacy Policy? Reach out at privacy@example.com.", "href": "mailto:privacy@example.com", "fontSize": 15, "lineHeight": 1.65, "color": "#111", "textDecoration": "underline" },
+      "style": { "marginBottom": 64, "maxWidth": 720 }
+    }
+  ]
+}

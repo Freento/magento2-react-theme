@@ -1,0 +1,19 @@
+services:
+  react-app:
+    image: node:22-alpine
+    working_dir: /app
+    ports:
+      - "${HOST_PORT:-8250}:${CONTAINER_PORT:-3000}"
+    volumes:
+      - .:/app
+      - ${HOME}/.ssh:/root/.ssh:ro
+    environment:
+      GIT_CONFIG_COUNT: "3"
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: "*"
+      GIT_CONFIG_KEY_1: user.name
+      GIT_CONFIG_VALUE_1: ${GIT_USER_NAME}
+      GIT_CONFIG_KEY_2: user.email
+      GIT_CONFIG_VALUE_2: ${GIT_USER_EMAIL}
+    command: sh -c "apk add --no-cache git openssh-client && npm install && npm run dev"
+    restart: unless-stopped

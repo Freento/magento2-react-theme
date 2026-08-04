@@ -1,0 +1,258 @@
+{
+  "title": "Footer",
+  "path": "/__footer__",
+  "style": {
+    "padding": "0",
+    "background": "#F8F8F6",
+    "color": "#111111",
+    "marginTop": 64,
+    "maxWidth": "none",
+    "width": "100%"
+  },
+  "blocks": [
+    {
+      "id": "footer-grid",
+      "component": "Grid",
+      "props": {
+        "direction": "grid",
+        "columns": 3,
+        "rows": 0,
+        "rowGap": 32,
+        "columnGap": 56,
+        "alignItems": "start",
+        "justifyItems": "stretch"
+      },
+      "style": {
+        "width": "100%",
+        "maxWidth": 1200,
+        "marginLeft": "auto",
+        "marginRight": "auto",
+        "padding": "64px 32px 32px"
+      },
+      "responsive": {
+        "mobile": {
+          "props": {
+            "direction": "column",
+            "rowGap": 28
+          },
+          "style": {
+            "padding": "32px 16px 24px"
+          }
+        }
+      },
+      "children": [
+        {
+          "id": "footer-col-about",
+          "component": "Grid",
+          "props": {
+            "direction": "column",
+            "rowGap": 10,
+            "columnGap": 0,
+            "alignItems": "start",
+            "justifyItems": "stretch"
+          },
+          "style": {},
+          "children": [
+            {
+              "id": "footer-about-heading",
+              "component": "Heading",
+              "props": {
+                "text": "About",
+                "level": 4,
+                "fontSize": 12,
+                "fontWeight": 500,
+                "color": "#111111",
+                "textAlign": "left",
+                "letterSpacing": "0.12em",
+                "textTransform": "uppercase"
+              },
+              "style": {
+                "marginBottom": "4px"
+              }
+            },
+            {
+              "id": "footer-about-1",
+              "component": "Text",
+              "props": {
+                "text": "About Us",
+                "href": "/about",
+                "color": "#6B6B6B",
+                "fontSize": 14
+              },
+              "style": {}
+            },
+            {
+              "id": "footer-about-2",
+              "component": "Text",
+              "props": {
+                "text": "Contact Us",
+                "href": "/contact",
+                "color": "#6B6B6B",
+                "fontSize": 14
+              },
+              "style": {}
+            }
+          ],
+          "responsive": {
+            "mobile": {
+              "props": {
+                "justifyItems": "center"
+              }
+            }
+          }
+        },
+        {
+          "id": "footer-col-info",
+          "component": "Grid",
+          "props": {
+            "direction": "column",
+            "rowGap": 10,
+            "columnGap": 0,
+            "alignItems": "start",
+            "justifyItems": "stretch"
+          },
+          "style": {},
+          "children": [
+            {
+              "id": "footer-info-heading",
+              "component": "Heading",
+              "props": {
+                "text": "Information",
+                "level": 4,
+                "fontSize": 12,
+                "fontWeight": 500,
+                "color": "#111111",
+                "textAlign": "left",
+                "letterSpacing": "0.12em",
+                "textTransform": "uppercase"
+              },
+              "style": {
+                "marginBottom": "4px"
+              }
+            },
+            {
+              "id": "footer-info-1",
+              "component": "Text",
+              "props": {
+                "text": "Privacy Policy",
+                "href": "/privacy-policy",
+                "color": "#6B6B6B",
+                "fontSize": 14
+              },
+              "style": {}
+            },
+            {
+              "id": "footer-info-2",
+              "component": "Text",
+              "props": {
+                "text": "Terms of Service",
+                "href": "/terms-of-service",
+                "color": "#6B6B6B",
+                "fontSize": 14
+              },
+              "style": {}
+            }
+          ],
+          "responsive": {
+            "mobile": {
+              "props": {
+                "justifyItems": "center"
+              }
+            }
+          }
+        },
+        {
+          "id": "footer-col-newsletter",
+          "component": "Grid",
+          "props": {
+            "direction": "column",
+            "rowGap": 10,
+            "columnGap": 0,
+            "alignItems": "start",
+            "justifyItems": "stretch"
+          },
+          "style": {},
+          "children": [
+            {
+              "id": "footer-newsletter-heading",
+              "component": "Heading",
+              "props": {
+                "text": "Newsletter",
+                "level": 4,
+                "fontSize": 12,
+                "fontWeight": 500,
+                "color": "#111111",
+                "textAlign": "left",
+                "letterSpacing": "0.12em",
+                "textTransform": "uppercase"
+              },
+              "style": {
+                "marginBottom": "4px"
+              }
+            },
+            {
+              "id": "footer-newsletter-blurb",
+              "component": "Text",
+              "props": {
+                "text": "Quiet drops, hand-picked. No noise.",
+                "color": "#6B6B6B",
+                "fontSize": 14
+              },
+              "style": {}
+            },
+            {
+              "id": "footer-newsletter-form",
+              "component": "NewsletterForm",
+              "props": {
+                "buttonText": "Subscribe",
+                "placeholder": "Enter your email"
+              },
+              "style": {},
+              "responsive": {
+                "mobile": {
+                  "style": {
+                    "fullWidth": true,
+                    "paddingLeft": "5%",
+                    "paddingRight": "5%"
+                  }
+                }
+              }
+            }
+          ],
+          "responsive": {
+            "mobile": {
+              "props": {
+                "justifyItems": "center"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "footer-copyright",
+      "component": "Text",
+      "props": {
+        "text": "© 2013-present Freento, Inc. All rights reserved.",
+        "textAlign": "center",
+        "color": "#6B6B6B",
+        "fontSize": 12
+      },
+      "style": {
+        "borderTop": "1px solid #E8E8E5",
+        "padding": "20px 32px",
+        "width": "100%",
+        "maxWidth": 1200,
+        "marginLeft": "auto",
+        "marginRight": "auto"
+      },
+      "responsive": {
+        "mobile": {
+          "style": {
+            "padding": "16px"
+          }
+        }
+      }
+    }
+  ]
+}

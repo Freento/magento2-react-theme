@@ -1,0 +1,33 @@
+export default {
+    label: 'Icon',
+    category: 'content',
+    icon: 'Star',
+    acceptsChildren: false,
+    allowedIn: ['page', 'Grid'],
+    hideStyleFields: ['backgroundColor', 'borderSides', 'borderStyle', 'borderColor', 'borderWidth', 'fontFamily', 'fontSize', 'textAlign'],
+    defaultProps: { name: 'star', size: 24, strokeWidth: 1.5 },
+    propsSchema: {
+      name: {
+        label: 'Icon',
+        type: 'segmented',
+        cols: 4,
+        group: 'Icon',
+        options: [
+          { value: 'truck',   label: 'Truck',   icon: 'Truck',       title: 'Shipping / truck' },
+          { value: 'shield',  label: 'Shield',  icon: 'Shield',      title: 'Quality / guarantee' },
+          { value: 'refresh', label: 'Return',  icon: 'Refresh',     title: 'Returns / refresh' },
+          { value: 'lock',    label: 'Lock',    icon: 'Lock',        title: 'Secure / lock' },
+          { value: 'plus',    label: 'Plus',    icon: 'PlusCircle',  title: 'Add / circle plus' },
+          { value: 'card',    label: 'Card',    icon: 'CreditCard',  title: 'Payment / card' },
+          { value: 'leaf',    label: 'Leaf',    icon: 'Leaf',        title: 'Eco / leaf' },
+          { value: 'star',    label: 'Star',    icon: 'Star',        title: 'Quality / star' },
+          { value: 'heart',   label: 'Heart',   icon: 'Heart',       title: 'Wishlist / heart' },
+          { value: 'bag',     label: 'Bag',     icon: 'ShoppingBag', title: 'Cart / bag' },
+          { value: 'search',  label: 'Search',  icon: 'Search',      title: 'Search' },
+          { value: 'user',    label: 'User',    icon: 'User',        title: 'Account / user' },
+        ],
+      },
+      size: { label: 'Size (px)', type: 'number', placeholder: '24', group: 'Icon' },
+      strokeWidth: { label: 'Stroke width', type: 'number', placeholder: '1.5', group: 'Icon' },
+    },
+};

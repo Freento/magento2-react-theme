@@ -1,0 +1,114 @@
+@import (reference) "../../abstracts/tokens";
+@import (reference) "../../abstracts/mixins";
+
+/* Reviews */
+.reviews-section {
+    padding: 8px 0;
+}
+
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    gap: 16px;
+}
+
+.reviews-section h3 {
+    font-size: @fs-13;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: @ink;
+    margin-bottom: 6px;
+}
+
+.rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: @fs-13;
+    color: @ink-2;
+}
+
+.stars-display {
+    display: flex;
+    gap: 2px;
+}
+
+.star-filled {
+    color: @ink;
+    font-size: @fs-lg;
+}
+
+.star-empty {
+    color: @border;
+    font-size: @fs-lg;
+}
+
+.rating-text {
+    color: @ink-2;
+    font-size: @fs-13;
+    font-family: @font-serif;
+    font-style: italic;
+}
+
+.write-review-btn {
+    .button(@fs: @fs-base; @speed: @t-med);
+    padding: 12px 22px;
+    white-space: nowrap;
+}
+
+.no-reviews {
+    color: @ink-2;
+    font-family: @font-serif;
+    font-style: italic;
+    margin-top: 12px;
+    font-size: @fs-base;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.review-item {
+    padding: 20px;
+    border: 1px solid @border;
+    border-radius: @radius-lg;
+    background: @bg;
+}
+
+.review-header-item {
+    margin-bottom: 10px;
+}
+
+.review-stars {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 6px;
+}
+
+.review-author {
+    color: @ink-2;
+    font-size: @fs-13;
+    margin: 0;
+}
+
+.review-summary {
+    font-size: 16px;
+    font-weight: 500;
+    color: @ink;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.review-text {
+    color: @ink-2;
+    line-height: 1.6;
+    margin: 0;
+    font-size: @fs-base;
+}

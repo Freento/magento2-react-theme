@@ -1,0 +1,370 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.category-page {
+    padding-top: 40px;
+
+    @media (max-width: @screen__m) {
+        padding-top: 16px;
+    }
+}
+
+.page-title {
+    font-size: @fs-hero;
+    margin-bottom: 6px;
+    color: @ink;
+    letter-spacing: -0.02em;
+
+    @media (max-width: @screen__m) {
+        font-size: @fs-2xl;
+        line-height: 1.2;
+    }
+}
+
+.category-description {
+    color: @ink-2;
+    margin-bottom: 24px;
+    font-size: @fs-md;
+}
+
+.category-content {
+    display: flex;
+    gap: 32px;
+    margin-top: 16px;
+
+    @media (max-width: @screen__900) {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+.sidebar {
+    flex: 0 0 260px;
+    min-width: 260px;
+
+    @media (max-width: @screen__900) {
+        flex: none;
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+
+    &.full-width {
+        flex: none;
+        width: 100%;
+    }
+
+    @media (max-width: @screen__900) {
+        width: 100%;
+    }
+}
+
+.category-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 12px 0;
+    border-top: 1px solid @border;
+    border-bottom: 1px solid @border;
+
+    @media (max-width: @screen__900) {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+.total-count {
+    font-family: @font-serif;
+    font-style: italic;
+    font-weight: 400;
+    color: @ink-2;
+    font-size: @fs-md;
+    white-space: nowrap;
+}
+
+.page-count-mobile {
+    display: none;
+
+    @media (max-width: @screen__m) {
+        display: block;
+        margin: 4px 0 14px;
+        font-family: @font-serif;
+        font-style: italic;
+        color: @ink-2;
+        font-size: @fs-md;
+    }
+}
+
+@media (max-width: @screen__m) {
+    .plp-toolbar .total-count {
+        display: none;
+    }
+}
+
+.page-info {
+    color: @ink-2;
+    font-size: @fs-13;
+}
+
+.no-products {
+    text-align: center;
+    padding: 80px 20px;
+    color: @ink-2;
+    font-size: @fs-md;
+    background: @surface;
+    border-radius: @radius-lg;
+    margin-top: 24px;
+}
+
+.plp {
+    position: relative;
+}
+
+.plp-toolbar {
+    position: sticky;
+    top: 64px;
+    z-index: 30;
+    background: fade(@bg, 96%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid @border;
+    border-bottom: 1px solid @border;
+    margin-bottom: 24px;
+
+    @media (max-width: @screen__900) {
+        top: 56px;
+    }
+
+    @media (max-width: @screen__xs) {
+        top: 52px;
+    }
+
+    @media (max-width: @screen__m) {
+        margin-left: calc(@gutter * -1);
+        margin-right: calc(@gutter * -1);
+        padding-left: @gutter;
+        padding-right: @gutter;
+    }
+}
+
+.plp-toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+}
+
+.plp-toolbar-left,
+.plp-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: @fs-13;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: @radius;
+    background: transparent;
+    color: @ink;
+    border: 1px solid @border;
+    cursor: pointer;
+    transition: border-color @t-fast, background @t-fast;
+
+    &:hover {
+        border-color: @ink;
+        background: @surface;
+    }
+}
+
+.plp-sort {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: @fs-13;
+    color: @ink;
+}
+
+.plp-sort-label {
+    font-size: @fs-xs;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: @ink-2;
+}
+
+.plp-sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    font: inherit;
+    font-size: @fs-13;
+    font-weight: 500;
+    background: transparent;
+    border: 1px solid @border;
+    border-radius: @radius;
+    padding: 7px 28px 7px 12px;
+    color: @ink;
+    cursor: pointer;
+    transition: border-color @t-fast;
+
+    &:hover,
+    &:focus {
+        border-color: @ink;
+        outline: none;
+    }
+}
+
+.plp-sort-caret {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: @ink-2;
+    display: inline-flex;
+}
+
+.plp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 0 12px;
+}
+
+.plp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: @fs-sm;
+    padding: 5px 10px;
+    border-radius: @radius-pill;
+    background: @surface;
+    border: 1px solid @border;
+
+    button {
+        .btn-reset();
+        color: @ink-2;
+        font-size: @fs-base;
+        line-height: 1;
+        padding: 0 0 0 4px;
+        transition: color @t-fast;
+
+        &:hover {
+            color: @ink;
+        }
+    }
+}
+
+.plp-chip-label {
+    font-weight: 500;
+    color: @ink;
+}
+
+.plp-chip-value {
+    color: @ink-2;
+}
+
+.plp-clear-all {
+    .btn-reset(transparent);
+    color: @ink-2;
+    font-size: @fs-sm;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color @t-fast;
+
+    &:hover {
+        color: @ink;
+    }
+}
+
+/* Filter drawer */
+.plp-scrim {
+    position: fixed;
+    inset: 0;
+    background: fade(@ink, 40%);
+    z-index: 80;
+    animation: scrim-in 200ms ease;
+}
+
+.plp-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 380px;
+    max-width: 100vw;
+    background: @bg;
+    border-left: 1px solid @border;
+    transform: translateX(100%);
+    transition: transform 240ms ease;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: @screen__900) {
+        width: 100%;
+        max-width: 100vw;
+        border-left: 0;
+    }
+
+    &.is-open {
+        transform: translateX(0);
+    }
+}
+
+.plp-drawer-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid @border;
+
+    h3 {
+        margin: 0;
+        font-size: @fs-base;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: @ink;
+    }
+}
+
+.plp-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px;
+
+    .layer-navigation-header {
+        display: none;
+    }
+}
+
+.plp-drawer-foot {
+    padding: 14px 20px;
+    border-top: 1px solid @border;
+    display: flex;
+    gap: 8px;
+}
+
+// Filter-drawer actions stretch to fill the row; identity (colour, ghost
+// variant, hover) comes from base/buttons.less. @t-med kept for the softer
+// drawer feel, overriding the canonical @t-fast.
+.btn-primary,
+.btn-ghost {
+    flex: 1;
+    padding: 12px 18px;
+    transition: background @t-med, border-color @t-med;
+}

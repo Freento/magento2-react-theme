@@ -1,0 +1,200 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+// Canonical skeleton placeholder base. Markup composes it with a shape class
+// that only sets size: <span class="skeleton ma-skel-label" />. The shimmer
+// engine itself is the .shimmer() mixin. Used across checkout + account.
+.skeleton {
+    display: block;
+    .shimmer(@skel-base, @skel-hi, @skel-base, 1.4s ease-in-out infinite);
+    border-radius: @radius;
+}
+
+.sk-img,
+.sk-bar {
+    .shimmer(@border, fade(@border, 40%), @border, 1.6s ease-in-out infinite);
+    border-radius: @radius;
+}
+
+.sk-bar {
+    height: 12px;
+
+    &--lg {
+        height: 32px;
+        width: 60%;
+        margin-bottom: 16px;
+    }
+
+    &--md {
+        height: 16px;
+        width: 80%;
+        margin-bottom: 10px;
+    }
+
+    &--sm {
+        height: 12px;
+        width: 50%;
+        margin-bottom: 8px;
+    }
+
+    &--xs {
+        height: 10px;
+        width: 35%;
+        margin-bottom: 6px;
+    }
+
+    &--cta {
+        height: 48px;
+        width: 100%;
+        margin: 18px 0;
+        border-radius: @radius-pill;
+    }
+}
+
+/* ── PLP ───────────────────────────────────────────────────────── */
+.sk-plp {
+    padding: 24px 0;
+}
+
+.sk-plp-title {
+    height: 36px;
+    width: 35%;
+    margin: 0 0 28px;
+
+    @media (max-width: @screen__m) {
+        height: 28px;
+        margin-bottom: 18px;
+    }
+}
+
+.sk-plp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 28px 20px;
+
+    @media (max-width: @screen__m) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 14px;
+    }
+}
+
+.sk-plp-card {
+    display: flex;
+    flex-direction: column;
+
+    .sk-img {
+        aspect-ratio: 3 / 4;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .sk-bar--md {
+        width: 75%;
+    }
+
+    .sk-bar--sm {
+        width: 40%;
+    }
+
+    .sk-bar--xs {
+        width: 25%;
+    }
+}
+
+/* ── PDP ───────────────────────────────────────────────────────── */
+.sk-pdp {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    padding: 24px 0;
+
+    @media (max-width: @screen__900) {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+.sk-pdp-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sk-pdp-main {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+
+    @media (max-width: @screen__900) {
+        aspect-ratio: 4 / 5;
+    }
+}
+
+.sk-pdp-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.sk-pdp-thumb {
+    aspect-ratio: 1 / 1;
+}
+
+.sk-pdp-info {
+    padding-top: 8px;
+}
+
+.sk-pdp-swatches {
+    display: flex;
+    gap: 8px;
+    margin: 20px 0 14px;
+}
+
+.sk-pdp-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: @radius-pill;
+    .shimmer(@border, fade(@border, 40%), @border, 1.6s ease-in-out infinite);
+}
+
+/* ── Layer Navigation (filters sidebar) ────────────────────────── */
+.sk-ln {
+    padding-top: 18px;
+}
+
+.sk-ln-group {
+    padding: 14px 0;
+    border-bottom: 1px solid @border;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+.sk-ln-title {
+    height: 12px;
+    width: 40%;
+    margin-bottom: 14px;
+}
+
+.sk-ln-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sk-ln-opt {
+    height: 12px;
+    width: 80%;
+
+    &:nth-child(2) {
+        width: 65%;
+    }
+
+    &:nth-child(3) {
+        width: 75%;
+    }
+
+    &:nth-child(4) {
+        width: 55%;
+    }
+}

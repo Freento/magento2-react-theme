@@ -1,0 +1,71 @@
+@import (reference) "../abstracts/tokens";
+
+// PayPal brand dark blue — intentionally off the storefront palette (a
+// storefront token must not override a payment brand's official colour).
+@pp-blue-dark: #003087;
+
+.paypal-container {
+    border: 1px solid @border;
+    border-radius: @radius;
+    padding: 16px;
+    background: @surface;
+    margin-bottom: 14px;
+}
+
+.paypal-button {
+    min-height: 48px;
+}
+
+.paypal-mock-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 18px;
+    background: @pp-blue-dark;
+    color: @bg;
+    border-radius: @radius;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+}
+
+.accept-hosted-container {
+    margin-top: 14px;
+}
+
+.iframe-container {
+    margin: 14px 0;
+}
+
+.iframe-start-container {
+    text-align: center;
+}
+
+.security-info {
+    background: @surface;
+    padding: 14px 16px;
+    border-radius: @radius;
+    margin-bottom: 14px;
+    text-align: center;
+
+    h5 {
+        margin: 0 0 4px;
+        font-size: @fs-base;
+        font-weight: 600;
+        color: @ink;
+    }
+
+    p {
+        margin: 0;
+        font-size: @fs-sm;
+        color: @ink-2;
+    }
+}
+
+.security-notice {
+    margin-top: 14px;
+    font-size: @fs-sm;
+    color: @ink-2;
+    text-align: center;
+}

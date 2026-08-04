@@ -1,0 +1,113 @@
+{
+  "title": "Terms of Service",
+  "path": "/terms-of-service",
+  "blocks": [
+    {
+      "id": "tos-title",
+      "component": "Heading",
+      "props": {
+        "text": "Terms of Service",
+        "level": 1,
+        "textAlign": "left",
+        "fontSize": 44,
+        "letterSpacing": "-0.02em"
+      },
+      "style": {
+        "marginTop": 40,
+        "marginBottom": 12
+      }
+    },
+    {
+      "id": "tos-updated",
+      "component": "Text",
+      "props": {
+        "text": "Last updated: January 2025",
+        "fontSize": 13,
+        "lineHeight": 1.5,
+        "color": "#6B6B6B",
+        "fontStyle": "italic"
+      },
+      "style": {
+        "marginBottom": 32
+      }
+    },
+    {
+      "id": "tos-lead",
+      "component": "Text",
+      "props": {
+        "text": "By accessing or using our website, you agree to be bound by these Terms of Service and all applicable laws and regulations.",
+        "fontSize": 18,
+        "lineHeight": 1.6,
+        "color": "#6B6B6B"
+      },
+      "style": {
+        "marginBottom": 48,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "tos-use-h",
+      "component": "Heading",
+      "props": { "text": "Use of Website", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "tos-use-intro",
+      "component": "Text",
+      "props": { "text": "You may use our website for lawful purposes only. You agree not to:", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 12, "maxWidth": 720 }
+    },
+    { "id": "tos-use-1", "component": "Text", "props": { "text": "•  Violate any laws or regulations", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "tos-use-2", "component": "Text", "props": { "text": "•  Infringe on intellectual property rights", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "tos-use-3", "component": "Text", "props": { "text": "•  Transmit harmful or malicious code", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": {} },
+    { "id": "tos-use-4", "component": "Text", "props": { "text": "•  Attempt to gain unauthorized access to our systems", "fontSize": 15, "lineHeight": 1.7, "color": "#333" }, "style": { "marginBottom": 48 } },
+    {
+      "id": "tos-product-h",
+      "component": "Heading",
+      "props": { "text": "Product Information", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "tos-product-body",
+      "component": "Text",
+      "props": { "text": "We strive to provide accurate product descriptions and pricing. However, we do not warrant that product descriptions or other content is accurate, complete, reliable, or error-free.", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 48, "maxWidth": 720 }
+    },
+    {
+      "id": "tos-orders-h",
+      "component": "Heading",
+      "props": { "text": "Orders and Pricing", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "tos-orders-body",
+      "component": "Text",
+      "props": { "text": "All orders are subject to acceptance and availability. We reserve the right to refuse or cancel any order for any reason.", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 48, "maxWidth": 720 }
+    },
+    {
+      "id": "tos-liab-h",
+      "component": "Heading",
+      "props": { "text": "Limitation of Liability", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "tos-liab-body",
+      "component": "Text",
+      "props": { "text": "To the maximum extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of our website or products.", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 48, "maxWidth": 720 }
+    },
+    {
+      "id": "tos-changes-h",
+      "component": "Heading",
+      "props": { "text": "Changes to Terms", "level": 2, "textAlign": "left", "fontSize": 26 },
+      "style": { "marginBottom": 12 }
+    },
+    {
+      "id": "tos-changes-body",
+      "component": "Text",
+      "props": { "text": "We reserve the right to modify these Terms of Service at any time. Your continued use of the website after changes constitutes acceptance of the modified terms.", "fontSize": 15, "lineHeight": 1.65, "color": "#333" },
+      "style": { "marginBottom": 64, "maxWidth": 720 }
+    }
+  ]
+}

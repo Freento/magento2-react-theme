@@ -1,0 +1,81 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+/* ──────────────────────────────────────────── States: loading / errors / empty */
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.loading-spinner {
+    .spinner(18px, 2px, fade(@bg, 40%), @bg, @spin);
+}
+
+.loading-container .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid @border;
+    border-top-color: @ink;
+}
+
+.error-message {
+    padding: 12px 14px;
+    margin: 0 0 16px;
+    background: @danger-bg;
+    border: 1px solid @danger-border;
+    border-radius: @radius;
+    color: @danger;
+    font-size: @fs-sm;
+    line-height: @lh-base;
+}
+
+.empty-cart-message {
+    padding: 64px 24px;
+    text-align: center;
+    color: @ink-2;
+    font-size: @fs-base;
+
+    h2 {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        font-size: @fs-lg;
+        font-weight: 600;
+        color: @ink;
+    }
+}
+
+.checkout-notice {
+    max-width: 520px;
+    margin: 40px auto;
+    padding: 40px 32px;
+    background: @bg;
+    border: 1px solid @border;
+    border-radius: @radius;
+    text-align: center;
+}
+
+.checkout-notice-title {
+    margin: 0 0 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: @fs-lg;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: @ink;
+}
+
+.checkout-notice-text {
+    margin: 0 auto 22px;
+    max-width: 380px;
+    font-size: @fs-base;
+    line-height: @lh-relaxed;
+    color: @ink-2;
+}
+
+.checkout-notice-action {
+    width: auto;
+    min-width: 200px;
+    margin: 0;
+}

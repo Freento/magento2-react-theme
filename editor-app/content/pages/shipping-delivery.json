@@ -1,0 +1,24 @@
+{
+  "title": "Shipping & Delivery",
+  "path": "/shipping-delivery",
+  "blocks": [
+    {
+      "id": "sd-title",
+      "component": "Heading",
+      "props": {
+        "text": "Shipping & Delivery",
+        "level": 1,
+        "textAlign": "left"
+      },
+      "style": {}
+    },
+    {
+      "id": "sd-body",
+      "component": "Html",
+      "props": {
+        "html": "<h2>Shipping Information</h2>\n<p>We offer fast and reliable shipping to ensure your order arrives safely and on time.</p>\n\n<h3>Shipping Methods</h3>\n<ul>\n  <li><strong>Standard Shipping:</strong> 5-7 business days</li>\n  <li><strong>Express Shipping:</strong> 2-3 business days</li>\n  <li><strong>Overnight Shipping:</strong> 1 business day</li>\n</ul>\n\n<h3>Shipping Costs</h3>\n<p>Shipping costs are calculated based on the weight and dimensions of your order, as well as your shipping address. The exact shipping cost will be displayed at checkout.</p>\n\n<h3>Free Shipping</h3>\n<p>We offer free standard shipping on orders over $50 within the continental United States.</p>\n\n<h3>International Shipping</h3>\n<p>We currently ship to select international destinations. International shipping times and costs vary by location.</p>\n\n<h3>Order Processing</h3>\n<p>Orders are typically processed within 1-2 business days. You will receive a confirmation email with tracking information once your order has shipped.</p>\n\n<h3>Delivery Issues</h3>\n<p>If you experience any issues with your delivery, please contact our customer service team at support@example.com.</p>"
+      },
+      "style": {}
+    }
+  ]
+}

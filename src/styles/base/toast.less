@@ -1,0 +1,93 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.toast-stack {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+    pointer-events: none;
+
+    > * {
+        pointer-events: auto;
+    }
+
+    .mc-toast,
+    .nl-toast,
+    .wl-toast {
+        position: static;
+        top: auto;
+        right: auto;
+        animation: toast-in 220ms ease;
+    }
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.wl-toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    max-width: 360px;
+    min-width: 240px;
+    background: @ink;
+    color: @bg;
+    border-radius: @radius;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: @fs-13;
+    line-height: 1.4;
+    box-shadow: 0 8px 24px fade(@black, 22%);
+    z-index: 1100;
+    animation: toast-in 220ms ease;
+
+    &--error {
+        background: @danger;
+    }
+
+    &--success {
+        background: @success;
+    }
+
+    &-text {
+        line-height: 1.4;
+
+        strong {
+            font-weight: 600;
+        }
+    }
+
+    &-close {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        .btn-reset(transparent);
+        border-radius: @radius-pill;
+        color: fade(@bg, 65%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: color @t-fast, background @t-fast;
+
+        &:hover {
+            color: @bg;
+            background: fade(@bg, 10%);
+        }
+    }
+}

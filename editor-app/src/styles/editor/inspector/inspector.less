@@ -1,0 +1,227 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.editor-root {
+    .settings-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 -14px 0;
+        padding: 12px 14px;
+        background: @e-code-bg;
+        border-bottom: 1px solid @e-code-border;
+    }
+
+    .settings-header-icon {
+        width: 30px;
+        height: 30px;
+        color: @e-text;
+        .flex-center(flex);
+        flex-shrink: 0;
+    }
+
+    .settings-header-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: @e-text;
+    }
+
+    .settings-section-title {
+        font-size: 11px;
+        font-weight: 700;
+        color: @e-code-text;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 20px 0 10px;
+        padding-top: 16px;
+        border-top: 1px solid @e-code-border;
+
+        &:first-of-type {
+            margin-top: 14px;
+            padding-top: 0;
+            border-top: none;
+        }
+    }
+
+    .field {
+        margin-bottom: 0;
+    }
+
+    .field-label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 400;
+        color: @e-text-muted;
+        margin-bottom: 6px;
+    }
+
+    .field-input {
+        width: 100%;
+        height: 30px;
+        padding: 0 8px;
+        border: 1px solid transparent;
+        border-radius: @e-r-sm;
+        font-size: 12px;
+        font-family: inherit;
+        color: @e-text;
+        background: @e-surface-alt;
+        outline: none;
+        transition: background-color 0.1s, border-color 0.1s, box-shadow 0.1s;
+
+        &::placeholder {
+            color: @e-text-soft;
+        }
+
+        &:hover {
+            background: @e-surface;
+            border-color: @e-border-strong;
+        }
+
+        &:focus {
+            background: @e-surface;
+            border-color: @e-primary;
+            box-shadow: 0 0 0 2px fade(@e-accent-strong, 18%);
+        }
+    }
+
+    textarea.field-input {
+        height: auto;
+        min-height: 64px;
+        padding: 7px 8px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+    select.field-input {
+        padding-right: 24px;
+        appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        cursor: pointer;
+    }
+
+    .field-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 2px 0;
+        font-size: 12px;
+        color: @e-text;
+        user-select: none;
+
+        > span:not(.field-checkbox-inline-suffix) {
+            flex: 1;
+            font-weight: 400;
+            color: @e-text-muted;
+            cursor: pointer;
+        }
+
+        > input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 28px;
+            height: 16px;
+            margin: 0;
+            border-radius: 999px;
+            background: @e-border-strong;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            flex-shrink: 0;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: @e-white;
+                box-shadow: 0 1px 2px fade(@e-black, 20%);
+                transition: transform 0.15s;
+            }
+
+            &:checked {
+                background: @e-primary;
+            }
+
+            &:checked::after {
+                transform: translateX(12px);
+            }
+        }
+
+        &:hover > input[type="checkbox"]:not(:checked) {
+            background: @e-text-soft;
+        }
+    }
+
+    .field-checkbox-inline-number {
+        flex: 0 0 auto;
+        height: 24px !important;
+        text-align: right;
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    .field-checkbox-inline-suffix {
+        flex: 0 0 auto;
+        font-size: 11px;
+        color: @e-text-soft;
+        margin-left: -4px;
+    }
+
+    [data-tooltip] {
+        position: relative;
+
+        &::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%) translateY(2px);
+            padding: 4px 8px;
+            background: @e-code-text;
+            color: @e-white;
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 1.2;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.12s 0.2s, transform 0.12s 0.2s;
+            z-index: 1000;
+            box-shadow: 0 2px 8px fade(@e-black, 18%);
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: @e-code-text;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.12s 0.2s;
+            z-index: 1000;
+        }
+
+        &:hover::after,
+        &:focus-visible::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        &:hover::before,
+        &:focus-visible::before {
+            opacity: 1;
+        }
+    }
+}

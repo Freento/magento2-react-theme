@@ -1,0 +1,27 @@
+@import (reference) "../../abstracts/tokens";
+@import (reference) "../../abstracts/mixins";
+
+// PayPal brand blue — intentionally off the storefront palette (no storefront
+// token should override a payment provider's brand colour). Named, not raw.
+@pp-blue: #0070ba;
+
+.magento-paypal-button-static {
+  background: @pp-blue;
+  color: white;
+  border: none;
+  border-radius: @radius;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  transition: background-color 0.2s;
+  min-height: 48px;
+}
+
+.magento-paypal-spinner {
+  .spinner(16px, 2px, white, transparent, 1s linear infinite);
+}

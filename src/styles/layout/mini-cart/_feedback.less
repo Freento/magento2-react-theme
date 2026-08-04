@@ -1,0 +1,68 @@
+@import (reference) "../../abstracts/tokens";
+@import (reference) "../../abstracts/mixins";
+
+.mc-item {
+    position: relative;
+
+    &.is-pending > *:not(.mc-item-spinner) {
+        opacity: 0.45;
+        transition: opacity @t-fast;
+        pointer-events: none;
+    }
+}
+
+.mc-item-spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.mc-spinner {
+    .spinner(18px, 2px, @border, @ink, 0.8s linear infinite);
+}
+
+.mc-toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    max-width: 360px;
+    min-width: 240px;
+    background: @ink;
+    color: @bg;
+    border-radius: @radius;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: @fs-13;
+    box-shadow: 0 8px 24px fade(@black, 22%);
+    animation: mc-toast-in 220ms ease;
+    z-index: 1100;
+}
+
+@keyframes mc-toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.mc-toast-text strong {
+    font-weight: 600;
+}
+
+.mc-toast-close {
+    .toast-close();
+}
+
+.mc-toast.mc-toast--warn {
+    background: @warning;
+}

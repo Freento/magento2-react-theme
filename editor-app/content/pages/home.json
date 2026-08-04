@@ -1,0 +1,658 @@
+{
+  "title": "Home",
+  "path": "/",
+  "blocks": [
+    {
+      "id": "home-hero",
+      "component": "Grid",
+      "props": {
+        "direction": "grid",
+        "columns": 2,
+        "rows": 0,
+        "rowGap": 0,
+        "columnGap": 0,
+        "alignItems": "stretch",
+        "justifyItems": "stretch"
+      },
+      "style": {
+        "marginTop": "0",
+        "width": "100%",
+        "fullWidth": true
+      },
+      "children": [
+        {
+          "id": "home-hero-img",
+          "component": "Image",
+          "props": {
+            "src": "/uploads/home-hero.avif",
+            "mobileSrc": "/uploads/home-hero-mobile.avif",
+            "alt": "Model in spring outerwear",
+            "objectFit": "cover",
+            "objectPosition": "right center",
+            "priority": true
+          },
+          "style": {
+            "width": "100%",
+            "height": "600px",
+            "background": "#F8F8F6",
+            "colStart": 1,
+            "rowStart": 1
+          },
+          "responsive": {
+            "mobile": {
+              "style": {
+                "height": "360px"
+              }
+            }
+          }
+        },
+        {
+          "id": "home-hero-eyebrow",
+          "component": "Text",
+          "props": {
+            "text": "Spring drop · 24 styles",
+            "color": "#6B6B6B",
+            "fontSize": 12,
+            "lineHeight": 1.4,
+            "letterSpacing": "0.12em",
+            "textTransform": "uppercase",
+            "fontWeight": 500
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "marginBottom": "16px",
+            "marginLeft": "64px",
+            "marginRight": "64px"
+          },
+          "responsive": {
+            "mobile": {
+              "style": {
+                "marginTop": "5%",
+                "marginLeft": "0",
+                "marginRight": "0"
+              },
+              "props": {
+                "fontSize": 10
+              }
+            }
+          }
+        },
+        {
+          "id": "home-hero-h1",
+          "component": "Heading",
+          "props": {
+            "text": "Considered essentials, made to outlast the season.",
+            "level": 1,
+            "fontSize": "48px",
+            "fontWeight": 600,
+            "color": "#111111",
+            "textAlign": "left",
+            "letterSpacing": "-0.02em",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "marginBottom": "20px",
+            "marginLeft": "64px",
+            "marginRight": "64px"
+          },
+          "responsive": {
+            "mobile": {
+              "style": {
+                "marginLeft": "5%",
+                "marginRight": "5%"
+              },
+              "props": {
+                "fontSize": 24,
+                "textAlign": "center"
+              }
+            }
+          }
+        },
+        {
+          "id": "home-hero-p",
+          "component": "Text",
+          "props": {
+            "text": "A tightened edit of softer cottons, lighter shells and quietly capable bags — built for the way you actually move through your week.",
+            "color": "#6B6B6B",
+            "fontSize": 16,
+            "lineHeight": 1.55
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "marginBottom": "32px",
+            "marginLeft": "64px",
+            "marginRight": "64px"
+          },
+          "responsive": {
+            "mobile": {
+              "style": {
+                "marginLeft": "0",
+                "marginRight": "0",
+                "paddingLeft": "5%",
+                "paddingRight": "5%",
+                "marginBottom": "5%"
+              },
+              "props": {
+                "textAlign": "center"
+              }
+            }
+          }
+        },
+        {
+          "id": "home-hero-cta",
+          "component": "Button",
+          "props": {
+            "text": "Shop the collection",
+            "href": "/women/tops-women.html",
+            "backgroundColor": "#111111",
+            "color": "#FFFFFF",
+            "fontSize": 14,
+            "fontWeight": 500,
+            "letterSpacing": "0.02em",
+            "padding": "14px 22px",
+            "borderRadius": "4px",
+            "fullWidth": false,
+            "borderWidth": 1,
+            "borderColor": "#111111",
+            "borderStyle": "solid",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "alignSelf": "flex-start",
+            "marginLeft": "64px"
+          },
+          "responsive": {
+            "mobile": {
+              "style": {
+                "marginLeft": "0",
+                "marginTop": "0px",
+                "alignSelf": "center"
+              },
+              "props": {
+                "textAlign": "center"
+              }
+            }
+          }
+        }
+      ],
+      "responsive": {
+        "mobile": {
+          "props": {
+            "direction": "column",
+            "justifyItems": "center"
+          },
+          "style": {
+            "marginBottom": "5%"
+          }
+        }
+      }
+    },
+    {
+      "id": "home-arrivals",
+      "component": "ProductsCarousel",
+      "props": {
+        "eyebrow": "Just in",
+        "title": "New arrivals",
+        "categoryId": "2",
+        "pageSize": 8,
+        "itemsPerSlide": 4,
+        "priority": true
+      },
+      "style": {
+        "width": "100%",
+        "marginBottom": "3%",
+        "marginTop": "3%"
+      }
+    },
+    {
+      "id": "home-value-strip",
+      "component": "Grid",
+      "props": {
+        "direction": "grid",
+        "columns": 4,
+        "rows": 0,
+        "rowGap": 12,
+        "columnGap": 24,
+        "alignItems": "start",
+        "justifyItems": "stretch"
+      },
+      "style": {
+        "width": "100%",
+        "marginBottom": "72px",
+        "paddingTop": "32px",
+        "paddingBottom": "32px"
+      },
+      "children": [
+        {
+          "id": "home-vs-1-icon",
+          "component": "Icon",
+          "props": {
+            "name": "truck",
+            "size": 22,
+            "strokeWidth": 1.5
+          },
+          "style": {
+            "colStart": 1,
+            "rowStart": 1,
+            "marginBottom": "8px"
+          }
+        },
+        {
+          "id": "home-vs-1-title",
+          "component": "Heading",
+          "props": {
+            "text": "Free shipping over $75",
+            "level": 4,
+            "fontSize": "14px",
+            "fontWeight": 500,
+            "color": "#111111",
+            "textAlign": "left",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 1,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-vs-1-sub",
+          "component": "Text",
+          "props": {
+            "text": "Carbon-neutral by default",
+            "color": "#6B6B6B",
+            "fontSize": 12,
+            "lineHeight": 1.4
+          },
+          "style": {
+            "colStart": 1,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-vs-3-icon",
+          "component": "Icon",
+          "props": {
+            "name": "refresh",
+            "size": 22,
+            "strokeWidth": 1.5
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "marginBottom": "8px"
+          }
+        },
+        {
+          "id": "home-vs-3-title",
+          "component": "Heading",
+          "props": {
+            "text": "Easy returns",
+            "level": 4,
+            "fontSize": "14px",
+            "fontWeight": 500,
+            "color": "#111111",
+            "textAlign": "left",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-vs-3-sub",
+          "component": "Text",
+          "props": {
+            "text": "60 days, no questions",
+            "color": "#6B6B6B",
+            "fontSize": 12,
+            "lineHeight": 1.4
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-vs-2-icon",
+          "component": "Icon",
+          "props": {
+            "name": "shield",
+            "size": 22,
+            "strokeWidth": 1.5
+          },
+          "style": {
+            "colStart": 3,
+            "rowStart": 1,
+            "marginBottom": "8px"
+          }
+        },
+        {
+          "id": "home-vs-2-title",
+          "component": "Heading",
+          "props": {
+            "text": "Made to last",
+            "level": 4,
+            "fontSize": "14px",
+            "fontWeight": 500,
+            "color": "#111111",
+            "textAlign": "left",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 3,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-vs-2-sub",
+          "component": "Text",
+          "props": {
+            "text": "2-year quality promise",
+            "color": "#6B6B6B",
+            "fontSize": 12,
+            "lineHeight": 1.4
+          },
+          "style": {
+            "colStart": 3,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-vs-4-icon",
+          "component": "Icon",
+          "props": {
+            "name": "lock",
+            "size": 22,
+            "strokeWidth": 1.5
+          },
+          "style": {
+            "colStart": 4,
+            "rowStart": 1,
+            "marginBottom": "8px"
+          }
+        },
+        {
+          "id": "home-vs-4-title",
+          "component": "Heading",
+          "props": {
+            "text": "Secure checkout",
+            "level": 4,
+            "fontSize": "14px",
+            "fontWeight": 500,
+            "color": "#111111",
+            "textAlign": "left",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 4,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-vs-4-sub",
+          "component": "Text",
+          "props": {
+            "text": "Encrypted end-to-end",
+            "color": "#6B6B6B",
+            "fontSize": 12,
+            "lineHeight": 1.4
+          },
+          "style": {
+            "colStart": 4,
+            "rowStart": 1
+          }
+        }
+      ],
+      "responsive": {
+        "mobile": {
+          "props": {
+            "alignItems": "start",
+            "direction": "column",
+            "justifyItems": "center"
+          },
+          "style": {
+            "paddingTop": "0px",
+            "marginBottom": "10%",
+            "paddingBottom": "0px",
+            "marginTop": "10%",
+            "borderSides": "all"
+          }
+        }
+      }
+    },
+    {
+      "id": "home-editorial",
+      "component": "Grid",
+      "props": {
+        "direction": "grid",
+        "columns": 2,
+        "rows": 0,
+        "rowGap": 16,
+        "columnGap": 64,
+        "alignItems": "center",
+        "justifyItems": "stretch"
+      },
+      "style": {
+        "width": "100%",
+        "marginBottom": "3%",
+        "backgroundColor": "#FFFFFF"
+      },
+      "children": [
+        {
+          "id": "home-editorial-img",
+          "component": "Image",
+          "props": {
+            "src": "/uploads/1778228000724-w4qmb62.jpg",
+            "alt": "Watch and notebook on a desk",
+            "objectFit": "contain",
+            "objectPosition": "center center"
+          },
+          "style": {
+            "width": "100%",
+            "aspectRatio": "650 / 434",
+            "borderRadius": "6px",
+            "background": "#F8F8F6",
+            "colStart": 1,
+            "rowStart": 1
+          }
+        },
+        {
+          "id": "home-editorial-eyebrow",
+          "component": "Text",
+          "props": {
+            "text": "FIELD NOTES",
+            "color": "#6B6B6B",
+            "fontSize": 12,
+            "lineHeight": 1.4,
+            "letterSpacing": "0.12em",
+            "textTransform": "uppercase",
+            "fontWeight": 500
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "marginBottom": "16px"
+          }
+        },
+        {
+          "id": "home-editorial-h2",
+          "component": "Heading",
+          "props": {
+            "text": "The case for buying less, but better.",
+            "level": 2,
+            "fontSize": "34px",
+            "fontWeight": 600,
+            "color": "#111111",
+            "textAlign": "left",
+            "letterSpacing": "-0.015em",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "marginBottom": "16px"
+          }
+        },
+        {
+          "id": "home-editorial-p",
+          "component": "Text",
+          "props": {
+            "text": "We spent two years trimming our catalogue to seventeen pieces that survive a real wardrobe. Here is how we choose the cottons, finish the seams, and decide what doesn't make the cut.",
+            "color": "#6B6B6B",
+            "fontSize": 15,
+            "lineHeight": 1.6
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "marginBottom": "28px"
+          },
+          "responsive": {
+            "mobile": {
+              "style": {
+                "marginBottom": "0px"
+              }
+            }
+          }
+        },
+        {
+          "id": "home-editorial-cta",
+          "component": "Button",
+          "props": {
+            "text": "Read the journal",
+            "href": "/about",
+            "backgroundColor": "transparent",
+            "color": "#111111",
+            "fontSize": 14,
+            "fontWeight": 500,
+            "letterSpacing": "0.02em",
+            "padding": "14px 22px",
+            "borderRadius": "4px",
+            "fullWidth": false,
+            "borderWidth": 1,
+            "borderColor": "#E8E8E5",
+            "borderStyle": "solid",
+            "fontFamily": "Inter, sans-serif"
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1,
+            "alignSelf": "flex-start"
+          }
+        }
+      ],
+      "responsive": {
+        "mobile": {
+          "props": {
+            "direction": "column",
+            "justifyItems": "center"
+          },
+          "style": {
+            "marginBottom": "10%"
+          }
+        }
+      }
+    },
+    {
+      "id": "home-bags",
+      "component": "ProductsCarousel",
+      "props": {
+        "eyebrow": "Carry essentials",
+        "title": "Bags & backpacks",
+        "categoryId": "4",
+        "pageSize": 8,
+        "itemsPerSlide": 4,
+        "sortBy": "id_asc",
+        "priority": true
+      },
+      "style": {
+        "width": "100%"
+      }
+    },
+    {
+      "id": "home-newsletter-eyebrow",
+      "component": "Text",
+      "props": {
+        "text": "Quietly, once a month",
+        "color": "#6B6B6B",
+        "fontSize": 12,
+        "lineHeight": 1.4,
+        "letterSpacing": "0.12em",
+        "textTransform": "uppercase",
+        "fontWeight": 500,
+        "textAlign": "center"
+      },
+      "style": {
+        "width": "100%",
+        "marginBottom": "12px",
+        "marginTop": "3%"
+      },
+      "responsive": {
+        "mobile": {
+          "style": {
+            "marginTop": "10%"
+          }
+        }
+      }
+    },
+    {
+      "id": "home-newsletter-h3",
+      "component": "Heading",
+      "props": {
+        "text": "New drops, no noise.",
+        "level": 3,
+        "fontSize": "28px",
+        "fontWeight": 600,
+        "color": "#111111",
+        "textAlign": "center",
+        "letterSpacing": "-0.015em",
+        "fontFamily": "Inter, sans-serif"
+      },
+      "style": {
+        "width": "100%",
+        "marginBottom": "12px"
+      }
+    },
+    {
+      "id": "home-newsletter-p",
+      "component": "Text",
+      "props": {
+        "text": "One email, the first Sunday of each month. New pieces, restocks, the occasional field note. Unsubscribe anytime.",
+        "color": "#6B6B6B",
+        "fontSize": 15,
+        "lineHeight": 1.6,
+        "textAlign": "center"
+      },
+      "style": {
+        "width": "100%",
+        "marginBottom": "24px"
+      }
+    },
+    {
+      "id": "home-newsletter-form",
+      "component": "NewsletterForm",
+      "props": {
+        "buttonText": "Subscribe",
+        "placeholder": "you@email.com"
+      },
+      "style": {
+        "width": "100%",
+        "marginBottom": "3%"
+      },
+      "responsive": {
+        "mobile": {
+          "style": {
+            "marginBottom": "10%"
+          }
+        }
+      }
+    }
+  ]
+}

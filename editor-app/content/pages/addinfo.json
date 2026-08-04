@@ -1,0 +1,42 @@
+{
+  "title": "Additional Info",
+  "path": "/addinfo",
+  "blocks": [
+    {
+      "id": "b9a6tyfv",
+      "component": "Heading",
+      "props": {
+        "text": "Yeah, it's a new page",
+        "level": 2,
+        "color": "",
+        "textAlign": "left"
+      },
+      "style": {}
+    },
+    {
+      "id": "b3zmbbgl",
+      "component": "Text",
+      "props": {
+        "text": "Really",
+        "color": "",
+        "fontSize": 14,
+        "lineHeight": 1.6,
+        "textAlign": "left"
+      },
+      "style": {}
+    },
+    {
+      "id": "boygghje",
+      "component": "Image",
+      "props": {
+        "src": "https://placehold.co/600x300",
+        "alt": "",
+        "width": "100%",
+        "height": "auto",
+        "objectFit": "cover",
+        "borderRadius": "0"
+      },
+      "style": {}
+    }
+  ]
+}

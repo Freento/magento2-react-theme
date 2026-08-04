@@ -1,0 +1,356 @@
+@import (reference) "../../abstracts/tokens";
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.profile-name {
+    margin: 0 0 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: @ink;
+}
+
+.profile-email,
+.profile-dob {
+    margin: 0 0 4px;
+    font-size: @fs-base;
+    color: @ink-2;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid @border;
+
+    > * + * {
+        margin-left: 0;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        margin: 0;
+    }
+
+    .btn-primary + .btn-secondary,
+    .btn-primary + .btn-danger,
+    .btn-secondary + .btn-primary,
+    .btn-secondary + .btn-danger {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: @screen__m) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .profile-actions .btn-primary,
+    .profile-actions .btn-secondary,
+    .profile-actions .btn-danger {
+        width: 100% !important;
+        flex: 0 0 auto;
+    }
+}
+
+.ma-skel-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    .ma-skel-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+
+        @media (max-width: @screen__s) {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+.ma-skel-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ma-skel-label {
+    width: 30%;
+    height: 11px;
+    border-radius: @radius;
+}
+
+.ma-skel-value {
+    width: 100%;
+    height: 44px;
+    border-radius: @radius;
+}
+
+.ma-skel-btn {
+    width: 140px;
+    height: 40px;
+    margin-top: 4px;
+    border-radius: @radius;
+}
+
+.ma-skel-btn-sm {
+    width: 96px;
+    height: 32px;
+    border-radius: @radius;
+}
+
+.profile-card {
+    background: @bg;
+    border: 1px solid @border;
+    border-radius: @radius;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+}
+
+.profile-header-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 20px;
+    align-items: center;
+}
+
+@media (max-width: @screen__720) {
+    .profile-header-card {
+        grid-template-columns: auto 1fr;
+    }
+
+    .profile-header-actions {
+        grid-column: 1 / -1;
+    }
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: @ink;
+    color: @bg;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.profile-header-main {
+    min-width: 0;
+}
+
+.profile-display-name {
+    margin: 0 0 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: @fs-2xl;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: @ink;
+    line-height: 1.15;
+}
+
+.profile-meta-row {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: @fs-sm;
+    color: @ink-2;
+}
+
+.profile-email-text {
+    color: @ink;
+}
+
+.profile-meta-dot {
+    color: @ink-2;
+}
+
+.profile-header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+
+    .btn-primary,
+    .btn-secondary {
+        width: auto;
+        margin: 0;
+        min-width: 140px;
+        height: 36px;
+        padding: 0 16px;
+    }
+
+    @media (max-width: @screen__720) {
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        .btn-primary,
+        .btn-secondary {
+            min-width: 0;
+            flex: 1;
+        }
+    }
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 0 0 14px;
+
+    @media (max-width: @screen__xs) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-stat {
+    appearance: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 18px 20px;
+    background: @bg;
+    border: 1px solid @border;
+    border-radius: @radius;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: @ink;
+    transition: border-color @t-fast, background @t-fast;
+
+    &:hover {
+        border-color: @ink;
+        background: @surface;
+    }
+
+    &-value {
+        font-family: 'Inter', sans-serif;
+        font-size: @fs-2xl;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+    }
+
+    &-label {
+        font-size: @fs-2xs;
+        font-weight: 500;
+        letter-spacing: @tracking-eyebrow;
+        text-transform: uppercase;
+        color: @ink-2;
+    }
+}
+
+.profile-card-title {
+    margin: 0 0 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: @fs-lg;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: @ink;
+}
+
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 24px;
+    margin: 0;
+
+    @media (max-width: @screen__xs) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-detail {
+    dt {
+        margin: 0 0 4px;
+        font-size: @fs-2xs;
+        font-weight: 500;
+        letter-spacing: @tracking-eyebrow;
+        text-transform: uppercase;
+        color: @ink-2;
+    }
+
+    dd {
+        margin: 0;
+        font-size: @fs-base;
+        color: @ink;
+        word-break: break-word;
+    }
+}
+
+/* Default addresses */
+.profile-default-addresses {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+
+    @media (max-width: @screen__720) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-default-card {
+    .profile-card-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .profile-card-title {
+        margin: 0;
+        font-size: @fs-base;
+    }
+}
+
+.profile-card-eyebrow {
+    font-size: @fs-2xs;
+    font-weight: 500;
+    letter-spacing: @tracking-eyebrow;
+    text-transform: uppercase;
+    color: @ink-2;
+}
+
+.profile-address {
+    font-size: @fs-sm;
+    color: @ink;
+    line-height: @lh-relaxed;
+
+    .muted {
+        color: @ink-2;
+    }
+}
+
+.profile-default-empty {
+    margin: 0;
+    font-size: @fs-sm;
+    font-style: italic;
+    color: @ink-2;
+}

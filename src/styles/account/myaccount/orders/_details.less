@@ -1,0 +1,278 @@
+@import (reference) "../../../abstracts/tokens";
+
+.order-details-page {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .co-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: transparent;
+        border: 0;
+        padding: 0 0 18px;
+        color: @ink-2;
+        font: inherit;
+        font-size: @fs-sm;
+        cursor: pointer;
+        transition: color 120ms ease;
+
+        &:hover {
+            color: @ink;
+        }
+    }
+}
+
+.order-details-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 0 0 20px;
+    margin: 0 0 24px;
+    border-bottom: 1px solid @border;
+}
+
+.order-details-title {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: @fs-2xl;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    font-variant-numeric: tabular-nums;
+    color: @ink;
+}
+
+.order-section {
+    padding: 20px 22px;
+    background: @bg;
+    border: 1px solid @border;
+    border-radius: @radius;
+
+    &-title {
+        margin: 0 0 14px;
+        font-size: @fs-2xs;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: @ink-2;
+    }
+
+    // Detail blocks lose their card chrome when nested inside an order-section.
+    .address-details,
+    .payment-details,
+    .shipment-details {
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+    }
+}
+
+.order-details-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.totals-grid {
+    display: grid;
+    gap: 8px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: @fs-base;
+    color: @ink;
+    font-variant-numeric: tabular-nums;
+
+    > span:first-child {
+        color: @ink-2;
+    }
+
+    &.grand-total {
+        padding-top: 10px;
+        margin-top: 4px;
+        border-top: 1px solid @border;
+        font-size: @fs-lg;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+
+        > span:first-child {
+            color: @ink;
+        }
+    }
+}
+
+.address-details,
+.payment-details {
+    p {
+        margin: 0 0 4px;
+        font-size: @fs-sm;
+        line-height: 1.55;
+        color: @ink-2;
+    }
+
+    strong {
+        color: @ink;
+        font-weight: 500;
+    }
+}
+
+.order-items-section,
+.payment-section,
+.shipment-section,
+.address-section {
+    margin-bottom: 24px;
+
+    h3 {
+        margin: 0 0 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: @fs-base;
+        font-weight: 600;
+        letter-spacing: 0;
+        color: @ink;
+    }
+}
+
+.order-items {
+    border: 1px solid @border;
+    border-radius: 4px;
+    overflow: hidden;
+
+    @media (max-width: @screen__m) {
+        border-radius: 4px;
+    }
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid @border;
+    transition: background-color 120ms ease;
+    gap: 16px;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+
+    &:hover {
+        background: @surface;
+    }
+
+    @media (max-width: @screen__m) {
+        padding: 12px 14px;
+    }
+
+    @media (max-width: @screen__xs) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+.item-details {
+    h4 {
+        margin: 0 0 4px;
+        font-family: 'Inter', sans-serif;
+        font-size: @fs-base;
+        font-weight: 600;
+        color: @ink;
+    }
+
+    p {
+        margin: 2px 0;
+        font-size: @fs-sm;
+        color: @ink-2;
+    }
+}
+
+.item-price {
+    font-size: @fs-base;
+    font-weight: 600;
+    color: @ink;
+    white-space: nowrap;
+
+    @media (max-width: @screen__xs) {
+        align-self: flex-end;
+    }
+}
+
+// Detail blocks as standalone cards (outside an order-section).
+.address-section .address-details,
+.payment-details,
+.shipment-details {
+    background: @surface;
+    padding: 14px 16px;
+    border-radius: 4px;
+
+    p {
+        margin: 3px 0;
+        font-size: 13px;
+        color: @ink-2;
+        line-height: 1.5;
+    }
+}
+
+.shipment-item {
+    margin-bottom: 10px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.ma-skel-back {
+    width: 120px;
+    height: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.ma-skel-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &-title {
+        width: 60px;
+        height: 10px;
+        margin-bottom: 4px;
+        border-radius: 4px;
+    }
+
+    &-line {
+        width: 100%;
+        height: 12px;
+        border-radius: 4px;
+
+        &--short {
+            width: 60%;
+        }
+    }
+}
+
+.ma-skel-item-name {
+    width: 60%;
+    height: 14px;
+    border-radius: 4px;
+}
+
+.ma-skel-item-meta {
+    width: 40%;
+    height: 11px;
+    margin-top: 6px;
+    border-radius: 4px;
+}
+
+.ma-skel-item-price {
+    width: 60px;
+    height: 16px;
+    flex-shrink: 0;
+    border-radius: 4px;
+}

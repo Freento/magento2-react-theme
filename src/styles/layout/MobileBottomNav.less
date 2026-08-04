@@ -1,0 +1,81 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    background: @bg;
+    border-top: 1px solid @border;
+    padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+}
+
+.mbn-item {
+    flex: 1;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 0;
+    .btn-reset(transparent);
+    color: @ink;
+    font: inherit;
+    font-size: @fs-2xs;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    text-decoration: none;
+    transition: color @t-fast;
+
+    &:hover {
+        color: @ink;
+    }
+
+    svg {
+        stroke: @ink;
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.mbn-icon {
+    position: relative;
+    display: inline-flex;
+}
+
+.mbn-badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    background: @ink;
+    color: @bg;
+    font-size: @fs-2xs;
+    font-weight: 600;
+    letter-spacing: 0;
+    border-radius: @radius-pill;
+    min-width: 16px;
+    padding: 0 5px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    text-transform: none;
+}
+
+@media (max-width: @screen__900) {
+    .mobile-bottom-nav {
+        display: flex;
+    }
+
+    .App {
+        padding-bottom: 64px;
+    }
+
+    .nav-links .nav-link-account,
+    .nav-links .nav-link-cart {
+        display: none;
+    }
+}

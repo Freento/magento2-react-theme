@@ -1,0 +1,84 @@
+@import (reference) "../abstracts/tokens";
+@import (reference) "../abstracts/mixins";
+
+.editor-root {
+    .accordion {
+        border-bottom: 1px solid @e-border;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:not(.open) .accordion-trigger:hover .accordion-title,
+        &:not(.open) .accordion-trigger:hover .accordion-chevron {
+            color: @e-primary;
+        }
+
+        &.open .accordion-chevron {
+            color: @e-text;
+        }
+    }
+
+    .accordion-trigger {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 2px 14px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        color: @e-text;
+        font-family: inherit;
+        transition: color 0.1s;
+    }
+
+    .accordion-chevron {
+        .flex-center();
+        width: 14px;
+        height: 14px;
+        color: @e-text-soft;
+        flex-shrink: 0;
+        transition: color 0.1s;
+    }
+
+    .accordion-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: @e-text;
+        letter-spacing: -0.01em;
+        flex: 1;
+    }
+
+    .accordion-body {
+        padding: 0 0 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .inspector-component-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 14px;
+        padding-bottom: 18px;
+    }
+
+    .inspector-empty-hint {
+        padding: 32px 16px;
+        text-align: center;
+        font-size: 13px;
+        color: @e-text-soft;
+        line-height: 1.5;
+    }
+}

@@ -1,0 +1,64 @@
+@import (reference) "abstracts/tokens";
+@import (reference) "abstracts/mixins";
+
+.editor-root {
+    .editor {
+        display: flex;
+        height: 100vh;
+        background: @e-bg;
+    }
+
+    .editor-sidebar {
+        width: 320px;
+        display: flex;
+        flex-direction: column;
+        background: @e-surface;
+        border-right: 1px solid @e-border;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .editor-expand {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 10;
+        width: 32px;
+        height: 32px;
+        .flex-center();
+        border: 1px solid @e-border;
+        background: @e-surface;
+        border-radius: @e-r;
+        color: @e-text-muted;
+        cursor: pointer;
+        box-shadow: @e-shadow-pop;
+        transition: all 0.1s;
+
+        &:hover {
+            color: @e-text;
+            border-color: @e-border-strong;
+        }
+    }
+
+    .editor-preview {
+        flex: 1;
+        overflow: auto;
+        background: @e-bg;
+        position: relative;
+    }
+
+    .editor-preview-inner {
+        background: @e-surface;
+        min-height: 100%;
+    }
+
+    .sidebar-header {
+        padding: 10px 10px;
+        border-bottom: 1px solid @e-border;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: @e-surface;
+        min-height: 52px;
+    }
+}

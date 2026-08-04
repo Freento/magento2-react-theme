@@ -1,0 +1,16 @@
+{
+  "name": "editor-core",
+  "version": "1.0.0",
+  "description": "Shared renderer + block catalog + block components used by both the visual editor and the storefront.",
+  "type": "module",
+  "exports": {
+    "./renderer": "./renderer.jsx",
+    "./registry": "./registry.js",
+    "./blocks": "./blocks/index.jsx",
+    "./blocks/*": "./blocks/*",
+    "./inline-edit-style": "./inline-edit-style.js"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  }
+}

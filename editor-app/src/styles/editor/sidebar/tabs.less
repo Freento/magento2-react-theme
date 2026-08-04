@@ -1,0 +1,42 @@
+@import (reference) "../abstracts/tokens";
+
+.editor-root {
+    .tab-bar {
+        display: flex;
+        padding: 4px;
+        gap: 2px;
+        background: @e-surface-alt;
+        margin: 10px;
+        border-radius: @e-r;
+
+        button {
+            flex: 1;
+            height: 26px;
+            padding: 0 10px;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+            border-radius: @e-r-sm;
+            cursor: pointer;
+            background: transparent;
+            color: @e-text-muted;
+            transition: all 0.1s;
+
+            &:hover {
+                color: @e-text;
+            }
+
+            &.active {
+                background: @e-surface;
+                color: @e-text;
+                box-shadow: 0 1px 2px fade(@e-black, 6%);
+            }
+        }
+    }
+
+    .tab-content {
+        flex: 1;
+        overflow: auto;
+        padding: 0 14px 16px;
+    }
+}

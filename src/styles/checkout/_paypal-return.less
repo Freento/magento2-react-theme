@@ -1,0 +1,80 @@
+@import (reference) "../abstracts/tokens";
+
+.paypal-return {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px @gutter;
+
+    &-card {
+        width: 100%;
+        max-width: 480px;
+        padding: 48px 40px;
+        background: @bg;
+        border: 1px solid @border;
+        border-radius: @radius;
+        text-align: center;
+        color: @ink;
+    }
+
+    &-icon {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Inter', sans-serif;
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 1;
+
+        &--error {
+            background: @danger-bg;
+            color: @danger;
+            border: 1px solid @danger-border;
+        }
+    }
+
+    &-spinner {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 24px;
+        border: 2px solid @border;
+        border-top-color: @ink;
+    }
+
+    &-title {
+        font-family: 'Inter', sans-serif;
+        font-size: @fs-xl;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        margin: 0 0 12px;
+    }
+
+    &-text {
+        margin: 0;
+        font-size: @fs-base;
+        line-height: 1.6;
+        color: @ink-2;
+    }
+
+    &-action {
+        margin-top: 28px;
+        min-width: 200px;
+    }
+}
+
+@media (max-width: @screen__600) {
+    .paypal-return {
+        min-height: calc(100vh - 140px);
+        padding: 24px 16px;
+
+        &-card {
+            padding: 32px 24px;
+        }
+    }
+}
