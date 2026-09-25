@@ -1,0 +1,96 @@
+{
+  "title": "Performance New",
+  "path": "/collections/performance-new.html",
+  "route": {
+    "type": "category",
+    "id": 39
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-collection-performance",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "260px",
+          "backgroundImage": "/uploads/promo-collection-performance.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-collection-performance-title",
+            "component": "Heading",
+            "props": {
+              "text": "You're the best",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-collection-performance-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "Make a strong statement with Luma Performance sportswear",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "260px"
+            }
+          }
+        }
+      },
+      {
+        "id": "collections-performance-new-products",
+        "component": "ProductsCarousel",
+        "props": {
+          "title": "New Arrivals",
+          "eyebrow": "",
+          "skus": [
+            {
+              "sku": "WSH03"
+            },
+            {
+              "sku": "WB03"
+            },
+            {
+              "sku": "WS07"
+            },
+            {
+              "sku": "WJ10"
+            },
+            {
+              "sku": "WJ04"
+            }
+          ],
+          "pageSize": 5,
+          "itemsPerSlide": 5,
+          "source": "skus"
+        },
+        "style": {
+          "width": "100%",
+          "marginTop": "3%"
+        }
+      }
+    ]
+  }
+}

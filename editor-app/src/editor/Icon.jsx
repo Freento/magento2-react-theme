@@ -8,6 +8,7 @@ import {
   ChevronUp,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   PanelLeftClose,
   PanelLeftOpen,
   Link as LinkIcon,
@@ -67,6 +68,7 @@ import {
   Heart,
   Search,
   User,
+  MessageSquare,
 } from 'lucide-react';
 
 const BLOCK_ICON_MAP = {
@@ -96,6 +98,7 @@ const BLOCK_ICON_MAP = {
   GalleryHorizontalEnd,
   Mail,
   ShoppingBag,
+  MessageSquare,
 };
 
 const lineIcon = (children) => function LineIcon({ size = 16, strokeWidth = 1.75, ...rest }) {
@@ -218,6 +221,7 @@ export const UI = {
   ChevronUp,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   ArrowUp,
   ArrowDown,
   GripVertical,

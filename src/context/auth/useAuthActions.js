@@ -2,23 +2,26 @@ import { useEffect, startTransition } from 'react';
 import { useMutation, useLazyQuery } from '@apollo/client';
 import {
   CREATE_CUSTOMER,
-  GET_CUSTOMER,
   REVOKE_CUSTOMER_TOKEN,
   GENERATE_CUSTOMER_TOKEN,
   REQUEST_PASSWORD_RESET,
 } from '../../queries/auth';
+// The one canonical customer query: auth shares the document with MyAccount and
+// checkout, so a page needs a single getCustomer request instead of two.
+import { GET_CUSTOMER_DATA } from '../../queries/customer';
 import { AUTH_EVENTS, dispatchAuthEvent } from './authEvents';
 import { mapLoginError } from './authErrors';
+import { readCustomerToken, writeCustomerToken, clearCustomerToken } from '../../lib/customerToken';
 
 export const useAuthActions = (state, dispatch) => {
   const [createCustomer] = useMutation(CREATE_CUSTOMER);
   const [revokeCustomerToken] = useMutation(REVOKE_CUSTOMER_TOKEN);
   const [generateCustomerToken] = useMutation(GENERATE_CUSTOMER_TOKEN);
   const [requestPasswordResetMutation] = useMutation(REQUEST_PASSWORD_RESET);
-  const [getCustomer] = useLazyQuery(GET_CUSTOMER);
+  const [getCustomer] = useLazyQuery(GET_CUSTOMER_DATA);
 
   const loadCustomer = async ({ fromMount = false } = {}) => {
-    const token = localStorage.getItem('customerToken');
+    const token = readCustomerToken();
     if (!token) {
       if (fromMount) dispatch({ type: 'SET_INITIAL_LOADING', payload: false });
       return;
@@ -32,7 +35,7 @@ export const useAuthActions = (state, dispatch) => {
         dispatchAuthEvent(AUTH_EVENTS.TOKEN_VALIDATED, result.data.customer);
         return result.data.customer;
       } else {
-        localStorage.removeItem('customerToken');
+        clearCustomerToken();
         dispatch({ type: 'LOGOUT' });
         dispatchAuthEvent(AUTH_EVENTS.TOKEN_INVALID);
       }
@@ -41,7 +44,7 @@ export const useAuthActions = (state, dispatch) => {
       const isAuth = status === 401 || status === 403 ||
           error.graphQLErrors?.some(e => e.extensions?.category === 'graphql-authorization');
       if (isAuth) {
-        localStorage.removeItem('customerToken');
+        clearCustomerToken();
         dispatch({ type: 'LOGOUT' });
         dispatchAuthEvent(AUTH_EVENTS.TOKEN_INVALID);
       }
@@ -66,7 +69,14 @@ export const useAuthActions = (state, dispatch) => {
         throw new Error(msg);
       }
 
-      localStorage.setItem('customerToken', token);
+      // The cookie is the only place the token lives, so a refused write is a failed
+      // sign-in, not a degraded one.
+      if (!writeCustomerToken(token)) {
+        throw new Error(
+          'Your browser is blocking cookies for this site, so we cannot keep you signed in. '
+          + 'Allow cookies and try again.'
+        );
+      }
       const customer = await loadCustomer();
       dispatch({ type: 'SET_LOGIN_MODAL', payload: false });
       const greeting = customer?.firstname
@@ -125,7 +135,7 @@ export const useAuthActions = (state, dispatch) => {
     } catch (error) {
       console.error('REST logout request failed:', error);
     } finally {
-      localStorage.removeItem('customerToken');
+      clearCustomerToken();
       dispatch({ type: 'LOGOUT' });
       dispatchAuthEvent(AUTH_EVENTS.LOGOUT);
       if (typeof window !== 'undefined') {

@@ -10,6 +10,7 @@ export const UPDATE_CUSTOMER_PROFILE = gql`
         lastname
         date_of_birth
         gender
+        is_subscribed
       }
     }
   }

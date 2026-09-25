@@ -1,19 +1,21 @@
 export const initialCartState = {
   cartId: null,
   cartData: null,
+  cartInitialized: false,
   isMiniCartOpen: false,
   loading: false,
   merging: false,
   error: null,
   pendingItems: new Set(),
   lastRemoved: null,
-  cartRecovered: null,
 };
 
 export const cartReducer = (state, action) => {
   switch (action.type) {
     case 'SET_CART_ID':
       return { ...state, cartId: action.payload };
+    case 'SET_CART_INITIALIZED':
+      return { ...state, cartInitialized: true };
     case 'SET_CART_DATA':
       return { ...state, cartData: action.payload };
     case 'SET_IS_MINI_CART_OPEN':
@@ -36,8 +38,6 @@ export const cartReducer = (state, action) => {
     }
     case 'SET_LAST_REMOVED':
       return { ...state, lastRemoved: action.payload };
-    case 'SET_CART_RECOVERED':
-      return { ...state, cartRecovered: action.payload };
     default:
       return state;
   }

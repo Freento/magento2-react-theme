@@ -73,34 +73,37 @@ function ColorPopup({hex6, alpha, onChange, onPick}) {
     const hueCss = `rgb(${Math.round(hueR)},${Math.round(hueG)},${Math.round(hueB)})`;
 
     return (
-        <div className="color-popup">
+        <div className="absolute top-[calc(100%+8px)] left-0 z-[1000] w-[240px] p-2.5 bg-e-surface border border-e-border rounded-e shadow-[0_12px_32px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.06)] flex flex-col gap-2.5 select-none">
             <div
                 ref={svRef}
-                className="color-popup-sv"
+                className="relative w-full h-[140px] rounded-e cursor-crosshair touch-none bg-[linear-gradient(to_bottom,rgba(0,0,0,0),rgba(0,0,0,1)),linear-gradient(to_right,rgba(255,255,255,1),var(--hue,#f00))] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]"
                 style={{'--hue': hueCss}}
                 onPointerDown={onSvDrag}
             >
                 <div
-                    className="color-popup-sv-thumb"
+                    className="absolute w-3 h-3 rounded-full border-2 border-solid border-white shadow-[0_0_0_1px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.35)] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                     style={{left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%`}}
                 />
             </div>
-            <div className="color-popup-row">
+            <div className="flex items-center gap-2.5">
                 <button
                     type="button"
-                    className="color-popup-eyedropper"
+                    className="w-7 h-7 shrink-0 border-none rounded-e bg-transparent cursor-pointer text-e-text-muted inline-flex items-center justify-center transition-colors duration-100 hover:bg-e-surface-alt hover:text-e-primary"
                     onClick={onPick}
                     data-tooltip="Pick from page"
                     aria-label="Eyedropper"
                 >
                     <UI.Pipette size={14} strokeWidth={1.75}/>
                 </button>
-                <div ref={hueRef} className="color-popup-hue" onPointerDown={onHueDrag}>
-                    <div className="color-popup-hue-thumb" style={{left: `${(hsv.h / 360) * 100}%`}}/>
+                <div ref={hueRef}
+                     className="relative flex-1 min-w-0 h-2.5 rounded-full cursor-pointer touch-none bg-[linear-gradient(to_right,#f00_0%,#ff0_17%,#0f0_33%,#0ff_50%,#00f_67%,#f0f_83%,#f00_100%)]"
+                     onPointerDown={onHueDrag}>
+                    <div className="absolute top-1/2 w-[14px] h-[14px] rounded-full bg-white border-2 border-solid border-white shadow-[0_0_0_1px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.35)] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                         style={{left: `${(hsv.h / 360) * 100}%`}}/>
                 </div>
             </div>
             {swatches.length > 0 && (
-                <div className="color-popup-swatches">
+                <div className="grid grid-cols-8 gap-1 pt-1 border-t border-e-border">
                     {swatches.map((c) => {
                         const parsed = parseColor(c);
                         const active = parsed.hex6 === hex6;
@@ -108,7 +111,7 @@ function ColorPopup({hex6, alpha, onChange, onPick}) {
                             <button
                                 key={c}
                                 type="button"
-                                className={`color-popup-swatch${active ? ' active' : ''}`}
+                                className={`relative aspect-square rounded-e border-none p-0 cursor-pointer shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)] transition-[transform,box-shadow] duration-[80ms] hover:scale-[1.06] hover:shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15)] [&.active]:!shadow-[inset_0_0_0_1px_#fff,0_0_0_2px_#0F4C5C]${active ? ' active' : ''}`}
                                 style={{background: '#' + parsed.hex6}}
                                 onClick={() => onChange(parsed.hex6, alpha)}
                                 data-tooltip={'#' + parsed.hex6}
@@ -179,33 +182,34 @@ export function ColorField({value, onChange}) {
     };
 
     return (
-        <div className="color-field">
+        <div className="relative flex items-center gap-1.5">
             <button
                 ref={swatchRef}
                 type="button"
-                className="color-field-swatch"
+                className="relative w-[22px] h-[22px] border-none p-0 rounded-e shrink-0 cursor-pointer shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)] overflow-hidden [transition:box-shadow_0.1s,transform_0.05s] hover:shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)] active:scale-95"
                 style={{background: hex6 ? '#' + hex6 : '#ffffff'}}
                 onClick={() => setOpen((o) => !o)}
                 aria-label="Open color picker"
             />
             <input
-                className="field-input color-field-text"
+                className="field-input flex-1 min-w-0 !text-[12px] tracking-[0.04em] uppercase !font-['SF_Mono',ui-monospace,Menlo,monospace]"
                 type="text"
                 value={hexLocal}
                 placeholder="000000"
                 onChange={(e) => onHexInput(e.target.value)}
                 spellCheck={false}
             />
-            <label className="color-field-alpha">
-                <span className="color-field-alpha-label">Opacity</span>
+            <label className="flex items-center gap-1.5 px-2 h-[30px] w-[110px] shrink-0 bg-e-surface-alt border border-transparent rounded-e transition-[background-color,border-color,box-shadow] duration-100 cursor-text hover:bg-e-surface hover:border-e-border-strong focus-within:bg-e-surface focus-within:border-e-primary focus-within:shadow-[0_0_0_2px_rgba(37,99,235,0.18)]">
+                <span className="text-[10.5px] font-medium text-e-text-soft uppercase tracking-[0.04em] shrink-0">Opacity</span>
                 <input
                     type="text"
+                    className="flex-1 min-w-0 border-0 outline-none bg-transparent [font-family:inherit] text-[12px] text-e-text text-right p-0"
                     inputMode="numeric"
                     value={alphaLocal}
                     aria-label="Opacity (%)"
                     onChange={(e) => onAlphaInput(e.target.value)}
                 />
-                <span className="color-field-alpha-suffix">%</span>
+                <span className="text-[11px] text-e-text-soft shrink-0">%</span>
             </label>
             {open && (
                 <div ref={popupRef}>

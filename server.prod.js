@@ -6,10 +6,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { resolveUrlRewrite } from './server/resolveUrlRewrite.js';
-import { resolveCategoryFromMap, startCategoryMapRefresh } from './server/categoryMap.js';
-
-startCategoryMapRefresh();
+import { resolveUrl, toRouteHint } from './server/resolveUrl.js';
+import { readRouteAreas, routeAreaPaths, findRouteArea } from './server/routeAreas.js';
+import { readCustomerTokenCookie } from './server/customerToken.js';
+import { ssrDebugEnabled, mergeStats, applyDebugHeaders, logSsrStats, writeSsrStats } from './server/ssrDebug.js';
 
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
 const ROOT       = __dirname;
@@ -19,6 +19,7 @@ const SERVER_BUNDLE      = path.join(ROOT, 'dist/server/entry-server.js');
 const SPA_SHELL_PATH     = path.join(CLIENT_DIR, '_spa-shell.html');
 const PAGES_INDEX_PATH   = path.join(CLIENT_DIR, '_pages-data.json');
 const PAGES_DIR          = path.join(ROOT, 'editor-app/content/pages');
+const ROUTES_DIR         = path.join(ROOT, 'editor-app/content/routes');
 const UPLOADS_DIR_DIST   = path.join(CLIENT_DIR, 'uploads');
 const UPLOADS_DIR_EDITOR = path.join(ROOT, 'editor-app/public/uploads');
 const UPLOADS_DIR        = fs.existsSync(UPLOADS_DIR_DIST) ? UPLOADS_DIR_DIST : UPLOADS_DIR_EDITOR;
@@ -35,8 +36,6 @@ const GRAPHQL_TARGET   = process.env.GRAPHQL_ORIGIN;
 const GRAPHQL_INSECURE = String(process.env.GRAPHQL_INSECURE || '').toLowerCase() === 'true';
 if (GRAPHQL_INSECURE) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const GRAPHQL_URI      = `${GRAPHQL_TARGET.replace(/\/$/, '')}/graphql`;
-// "graphql" → the client resolves URLs itself; the server then skips resolution.
-const RESOLVE_VIA_GRAPHQL = process.env.VITE_URL_RESOLVE_MODE === 'graphql';
 
 const SPA_SHELL = fs.readFileSync(SPA_SHELL_PATH, 'utf8');
 const { renderApp } = await import(SERVER_BUNDLE);
@@ -68,6 +67,12 @@ if (fs.existsSync(PAGES_INDEX_PATH)) {
   try { bakedPages = JSON.parse(fs.readFileSync(PAGES_INDEX_PATH, 'utf8')); } catch {}
 }
 const editorDirExists = fs.existsSync(PAGES_DIR);
+const routesDirExists = fs.existsSync(ROUTES_DIR);
+
+// A deploy that ships only dist/ has no content directory — the prerender baked
+// the documents into _pages-data.json for exactly that case.
+const readRouteDocs = () =>
+  (routesDirExists ? readRouteAreas(ROUTES_DIR) : bakedPages?.routes || []);
 
 const readAllPages = () => {
   if (!editorDirExists && bakedPages) return bakedPages.pages || [];
@@ -143,6 +148,16 @@ if (EDITOR_ENABLED && EDITOR_APP_URL) {
   app.use(editorProxy);
 }
 
+// Client-side navigation into a category whose area was not in the landing
+// document. Served here rather than proxied to the editor's /api/render so it
+// keeps working with EDITOR_ENABLED=off.
+app.get('/api/route-area', (req, res) => {
+  const area = findRouteArea(readRouteDocs(), String(req.query.path || ''));
+  if (!area) return res.status(404).json({ error: 'Not found' });
+  res.set('Cache-Control', 'no-store');
+  res.json({ area });
+});
+
 app.use(sirv(CLIENT_DIR, { extensions: [] }));
 app.use('/uploads', sirv(UPLOADS_DIR, { maxAge: 31536000, immutable: true, dev: true }));
 
@@ -152,6 +167,21 @@ const prerenderedFileFor = (pathname) => {
   if (pathname === '/') return path.join(CLIENT_DIR, 'index.html');
   const slug = pathname.replace(/^\/+|\/+$/g, '');
   return path.join(CLIENT_DIR, slug, 'index.html');
+};
+
+// Render as the customer when their cookie is present, so the catalog comes back
+// with their group's prices. A token Magento rejects is only discovered mid-render,
+// hence the one guest re-render.
+const renderForRequest = async (req, url, initialData) => {
+  const debug = ssrDebugEnabled();
+  const customerToken = readCustomerTokenCookie(req);
+  const rendered = await renderApp(url, initialData, { graphqlUri: GRAPHQL_URI, customerToken, debug });
+  if (!rendered.authRejected) {
+    return { ...rendered, debugStats: debug ? mergeStats(rendered.stats) : null };
+  }
+  const guest = await renderApp(url, initialData, { graphqlUri: GRAPHQL_URI, debug });
+  // Both renders count: the rejected one already paid for the full query set.
+  return { ...guest, debugStats: debug ? mergeStats(rendered.stats, guest.stats) : null };
 };
 
 const splice = (appHtml, initialData, headCss = '') => {
@@ -165,28 +195,36 @@ const splice = (appHtml, initialData, headCss = '') => {
 };
 
 app.get('*', async (req, res) => {
+  const startedAt = performance.now();
   const pathname = new URL(req.url, 'http://x').pathname;
   if (ASSET_RE.test(pathname)) return res.status(404).end();
+
+  // SSR documents are per-customer now, so no shared cache may store one.
+  res.set('Cache-Control', 'private, no-cache, no-store, max-age=0');
 
   const pageData    = findPageByPath(pathname);
   const footerData  = findPageByPath('/__footer__');
   const editorPages = collectEditorPagesByPath();
 
   if (!pageData) {
-    // Categories resolve from the refreshed map — id is available synchronously,
-    // so the products query fires and renders during SSR. Products resolve on the
-    // client via GraphQL `route` (node mode also falls back to the DB resolver).
-    const category = resolveCategoryFromMap(pathname);
-    const resolvedUrl = category
-      ? { path: category.path, data: category }
-      : RESOLVE_VIA_GRAPHQL ? null : await resolveUrlRewrite(pathname).catch(() => null);
+    const resolvedUrl = await resolveUrl(pathname);
     // entry-server reads `routeHint` (flattened, carries `path`) for the router
     // state; the client hydrates from `resolvedUrl` ({ path, data }).
-    const routeHint = resolvedUrl?.data ? { ...resolvedUrl.data, path: resolvedUrl.path } : null;
-    const initialData = { pageData: null, footerData, editorPages, resolvedUrl, routeHint };
+    const routeHint = toRouteHint(resolvedUrl);
+    // Only this path's area document travels in the document; the rest of the
+    // catalog gets a list of paths and fetches on demand.
+    const routeDocs = readRouteDocs();
+    const initialData = {
+      pageData: null, footerData, editorPages, resolvedUrl, routeHint,
+      routeArea: findRouteArea(routeDocs, pathname),
+      routeAreaPaths: routeAreaPaths(routeDocs),
+    };
     try {
-      const { html: appHtml, apolloState } = await renderApp(req.url, initialData, { graphqlUri: GRAPHQL_URI });
-      return res.type('html').send(splice(appHtml, { ...initialData, apolloCache: apolloState }, CATALOG_CSS_LINKS));
+      const { html: appHtml, apolloState, personalized, debugStats } = await renderForRequest(req, req.url, initialData);
+      applyDebugHeaders(res, debugStats, performance.now() - startedAt);
+      logSsrStats(req, debugStats, performance.now() - startedAt);
+      writeSsrStats(req, debugStats, performance.now() - startedAt);
+      return res.type('html').send(splice(appHtml, { ...initialData, apolloCache: apolloState, personalized }, CATALOG_CSS_LINKS));
     } catch (err) {
       console.error('[ssr]', err);
       // Fall back to a client-only render that still carries the resolved hint.
@@ -204,8 +242,11 @@ app.get('*', async (req, res) => {
       return res.type('html').send(fs.readFileSync(staticPath, 'utf8'));
     }
     const initialData = { pageData, footerData, editorPages };
-    const { html: appHtml, apolloState } = await renderApp(req.url, initialData, { graphqlUri: GRAPHQL_URI });
-    res.type('html').send(splice(appHtml, { ...initialData, apolloCache: apolloState }));
+    const { html: appHtml, apolloState, personalized, debugStats } = await renderForRequest(req, req.url, initialData);
+    applyDebugHeaders(res, debugStats, performance.now() - startedAt);
+    logSsrStats(req, debugStats, performance.now() - startedAt);
+    writeSsrStats(req, debugStats, performance.now() - startedAt);
+    res.type('html').send(splice(appHtml, { ...initialData, apolloCache: apolloState, personalized }));
   } catch (err) {
     console.error('[ssr]', err);
     res.type('html').send(SPA_SHELL);

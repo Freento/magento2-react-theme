@@ -1,0 +1,510 @@
+{
+  "title": "Gear",
+  "path": "/gear.html",
+  "route": {
+    "type": "category",
+    "id": 3
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-gear-main",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "420px",
+          "backgroundImage": "/uploads/promo-gear-main.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "/gear.html",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-gear-main-title",
+            "component": "Heading",
+            "props": {
+              "text": "Sprite Yoga Companion Kit",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-gear-main-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "Save up to 20% on a bundle!",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          },
+          {
+            "id": "promo-gear-main-cta",
+            "component": "Text",
+            "props": {
+              "text": "Shop Yoga Kit",
+              "fontSize": 14,
+              "fontWeight": 500,
+              "color": "#1a1a1a",
+              "textAlign": "center"
+            },
+            "style": {
+              "backgroundColor": "#ffffff",
+              "padding": "10px 22px",
+              "borderRadius": "4px",
+              "width": "fit-content",
+              "marginTop": "8px"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "300px"
+            }
+          }
+        }
+      },
+      {
+        "id": "promo-row-1",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 2,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-gear-fitnes",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "320px",
+              "backgroundImage": "/uploads/promo-gear-fitnes.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/gear/fitness-equipment.html"
+            },
+            "children": [
+              {
+                "id": "promo-gear-fitnes-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Loosen Up",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-gear-fitnes-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Extend your training with yoga straps, tone bands, and jump ropes",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              },
+              {
+                "id": "promo-gear-fitnes-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Fitness",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          },
+          {
+            "id": "promo-gear-equipment",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "320px",
+              "backgroundImage": "/uploads/promo-gear-equipment.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/gear/fitness-equipment.html"
+            },
+            "children": [
+              {
+                "id": "promo-gear-equipment-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Here’s to you!",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-gear-equipment-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "$4 Luma water bottle (save 70%)",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "promo-row-2",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 3,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-gear-category-bags",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/gear/bags.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-gear-category-bags-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-gear-category-bags.avif",
+                  "alt": "Tote, cart or carry",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-gear-category-bags-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Tote, cart or carry",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-gear-category-bags-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Luma bags go the distance",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-gear-category-bags-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Bags",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-gear-category-equipment",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/gear/fitness-equipment.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-gear-category-equipment-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-gear-category-equipment.avif",
+                  "alt": "Let’s get after it!",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-gear-category-equipment-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Let’s get after it!",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-gear-category-equipment-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Luma gym equipment fits your goals and style",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-gear-category-equipment-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Equipment",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-gear-category-watches",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/gear/watches.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-gear-category-watches-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-gear-category-watches.avif",
+                  "alt": "Luma watches",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-gear-category-watches-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma watches",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-gear-category-watches-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Keeping pace has never been more stylish",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-gear-category-watches-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Watches",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gear-products",
+        "component": "ProductsCarousel",
+        "props": {
+          "title": "Hot Sellers",
+          "eyebrow": "",
+          "skus": [
+            {
+              "sku": "24-MB02"
+            },
+            {
+              "sku": "24-WB04"
+            },
+            {
+              "sku": "24-UG06"
+            },
+            {
+              "sku": "24-WG080"
+            }
+          ],
+          "pageSize": 4,
+          "itemsPerSlide": 4,
+          "source": "skus"
+        },
+        "style": {
+          "width": "100%",
+          "marginTop": "3%"
+        }
+      }
+    ]
+  }
+}

@@ -2,6 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { stripIgnoredCharacters } from 'graphql';
+import { readCustomerToken, clearCustomerToken } from '../lib/customerToken';
 
 const isServer = typeof window === 'undefined';
 
@@ -20,7 +21,7 @@ export const minifyPrint = (ast, originalPrint) => {
 
 const authLink = setContext((_, { headers }) => {
   if (isServer) return { headers };
-  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('customerToken') : null;
+  const token = readCustomerToken();
   return {
     headers: {
       ...headers,
@@ -45,7 +46,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
   if (tokenCleared) return; // suppress the cascade of follow-up 401s
   tokenCleared = true;
-  try { localStorage.removeItem('customerToken'); } catch {}
+  clearCustomerToken();
   // Reset the latch after a tick so future genuine expirations are caught.
   setTimeout(() => { tokenCleared = false; }, 2000);
   window.dispatchEvent(new CustomEvent('auth:token-expired'));
@@ -81,10 +82,26 @@ function createHttpLinkForEnv() {
   return createHttpLink({ uri: resolveClientUri(), useGETForQueries: true, print: minifyPrint });
 }
 
+// Cart items are an interface; without this Apollo cannot match a fragment
+// defined `on CartItemInterface` to a concrete item and silently drops its
+// fields when writing to the cache. Shared with the SSR client in entry-server.
+export const possibleTypes = {
+  CartItemInterface: [
+    'SimpleCartItem',
+    'VirtualCartItem',
+    'DownloadableCartItem',
+    'BundleCartItem',
+    'ConfigurableCartItem',
+    'GiftCardCartItem',
+  ],
+};
+
 export function makeApolloClient({ ssr = false, initialCache = null } = {}) {
   const cache = new InMemoryCache({
+    possibleTypes,
     typePolicies: {
       Customer: { keyFields: false },
+      CompareList: { keyFields: ['uid'] },
       Query: {
         fields: {
           customer: {
@@ -118,6 +135,9 @@ export function makeApolloClient({ ssr = false, initialCache = null } = {}) {
           prices: {
             merge: (existing, incoming, { mergeObjects }) =>
               mergeObjects(existing, incoming),
+          },
+          items: {
+            merge: false,
           },
         },
       },

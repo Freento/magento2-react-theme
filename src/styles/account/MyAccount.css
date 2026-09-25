@@ -1,0 +1,105 @@
+.status.complete {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+}
+
+.status.canceled {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+.nav-tab {
+    width: 100%;
+    background: none;
+    border: 0;
+    border-left: 2px solid transparent;
+    padding: 12px 0 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font: inherit;
+    font-size: var(--fs-base);
+    color: var(--ink-2);
+    transition:
+        color 120ms ease,
+        border-color 120ms ease;
+}
+
+.nav-tab:hover {
+    color: var(--ink);
+}
+
+.nav-tab.active {
+    color: var(--ink);
+    font-weight: 500;
+    border-left-color: var(--ink);
+}
+
+@media (max-width: 768px) {
+    .nav-tab {
+        border-left: 0;
+        border-bottom: 2px solid transparent;
+        padding: 12px 14px;
+        white-space: nowrap;
+        font-size: var(--fs-13);
+        flex-shrink: 0;
+    }
+
+    .nav-tab.active {
+        border-left: 0;
+        border-bottom-color: var(--ink);
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-tab {
+        padding: 11px 12px;
+        font-size: var(--fs-sm);
+        letter-spacing: 0.02em;
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-2);
+    font-size: var(--fs-base);
+}
+
+.empty-state p {
+    font-size: var(--fs-base);
+    margin: 0 0 16px;
+}
+
+.empty-state .btn-primary,
+.empty-state .btn-secondary {
+    width: auto !important;
+    min-width: 180px;
+}
+
+.order-details-page .co-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 0;
+    padding: 0 0 18px;
+    color: var(--ink-2);
+    font: inherit;
+    font-size: var(--fs-sm);
+    cursor: pointer;
+    transition: color 120ms ease;
+}
+
+.order-details-page .co-back-link:hover {
+    color: var(--ink);
+}
+
+.address-modal .form-label {
+    font-size: var(--fs-sm);
+    letter-spacing: 0.04em;
+    color: var(--ink);
+}

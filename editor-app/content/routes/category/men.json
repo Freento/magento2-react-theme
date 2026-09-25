@@ -1,0 +1,540 @@
+{
+  "title": "Men",
+  "path": "/men.html",
+  "route": {
+    "type": "category",
+    "id": 11
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-mens-main",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "420px",
+          "backgroundImage": "/uploads/promo-mens-main.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "/men.html",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-mens-main-title",
+            "component": "Heading",
+            "props": {
+              "text": "Going the extra mile just got extra comfortable",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-mens-main-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "Luma’s Performance Fabric collection",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          },
+          {
+            "id": "promo-mens-main-cta",
+            "component": "Text",
+            "props": {
+              "text": "Shop Performance",
+              "fontSize": 14,
+              "fontWeight": 500,
+              "color": "#1a1a1a",
+              "textAlign": "center"
+            },
+            "style": {
+              "backgroundColor": "#ffffff",
+              "padding": "10px 22px",
+              "borderRadius": "4px",
+              "width": "fit-content",
+              "marginTop": "8px"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "300px"
+            }
+          }
+        }
+      },
+      {
+        "id": "promo-row-1",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 2,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-mens-t-shirts",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/men/tops-men/tees-men.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-mens-t-shirts-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-mens-t-shirts.avif",
+                  "alt": "Save up to $24!",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-mens-t-shirts-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Save up to $24!",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-mens-t-shirts-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Buy 3 Luma tees, get 4 instead",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-mens-t-shirts-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Tees",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-mens-pants",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "320px",
+              "backgroundImage": "/uploads/promo-mens-pants.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/men/bottoms-men/pants-men.html"
+            },
+            "children": [
+              {
+                "id": "promo-mens-pants-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Last chance\nfor pants",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                },
+                "style": {
+                  "whiteSpace": "pre-line"
+                }
+              },
+              {
+                "id": "promo-mens-pants-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Take 20% OFF",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              },
+              {
+                "id": "promo-mens-pants-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Pants",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "promo-row-2",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 3,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-mens-category-shorts",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/men/bottoms-men/shorts-men.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-mens-category-shorts-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-mens-category-shorts.avif",
+                  "alt": "Luma shorts",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-mens-category-shorts-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma shorts",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-mens-category-shorts-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Cool it now",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-mens-category-shorts-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Shorts",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-mens-category-tees",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/men/tops-men/tees-men.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-mens-category-tees-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-mens-category-tees.avif",
+                  "alt": "Luma tees",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-mens-category-tees-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma tees",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-mens-category-tees-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Grab a tee or two!",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-mens-category-tees-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Tees",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-mens-category-hoodies",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/men/tops-men/hoodies-and-sweatshirts-men.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-mens-category-hoodies-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-mens-category-hoodies.avif",
+                  "alt": "Luma hoodies",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-mens-category-hoodies-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma hoodies",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-mens-category-hoodies-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Dress for fitness",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-mens-category-hoodies-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Hoodies",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "men-products",
+        "component": "ProductsCarousel",
+        "props": {
+          "title": "Hot Sellers",
+          "eyebrow": "",
+          "skus": [
+            {
+              "sku": "MT07"
+            },
+            {
+              "sku": "MH07"
+            },
+            {
+              "sku": "MSH03"
+            },
+            {
+              "sku": "MP03"
+            }
+          ],
+          "pageSize": 4,
+          "itemsPerSlide": 4,
+          "source": "skus"
+        },
+        "style": {
+          "width": "100%",
+          "marginTop": "3%"
+        }
+      }
+    ]
+  }
+}

@@ -6,7 +6,6 @@ import ProductList from '../catalog/ProductList';
 import CategorySkeleton from '../catalog/CategorySkeleton';
 import useFilters from '../../hooks/useFilters';
 import { GET_SEARCH_RESULTS } from '../../queries/search';
-import '../../styles/search/Search.less';
 
 const Search = () => {
     const location = useLocation();
@@ -42,7 +41,8 @@ const Search = () => {
         showLayerNavigation,
         setPriceRange,
         graphqlFilters,
-        graphqlSort
+        graphqlSort,
+        applyFilters,
     } = useFilters(null, true);
 
     const queryVariables = useMemo(() => {
@@ -75,7 +75,7 @@ const Search = () => {
 
     if (!searchTerm) {
         return (
-            <div className="search-message">
+            <div className="search-message p-8 text-center">
                 <h1>Search</h1>
                 <p>Please enter a search term to find products.</p>
             </div>
@@ -88,7 +88,7 @@ const Search = () => {
 
     if (error) {
         return (
-            <div className="search-message">
+            <div className="search-message p-8 text-center">
                 <h1>Search Error</h1>
                 <p>An error occurred while searching for "{searchTerm}": {error.message}</p>
             </div>
@@ -101,10 +101,10 @@ const Search = () => {
     const totalPages = pageInfo.total_pages || 1;
 
     return (
-        <div className="category-page">
-            <h1 className="page-title">Search results for &ldquo;{searchTerm}&rdquo;</h1>
+        <div className="category-page pt-10 max768:pt-4">
+            <h1 className="page-title text-hero text-ink mb-1.5 tracking-[-0.02em] max768:text-2xl max768:leading-[1.2]">Search results for &ldquo;{searchTerm}&rdquo;</h1>
             {totalCount > 0 && (
-                <div className="page-count-mobile">
+                <div className="page-count-mobile hidden max768:block mt-1 mb-3.5 font-serif italic text-ink-2 text-md">
                     {totalCount}
                     {totalCount === 1 ? ' item' : ' items'}
                 </div>
@@ -122,6 +122,7 @@ const Search = () => {
                 activeFilters={activeFilters}
                 onAddFilter={addFilter}
                 onRemoveFilter={removeFilter}
+                onApplyFilters={applyFilters}
                 onClearAllFilters={clearAllFilters}
                 hasActiveFilters={hasActiveFilters}
                 isLayerNavigationVisible={isLayerNavigationVisible}

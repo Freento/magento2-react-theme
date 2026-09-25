@@ -5,7 +5,7 @@ import { useAuthEvents } from '../../hooks/useAuthEvents';
 import {
   GET_CART_DETAILS,
   CREATE_EMPTY_CART,
-  ADD_SIMPLE_PRODUCTS_TO_CART,
+  ADD_PRODUCTS_TO_CART,
   UPDATE_CART_ITEMS,
   REMOVE_ITEM_FROM_CART,
   MERGE_CARTS,
@@ -20,7 +20,7 @@ export const useCartActions = (state, dispatch) => {
   const apolloClient = useApolloClient();
 
   const [createEmptyCart] = useMutation(CREATE_EMPTY_CART);
-  const [addSimpleProductsToCart] = useMutation(ADD_SIMPLE_PRODUCTS_TO_CART);
+  const [addProductsToCart] = useMutation(ADD_PRODUCTS_TO_CART);
   const [updateCartItems] = useMutation(UPDATE_CART_ITEMS);
   const [removeItemFromCart] = useMutation(REMOVE_ITEM_FROM_CART);
   const [mergeCarts] = useMutation(MERGE_CARTS);
@@ -28,6 +28,7 @@ export const useCartActions = (state, dispatch) => {
 
   const [cartRequested, setCartRequested] = useState(false);
   const loadCart = () => setCartRequested(true);
+  const clearError = () => dispatch({ type: 'SET_ERROR', payload: null });
 
   useEffect(() => {
     if (!state.cartId) return;
@@ -70,16 +71,12 @@ export const useCartActions = (state, dispatch) => {
       localStorage.setItem('cartId', newCartId);
       dispatch({ type: 'SET_CART_ID', payload: newCartId });
       dispatch({ type: 'SET_ERROR', payload: null });
-      dispatch({ type: 'SET_CART_RECOVERED', payload: { at: Date.now() } });
       return newCartId;
     } catch (createError) {
       console.error('Failed to create new cart after error:', createError);
-      dispatch({ type: 'SET_ERROR', payload: 'Cart expired and we could not create a new one. Please refresh the page.' });
       return null;
     }
   };
-
-  const clearCartRecovered = () => dispatch({ type: 'SET_CART_RECOVERED', payload: null });
 
   useEffect(() => {
     if (!cartError) return;
@@ -95,10 +92,12 @@ export const useCartActions = (state, dispatch) => {
 
     if (cartId && !force) {
       dispatch({ type: 'SET_CART_ID', payload: cartId });
+      dispatch({ type: 'SET_CART_INITIALIZED' });
       return;
     }
 
     if (!force) {
+      dispatch({ type: 'SET_CART_INITIALIZED' });
       return;
     }
 
@@ -109,6 +108,8 @@ export const useCartActions = (state, dispatch) => {
       dispatch({ type: 'SET_CART_ID', payload: cartId });
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: 'Failed to create cart' });
+    } finally {
+      dispatch({ type: 'SET_CART_INITIALIZED' });
     }
   };
 
@@ -124,7 +125,7 @@ export const useCartActions = (state, dispatch) => {
     [AUTH_EVENTS.TOKEN_INVALID]: () => { initializeCart(true); },
   });
 
-  const addToCart = async (sku, quantity = 1) => {
+  const addToCart = async (sku, quantity = 1, selectedOptions = [], { openMiniCart: openAfterAdd = true } = {}) => {
     let cartId = state.cartId;
     if (!cartId) {
       try {
@@ -140,25 +141,30 @@ export const useCartActions = (state, dispatch) => {
 
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const result = await addSimpleProductsToCart({
+      const result = await addProductsToCart({
         variables: {
           cartId,
-          cartItems: [{ data: { quantity, sku } }]
+          cartItems: [{
+            sku,
+            quantity,
+            ...(selectedOptions.length ? { selected_options: selectedOptions } : {}),
+          }],
         }
       });
 
-      if (result.errors && result.errors.length) {
-        const msg = result.errors[0]?.message || 'Failed to add to bag';
+      const userErrors = result.data?.addProductsToCart?.user_errors || [];
+      if (result.errors?.length || userErrors.length) {
+        const msg = userErrors[0]?.message || result.errors?.[0]?.message || 'Failed to add to bag';
         dispatch({ type: 'SET_ERROR', payload: msg });
         throw new Error(msg);
       }
 
-      if (result.data?.addSimpleProductsToCart?.cart) {
-        dispatch({ type: 'SET_CART_DATA', payload: result.data.addSimpleProductsToCart.cart });
+      if (result.data?.addProductsToCart?.cart) {
+        dispatch({ type: 'SET_CART_DATA', payload: result.data.addProductsToCart.cart });
       }
 
       setCartRequested(true);
-      dispatch({ type: 'SET_IS_MINI_CART_OPEN', payload: true });
+      if (openAfterAdd) dispatch({ type: 'SET_IS_MINI_CART_OPEN', payload: true });
     } catch (error) {
       if (isDeadCartError(error)) { await recoverCart(); }
       dispatch({ type: 'SET_ERROR', payload: error.message });
@@ -168,8 +174,10 @@ export const useCartActions = (state, dispatch) => {
     }
   };
 
+  // Resolves to true when the line was updated, false when it failed, so
+  // callers that need to act on the outcome (cart item editing) can branch.
   const updateQuantity = async (cartItemId, quantity) => {
-    if (!state.cartId) return;
+    if (!state.cartId) return false;
     dispatch({ type: 'ADD_PENDING_ITEM', payload: cartItemId });
     try {
       const result = await updateCartItems({
@@ -182,16 +190,18 @@ export const useCartActions = (state, dispatch) => {
       if (result.data?.updateCartItems?.cart) {
         dispatch({ type: 'SET_CART_DATA', payload: result.data.updateCartItems.cart });
       }
+      return true;
     } catch (error) {
       if (isDeadCartError(error)) { await recoverCart(); }
       else dispatch({ type: 'SET_ERROR', payload: error.message });
+      return false;
     } finally {
       dispatch({ type: 'REMOVE_PENDING_ITEM', payload: cartItemId });
     }
   };
 
-  const removeItem = async (cartItemId) => {
-    if (!state.cartId) return;
+  const removeItem = async (cartItemId, { silent = false } = {}) => {
+    if (!state.cartId) return false;
     const removedName = state.cartData?.items?.find((it) => it.id === cartItemId)?.product?.name || 'Item';
     dispatch({ type: 'ADD_PENDING_ITEM', payload: cartItemId });
     try {
@@ -205,14 +215,17 @@ export const useCartActions = (state, dispatch) => {
       if (result.data?.removeItemFromCart?.cart) {
         dispatch({ type: 'SET_CART_DATA', payload: result.data.removeItemFromCart.cart });
       }
-
-      dispatch({
-        type: 'SET_LAST_REMOVED',
-        payload: { id: cartItemId, name: removedName, at: Date.now() },
-      });
+      if (!silent) {
+        dispatch({
+          type: 'SET_LAST_REMOVED',
+          payload: { id: cartItemId, name: removedName, at: Date.now() },
+        });
+      }
+      return true;
     } catch (error) {
       if (isDeadCartError(error)) { await recoverCart(); }
       else dispatch({ type: 'SET_ERROR', payload: error.message });
+      return false;
     } finally {
       dispatch({ type: 'REMOVE_PENDING_ITEM', payload: cartItemId });
     }
@@ -270,8 +283,8 @@ export const useCartActions = (state, dispatch) => {
     getCartItemsCount,
     clearCart,
     clearLastRemoved,
-    clearCartRecovered,
     refetchCart,
     loadCart,
+    clearError,
   };
 };

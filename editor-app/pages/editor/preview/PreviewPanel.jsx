@@ -59,7 +59,7 @@ export function PreviewPanel({
     return (
         <div
             ref={ref}
-            className="editor-preview"
+            className="editor-preview flex flex-col flex-1 overflow-auto bg-e-bg relative z-0"
             onClick={(e) => {
                 if (!e.target?.closest?.('[data-block-id]')) onDeselect?.();
             }}
@@ -67,6 +67,13 @@ export function PreviewPanel({
                 if (typeof window !== 'undefined' && window.__editorPicking) return;
                 const link = e.target.closest && e.target.closest('a');
                 if (!link) return;
+                // A container can be a link, and then every block inside it sits
+                // inside an anchor too. Selecting the nested block is what the
+                // author means by clicking it, so only a click on the block that
+                // owns the link follows it. Its own wrapper is outside the
+                // anchor; a nested block's is inside.
+                const hit = e.target.closest && e.target.closest('[data-block-id]');
+                if (hit && link.contains(hit)) return;
                 const href = link.getAttribute('href');
                 if (!href || href.startsWith('#')) return;
                 e.preventDefault();
@@ -87,13 +94,13 @@ export function PreviewPanel({
                 handleDrop();
             }}
         >
-            <div className="editor-preview-toolbar">
-                <div className="device-switch">
+            <div className="editor-preview-toolbar sticky top-0 z-[5] flex items-center gap-2.5 justify-center py-2 px-3 bg-e-code-bg border-b border-e-border">
+                <div className="device-switch inline-flex bg-e-surface border border-e-border rounded-e p-[3px] gap-0.5">
                     {devices.map((d) => (
                         <button
                             key={d.id}
                             type="button"
-                            className={`device-switch-item${device === d.id ? ' active' : ''}`}
+                            className={`device-switch-item inline-flex items-center gap-1.5 py-1 px-2.5 h-7 border-none bg-transparent text-e-text-muted text-[12px] font-medium rounded-e-sm cursor-pointer transition-all duration-100 [&:hover:not(.active)]:text-e-text [&:hover:not(.active)]:bg-e-code-bg [&.active]:text-e-text [&.active]:bg-e-primary-soft [&.active]:shadow-[0_0_0_1px_#0F4C5C]${device === d.id ? ' active' : ''}`}
                             onClick={() => onDeviceChange(d.id)}
                             title={d.label}
                         >
@@ -103,12 +110,12 @@ export function PreviewPanel({
                     ))}
                 </div>
                 {deviceWidth != null && (
-                    <span className="device-width-hint">{deviceWidth}px</span>
+                    <span className="device-width-hint text-[11px] text-e-text-soft [font-family:'SF_Mono',ui-monospace,Menlo,monospace]">{deviceWidth}px</span>
                 )}
-                <div className="editor-preview-toolbar-actions">
+                <div className="editor-preview-toolbar-actions absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button
                         type="button"
-                        className="icon-btn"
+                        className="icon-btn w-7 h-7 inline-flex items-center justify-center border border-transparent bg-transparent text-e-text-muted rounded-e cursor-pointer transition-all duration-100 flex-shrink-0 enabled:hover:bg-e-surface-hover enabled:hover:text-e-text enabled:hover:border-e-border disabled:opacity-[0.35] disabled:cursor-not-allowed"
                         onClick={onUndo}
                         disabled={!canUndo}
                         title="Undo"
@@ -118,7 +125,7 @@ export function PreviewPanel({
                     </button>
                     <button
                         type="button"
-                        className="icon-btn"
+                        className="icon-btn w-7 h-7 inline-flex items-center justify-center border border-transparent bg-transparent text-e-text-muted rounded-e cursor-pointer transition-all duration-100 flex-shrink-0 enabled:hover:bg-e-surface-hover enabled:hover:text-e-text enabled:hover:border-e-border disabled:opacity-[0.35] disabled:cursor-not-allowed"
                         onClick={onRedo}
                         disabled={!canRedo}
                         title="Redo"
@@ -127,22 +134,22 @@ export function PreviewPanel({
                         <UI.RedoArrow size={16} strokeWidth={1.75}/>
                     </button>
                     <button
-                        className="btn-save"
+                        className="btn-save h-8 px-[14px] text-[13px] font-medium border border-transparent rounded-e cursor-pointer transition-all duration-100 text-white bg-e-text inline-flex items-center gap-1.5 whitespace-nowrap enabled:hover:bg-e-text-hover disabled:bg-e-border disabled:text-e-text-soft disabled:cursor-default"
                         onClick={onSave}
                         disabled={!isDirty}
                     >
                         <UI.Save size={14} strokeWidth={2}/>
                         Save
                     </button>
-                    <span className="btn-tooltip-wrap">
+                    <span className="btn-tooltip-wrap relative inline-flex group">
                 <button
-                    className={`btn-save btn-push${canPush && !isPushing ? ' is-ready' : ''}`}
+                    className={`btn-save btn-push h-8 px-[14px] text-[13px] font-medium border rounded-e cursor-pointer transition-all duration-100 inline-flex items-center gap-1.5 whitespace-nowrap bg-transparent text-e-text-soft border-e-border [&.is-ready]:bg-e-text [&.is-ready]:text-white [&.is-ready]:border-e-text [&.is-ready]:enabled:hover:bg-e-text-hover disabled:bg-transparent disabled:text-e-text-soft disabled:border-e-border disabled:cursor-default${canPush && !isPushing ? ' is-ready' : ''}`}
                     onClick={onPush}
                     disabled={isPushing || !canPush}
                 >
                   {isPushing ? 'Pushing…' : 'Push'}
                 </button>
-                <span className="btn-tooltip" role="tooltip">
+                <span className="btn-tooltip absolute top-[calc(100%+8px)] right-0 z-50 py-1.5 px-2.5 bg-e-text text-white text-[12px] font-medium leading-[1.3] whitespace-nowrap rounded-e shadow-e-pop opacity-0 pointer-events-none translate-y-[-2px] transition-[opacity,transform] duration-[120ms] group-hover:opacity-100 group-hover:translate-y-0 before:content-[''] before:absolute before:top-[-4px] before:right-[14px] before:w-2 before:h-2 before:bg-e-text before:rotate-45 before:rounded-[1px]" role="tooltip">
                   {canPush ? 'Push all changes to production' : 'Nothing to push'}
                 </span>
               </span>
@@ -150,7 +157,7 @@ export function PreviewPanel({
             </div>
             {device === 'desktop' ? (
                 <div
-                    className="editor-preview-inner"
+                    className="editor-preview-inner bg-e-surface min-h-full"
                     ref={innerRef}
                 >
                     {renderContent()}
@@ -224,7 +231,7 @@ function DeviceFrame({
     }, [postData]);
 
     return (
-        <div className="device-frame">
+        <div className="device-frame flex-1 flex flex-col items-center p-4 min-h-0 gap-2.5 overflow-auto [&_iframe]:flex-shrink-0 [&_iframe]:rounded-e-lg [&_iframe]:shadow-[0_4px_24px_rgba(0,0,0,0.08)] [&_iframe]:bg-e-surface [&_iframe]:block [&_iframe]:h-[calc(100vh-52px-32px)] [&_iframe]:max-h-full">
             <iframe
                 ref={iframeRef}
                 title={`Preview (${device})`}

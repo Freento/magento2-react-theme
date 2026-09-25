@@ -7,7 +7,7 @@ const userError = (msg) => {
 export default {
   code: 'braintree',
   validate: null,
-  prepare: async (_state, deps) => {
+  prepare: async (state, deps) => {
     if (typeof deps.braintreeHostedTokenize !== 'function') {
       throw userError('Card form is still loading. Please wait a moment and try again.');
     }
@@ -35,7 +35,7 @@ export default {
       braintree: {
         payment_method_nonce: nonce,
         device_data: '',
-        is_active_payment_token_enabler: false,
+        is_active_payment_token_enabler: !!state.saveCard,
       },
     };
   },

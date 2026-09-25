@@ -1,4 +1,4 @@
-export { ADD_SIMPLE_PRODUCTS_TO_CART } from './addSimpleProductsToCart';
+export { ADD_PRODUCTS_TO_CART } from './addProductsToCart';
 export { CREATE_EMPTY_CART } from './createEmptyCart';
 export { GET_CART_DETAILS } from './getCartDetails';
 export { GET_CUSTOMER_CART } from './getCustomerCart';

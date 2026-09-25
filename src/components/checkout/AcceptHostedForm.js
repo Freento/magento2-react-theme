@@ -88,14 +88,14 @@ const AcceptHostedForm = ({
     if (loading) {
         return (
             <div className="accept-hosted-loading">
-                <div className="loading-spinner"></div>
+                <div className="loading-spinner w-[18px] h-[18px] rounded-full border-2 border-bg/40 border-t-bg animate-spin"></div>
                 <p>Loading secure payment form...</p>
             </div>
         );
     }
 
     return (
-        <div className="accept-hosted-container">
+        <div className="accept-hosted-container mt-3.5">
             <div className="accept-hosted-iframe-wrapper">
                 <iframe
                     ref={iframeRef}

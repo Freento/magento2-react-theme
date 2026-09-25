@@ -23,6 +23,9 @@ export function useBlockActions({
     const mutations = useBlockMutations({
         getCurrentBlocks: access.getCurrentBlocks,
         setCurrentBlocks: access.setCurrentBlocks,
+        sideForBlockId: access.sideForBlockId,
+        getBlocksFor: access.getBlocksFor,
+        setBlocksFor: access.setBlocksFor,
         selectedBlockRaw: access.selectedBlockRaw,
         selectedBlockId,
         device,

@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../styles/ui/Pagination.less';
 
 function buildPages(current, total) {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -12,6 +11,12 @@ function buildPages(current, total) {
   }
   return out;
 }
+
+const PAGER_CTRL =
+  'inline-flex items-center justify-center gap-1.5 h-9 bg-transparent border border-line rounded text-ink text-13 font-medium tracking-[0.02em] cursor-pointer transition-colors duration-fast ease-[ease]';
+
+const PAGER_BTN =
+  `pager-btn ${PAGER_CTRL} px-3.5 max600:px-3 enabled:hover:border-ink enabled:hover:bg-surface disabled:text-ink-2 disabled:border-line disabled:cursor-not-allowed disabled:bg-transparent [&:disabled_svg]:opacity-50`;
 
 const ArrowLeft = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -33,29 +38,31 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const atEnd = currentPage >= totalPages;
 
   return (
-    <nav className="pager" aria-label="Pagination">
+    <nav className="pager flex items-center justify-center gap-4 max600:gap-2 py-6" aria-label="Pagination">
       <button
         type="button"
-        className="pager-btn pager-prev"
+        className={`${PAGER_BTN} pager-prev`}
         onClick={() => onPageChange(currentPage - 1)}
         disabled={atStart}
         aria-label="Previous page"
       >
         <ArrowLeft />
-        <span>Prev</span>
+        <span className="max600:hidden">Prev</span>
       </button>
 
-      <ol className="pager-list">
+      <ol className="pager-list flex items-center gap-1 list-none m-0 p-0">
         {tokens.map((t) => {
           if (typeof t === 'string') {
-            return <li key={t} className="pager-gap" aria-hidden="true">…</li>;
+            return <li key={t} className="pager-gap inline-flex items-center justify-center min-w-[28px] h-9 text-ink-2 text-base select-none" aria-hidden="true">…</li>;
           }
           const isCurrent = t === currentPage;
           return (
             <li key={t}>
               <button
                 type="button"
-                className={`pager-num${isCurrent ? ' is-current' : ''}`}
+                className={isCurrent
+                  ? 'pager-num is-current inline-flex items-center justify-center gap-1.5 h-9 min-w-[36px] px-2.5 bg-ink border border-ink rounded text-bg text-13 font-medium tracking-[0.02em] cursor-default transition-colors duration-fast ease-[ease]'
+                  : `pager-num ${PAGER_CTRL} min-w-[36px] px-2.5 hover:border-ink hover:bg-surface`}
                 onClick={() => onPageChange(t)}
                 aria-current={isCurrent ? 'page' : undefined}
                 aria-label={`Page ${t}`}
@@ -69,12 +76,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
       <button
         type="button"
-        className="pager-btn pager-next"
+        className={`${PAGER_BTN} pager-next`}
         onClick={() => onPageChange(currentPage + 1)}
         disabled={atEnd}
         aria-label="Next page"
       >
-        <span>Next</span>
+        <span className="max600:hidden">Next</span>
         <ArrowRight />
       </button>
     </nav>

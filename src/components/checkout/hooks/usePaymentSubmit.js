@@ -17,6 +17,10 @@ export default function usePaymentSubmit({
       actions.setErrors({ payment: 'Please select a payment method to continue.' });
       return;
     }
+    if (!state.useSameAsShipping && state.billingEditing) {
+      actions.setErrors({ payment: 'Please update your billing address before placing the order.' });
+      return;
+    }
     if (completedSteps.has(3)) return;
 
     const strategy = getPaymentStrategy(selectedPayment);
@@ -86,6 +90,7 @@ export default function usePaymentSubmit({
       navigate('/checkout/success', { state: { orderNumber }, replace: true });
     } catch (err) {
       console.error(`[${selectedPayment}] placeOrder failed:`, err);
+      actions.uncompleteStep(3);
       actions.setErrors({ payment: err?.message || 'Order could not be placed.' });
     } finally {
       actions.setPaymentLoading(false);

@@ -3,8 +3,8 @@ export default {
     category: 'domain',
     icon: '⧫',
     acceptsChildren: false,
-    allowedIn: ['page', 'Grid'],
-    hideStyleFields: ['color', 'backgroundColor', 'borderSides', 'borderStyle', 'borderColor'],
+    allowedIn: ['page', 'Grid', 'Box'],
+    hideStyleFields: ['color', 'backgroundColor', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundOverlay', 'borderSides', 'borderStyle', 'borderColor', 'link'],
     defaultProps: {
       slides: [
         { title: 'Shinglas shingles from 10.80 BYN', subtitle: 'Best prices on roofing materials', buttonText: 'Learn more', buttonHref: '/catalog', image: 'https://placehold.co/1200x400/c52327/fff?text=Slide+1' },

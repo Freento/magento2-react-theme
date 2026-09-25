@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useWishlist } from '../../context/WishlistContext';
-import '../../styles/layout/MobileBottomNav.less';
+
+const MBN_ITEM =
+  'mbn-item flex-1 inline-flex flex-col items-center justify-center gap-1 py-1.5 bg-transparent border-0 cursor-pointer text-ink text-2xs font-medium tracking-[0.02em] normal-case no-underline transition-colors duration-fast ease-[ease] hover:text-ink [&_svg]:w-5 [&_svg]:h-5 [&_svg]:stroke-ink';
+
+const MBN_BADGE =
+  'mbn-badge absolute top-[-4px] right-[-8px] bg-ink text-bg text-2xs font-semibold tracking-normal rounded-pill min-w-[16px] px-[5px] h-4 leading-4 text-center normal-case';
 
 const Icon = {
   User: () => (
@@ -32,14 +37,14 @@ export default function MobileBottomNav() {
   const cartCount = getCartItemsCount();
 
   return (
-    <nav className="mobile-bottom-nav" aria-label="Primary mobile">
+    <nav className="mobile-bottom-nav hidden max900:flex fixed left-0 right-0 bottom-0 z-[70] bg-bg border-t border-line pt-1.5 pb-[max(6px,env(safe-area-inset-bottom))]" aria-label="Primary mobile">
       {isAuthenticated ? (
-        <Link to="/my-account" className="mbn-item">
+        <Link to="/my-account" className={MBN_ITEM}>
           <Icon.User />
           <span>Account</span>
         </Link>
       ) : (
-        <button onClick={openLoginModal} className="mbn-item" type="button">
+        <button onClick={openLoginModal} className={MBN_ITEM} type="button">
           <Icon.User />
           <span>Account</span>
         </button>
@@ -47,19 +52,19 @@ export default function MobileBottomNav() {
 
       <Link
         to="/my-account?tab=wishlist"
-        className="mbn-item"
+        className={MBN_ITEM}
       >
-        <span className="mbn-icon">
+        <span className="mbn-icon relative inline-flex">
           <Icon.Heart />
-          {wishlistCount > 0 && <span className="mbn-badge">{wishlistCount}</span>}
+          {wishlistCount > 0 && <span className={MBN_BADGE}>{wishlistCount}</span>}
         </span>
         <span>Wishlist</span>
       </Link>
 
-      <button onClick={openMiniCart} className="mbn-item mbn-cart" type="button">
-        <span className="mbn-icon">
+      <button onClick={openMiniCart} className={`${MBN_ITEM} mbn-cart`} type="button">
+        <span className="mbn-icon relative inline-flex">
           <Icon.Bag />
-          {cartCount > 0 && <span className="mbn-badge">{cartCount}</span>}
+          {cartCount > 0 && <span className={MBN_BADGE}>{cartCount}</span>}
         </span>
         <span>Cart</span>
       </button>

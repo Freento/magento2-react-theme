@@ -2,14 +2,19 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { useSyncBreadcrumbs } from '../../../../context/BreadcrumbContext';
 import { GET_PRODUCT_DETAILS } from '../../../../queries/product';
+import { useAuth } from '../../../../context/AuthContext';
+import { isSsrPersonalized } from '../../../../lib/ssrPersonalized';
 
 export default function useProductData(urlKeyProp) {
   const { urlKey: urlKeyParam } = useParams();
   const urlKey = urlKeyProp || urlKeyParam;
+  const { isAuthenticated } = useAuth();
 
   const { loading, error, data, refetch } = useQuery(GET_PRODUCT_DETAILS, {
     variables: { urlKey },
-    fetchPolicy: 'cache-first',
+    // Guests read the SSR/prefetch-populated cache; a customer only when the server
+    // rendered this document as them, otherwise it holds guest prices.
+    fetchPolicy: isAuthenticated && !isSsrPersonalized() ? 'cache-and-network' : 'cache-first',
   });
 
   // Magento's url_key `eq` filter can return related products too (e.g. a bundle
@@ -68,6 +73,7 @@ export default function useProductData(urlKeyProp) {
     refetch,
     isConfigurable,
     eyebrowText,
+    guestReviewsAllowed: data?.storeConfig?.allow_guests_to_write_product_reviews !== '0',
     reviews: product?.reviews?.items || [],
     reviewCount: product?.review_count || 0,
     ratingSummary: product?.rating_summary || 0,

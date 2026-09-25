@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
 import { renderPageBlocks, useActiveDevices } from 'editor-core/renderer';
-import * as defaultBlocks from 'editor-core/blocks';
 import { useSyncBreadcrumbs } from '../../context/BreadcrumbContext';
-import HostProductsCarousel from '../catalog/ProductsCarousel';
-import HostNewsletterForm from '../layout/NewsletterForm';
+import { storefrontBlocks as blocks } from './editorBlocks';
 import NotFound from './NotFound';
-
-const blocks = {
-  ...defaultBlocks,
-  ProductsCarousel: HostProductsCarousel,
-  NewsletterForm: HostNewsletterForm,
-};
 
 export default function EditorPageRoute({ slug, editorPages = {}, ssrHint }) {
   const devices = useActiveDevices(undefined, ssrHint);

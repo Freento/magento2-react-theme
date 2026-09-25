@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { INLINE_EDIT_STYLE } from '../inline-edit-style';
+import { InsideLinkContext } from '../link-context.js';
 
 export default function Button({
   text = 'Button',
@@ -22,6 +24,10 @@ export default function Button({
   _editor,
 }) {
   const bw = Number(borderWidth) || 0;
+  // A button inside a linked container stays a button to look at, but the
+  // click belongs to the container's link.
+  const insideLink = useContext(InsideLinkContext);
+  const Tag = insideLink ? 'span' : 'a';
   const buttonStyle = {
     display: fullWidth ? 'flex' : 'inline-flex',
     alignItems: 'center',
@@ -46,8 +52,8 @@ export default function Button({
 
   if (_editor?.isSelected) {
     return (
-      <a
-        href={href}
+      <Tag
+        {...(insideLink ? {} : { href })}
         style={{ ...buttonStyle, ...INLINE_EDIT_STYLE }}
         contentEditable
         suppressContentEditableWarning
@@ -58,13 +64,13 @@ export default function Button({
         }}
       >
         {text}
-      </a>
+      </Tag>
     );
   }
 
   return (
-    <a href={href} style={buttonStyle}>
+    <Tag {...(insideLink ? {} : { href })} style={buttonStyle}>
       {text}
-    </a>
+    </Tag>
   );
 }

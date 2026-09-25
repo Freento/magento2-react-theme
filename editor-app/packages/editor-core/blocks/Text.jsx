@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { INLINE_EDIT_STYLE } from '../inline-edit-style';
+import { InsideLinkContext } from '../link-context.js';
 
 export default function Text({
   text = '',
@@ -15,6 +17,7 @@ export default function Text({
   letterSpacing = 'normal',
   _editor,
 }) {
+  const insideLink = useContext(InsideLinkContext);
   const textStyle = {
     fontSize,
     lineHeight,
@@ -47,7 +50,7 @@ export default function Text({
     );
   }
 
-  if (href) {
+  if (href && !insideLink) {
     return (
       <p style={{ ...textStyle, textDecoration: 'none' }}>
         <a

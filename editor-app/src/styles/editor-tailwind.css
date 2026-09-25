@@ -1,0 +1,82 @@
+/* Editor Tailwind entry. Pulls the host theme's Tailwind layer (base reset,
+   shared component classes, and — because this file is compiled with
+   editor-app/tailwind.config.js whose `content` scans the editor too — every
+   utility the editor UI uses). Editor-only plain CSS (root typography and
+   keyframes that cannot be utilities) rides alongside. */
+@import "@host/styles/tailwind.css";
+
+/* Editor design tokens as custom properties. The same values live in
+   editor-app/tailwind.config.js (where they back the `e-*` utilities); these
+   are what the plain-CSS remnants below and in editor/inspector consume. */
+:root {
+    --e-bg: #f8f8f6;
+    --e-surface: #ffffff;
+    --e-surface-alt: #f8f8f6;
+    --e-surface-hover: #f2f2ef;
+    --e-surface-sel: #f2f2ef;
+    --e-border: #e8e8e5;
+    --e-border-strong: #d8d8d4;
+    --e-text: #111111;
+    --e-text-muted: #6b6b6b;
+    --e-text-soft: #9a9a95;
+    --e-text-hover: #262626;
+    --e-primary: #0f4c5c;
+    --e-primary-soft: #eaf0f2;
+    --e-primary-border: #0f4c5c;
+    --e-danger: #b91c1c;
+    --e-danger-soft: #fff5f5;
+    --e-danger-border: #fca5a5;
+    --e-success: #16a34a;
+    --e-info: #1d4ed8;
+    --e-white: #ffffff;
+    --e-black-rgb: 0 0 0;
+    --e-accent-strong-rgb: 37 99 235;
+    --e-code-bg: #f3f4f6;
+    --e-code-bg-soft: #f9fafb;
+    --e-code-border: #d1d5db;
+    --e-code-text: #1f2937;
+    --e-sel-soft: #dfe7fd;
+    --e-r-sm: 4px;
+    --e-r: 4px;
+    --e-r-lg: 6px;
+    --e-r-xl: 8px;
+}
+
+@layer base {
+    .editor-root {
+        font-family:
+            "Inter",
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            "Helvetica Neue",
+            Arial,
+            sans-serif;
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--e-text);
+        background: var(--e-bg);
+    }
+
+    .editor-root *,
+    .editor-root *::before,
+    .editor-root *::after {
+        box-sizing: border-box;
+    }
+
+    .editor-root button {
+        font-family: inherit;
+    }
+}
+
+@keyframes editor-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

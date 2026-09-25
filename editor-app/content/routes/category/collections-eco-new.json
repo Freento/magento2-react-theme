@@ -1,0 +1,96 @@
+{
+  "title": "Eco New",
+  "path": "/collections/eco-new.html",
+  "route": {
+    "type": "category",
+    "id": 40
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-collection-eco",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "260px",
+          "backgroundImage": "/uploads/promo-collection-eco.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-collection-eco-title",
+            "component": "Heading",
+            "props": {
+              "text": "Eco-friendly, ego-friendly",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-collection-eco-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "Recycled polyester, hemp and organic cotton apperel",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "260px"
+            }
+          }
+        }
+      },
+      {
+        "id": "collections-eco-new-products",
+        "component": "ProductsCarousel",
+        "props": {
+          "title": "New Arrivals",
+          "eyebrow": "",
+          "skus": [
+            {
+              "sku": "WSH03"
+            },
+            {
+              "sku": "WSH01"
+            },
+            {
+              "sku": "WS06"
+            },
+            {
+              "sku": "WS04"
+            },
+            {
+              "sku": "WJ01"
+            }
+          ],
+          "pageSize": 5,
+          "itemsPerSlide": 5,
+          "source": "skus"
+        },
+        "style": {
+          "width": "100%",
+          "marginTop": "3%"
+        }
+      }
+    ]
+  }
+}

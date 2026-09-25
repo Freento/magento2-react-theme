@@ -2,9 +2,14 @@ import {useState, useCallback, useEffect} from 'react';
 
 const FOOTER_PAGE_ID = '__footer__';
 
+/**
+ * @param {object} mainDoc  What Save writes for the document being edited:
+ *   `{ endpoint, id, path, body }`. A page and a route document differ only in
+ *   the endpoint and in the body being the stored document rather than the
+ *   editing view.
+ */
 export function useSavePush({
-                                currentPageId,
-                                pageData,
+                                mainDoc,
                                 footerData,
                                 mainDirty,
                                 footerDirty,
@@ -38,14 +43,14 @@ export function useSavePush({
             }
         })();
         try {
-            if (mainDirty) {
-                await fetch(`/api/editor/pages/${currentPageId}`, {
+            if (mainDirty && mainDoc?.endpoint) {
+                await fetch(mainDoc.endpoint, {
                     method: 'PUT',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(pageData),
+                    body: JSON.stringify(mainDoc.body),
                 });
-                setSavedPageJson(JSON.stringify(pageData));
-                broadcast?.postMessage({type: 'saved', id: currentPageId, path: pageData?.path});
+                setSavedPageJson(JSON.stringify(mainDoc.body));
+                broadcast?.postMessage({type: 'saved', id: mainDoc.id, path: mainDoc.path, kind: mainDoc.kind});
             }
             if (footerDirty) {
                 await fetch(`/api/editor/pages/${FOOTER_PAGE_ID}`, {
@@ -60,7 +65,7 @@ export function useSavePush({
             broadcast?.close?.();
             refreshPushStatus();
         }
-    }, [currentPageId, pageData, footerData, mainDirty, footerDirty, refreshPushStatus]);
+    }, [mainDoc, footerData, mainDirty, footerDirty, refreshPushStatus]);
 
     const push = useCallback(async () => {
         if (isPushing) return;

@@ -26,8 +26,9 @@ export default function useProductGallery(product, previewVariant, selectedVaria
         : [{ url: '/placeholder.jpg' }];
     const url = src(list[Math.min(activeImageIdx, list.length - 1)]);
     if (!url || prevImgUrlRef.current === url) return;
+    const isFirstUrl = prevImgUrlRef.current === null;
     prevImgUrlRef.current = url;
-    setMainImgLoading(true);
+    if (!isFirstUrl) setMainImgLoading(true);
   }, [product, selectedVariant, activeImageIdx]);
 
   // Visible gallery uses the *preview* variant (colour preview before size).

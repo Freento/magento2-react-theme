@@ -10,6 +10,39 @@ export const styleFields = [
     {key: 'margin', label: 'Outer margins', type: 'spacing', group: 'Advanced'},
     {key: 'padding', label: 'Inner padding', type: 'spacing', group: 'Advanced'},
     {key: 'backgroundColor', label: 'Background color', type: 'color', group: 'Advanced'},
+    {key: 'backgroundImage', label: 'Background image', type: 'image', group: 'Advanced'},
+    {
+        key: 'backgroundSize',
+        label: 'Background fit',
+        type: 'segmented',
+        options: [
+            {value: 'cover', label: '', icon: 'FitCover', title: 'Cover — fill the block, crop the overflow'},
+            {value: 'contain', label: '', icon: 'FitContain', title: 'Contain — fit inside, keep the ratio'},
+        ],
+        group: 'Advanced',
+    },
+    {
+        key: 'backgroundPosition',
+        label: 'Background position',
+        type: 'segmented',
+        cols: 3,
+        options: [
+            {value: 'left top', label: '↖', title: 'Top-left'},
+            {value: 'center top', label: '↑', title: 'Top'},
+            {value: 'right top', label: '↗', title: 'Top-right'},
+            {value: 'left center', label: '←', title: 'Left'},
+            {value: 'center center', label: '●', title: 'Center'},
+            {value: 'right center', label: '→', title: 'Right'},
+            {value: 'left bottom', label: '↙', title: 'Bottom-left'},
+            {value: 'center bottom', label: '↓', title: 'Bottom'},
+            {value: 'right bottom', label: '↘', title: 'Bottom-right'},
+        ],
+        group: 'Advanced',
+    },
+    // Light text on a photograph is only readable with something between the
+    // two, and the something has to sit under the block's own children.
+    {key: 'backgroundOverlay', label: 'Darken background', type: 'slider', min: 0, max: 1, step: 0.05, group: 'Advanced'},
+    {key: 'link', label: 'Link', type: 'text', placeholder: '/women.html', group: 'Advanced'},
     {key: 'color', label: 'Text color', type: 'color', group: 'Advanced'},
     {
         key: 'fontFamily',

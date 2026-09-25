@@ -17,7 +17,7 @@ export function GridGhosts({ block, dropTarget, onDropTargetChange, isDragging }
     return (
       <div
         key={`ghost-${r}-${c}`}
-        className="editor-grid-ghost"
+        className="editor-grid-ghost flex items-center justify-center text-e-text-soft text-[20px] font-light select-none transition-all duration-[120ms] hover:text-e-primary"
         style={{
           gridColumn: `${c}`,
           gridRow: `${r}`,

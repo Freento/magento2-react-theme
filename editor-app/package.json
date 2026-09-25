@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^4.3.0",
-    "less": "^4.6.4",
     "vike": "^0.4.220",
     "vite": "^6.3.0"
   }

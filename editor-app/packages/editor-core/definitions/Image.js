@@ -3,7 +3,11 @@ export default {
     category: 'content',
     icon: '🖼',
     acceptsChildren: false,
-    allowedIn: ['page', 'Grid'],
+    // The link lives in the style layer but belongs with the block's own
+    // settings: every block offers one, and an author looks for it in the
+    // same place each time.
+    regroupStyleFields: { link: 'Image' },
+    allowedIn: ['page', 'Grid', 'Box'],
     defaultProps: { src: 'https://placehold.co/600x300', alt: '', objectFit: 'cover', objectPosition: 'center center' },
     // Wrapper-level styleFields that don't apply to an image (no text =>
     // no fontSize/textAlign/textColor; borders/corner-radius are rarely
@@ -14,6 +18,10 @@ export default {
       'textAlign',
       'color',
       'backgroundColor',
+      'backgroundImage',
+      'backgroundSize',
+      'backgroundPosition',
+      'backgroundOverlay',
       'borderSides',
       'borderStyle',
       'borderColor',

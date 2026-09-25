@@ -1,6 +1,10 @@
 import { gql } from '@apollo/client';
+import { CHECKOUT_CART_PRICES } from './cartPricesFragment';
+import { CART_BILLING_ADDRESS_FIELDS } from '../cart/cartBillingAddressFields';
 
 export const SET_BILLING_ADDRESS = gql`
+  ${CHECKOUT_CART_PRICES}
+  ${CART_BILLING_ADDRESS_FIELDS}
   mutation setBillingAddress($cartId: String!, $billingAddress: CartAddressInput, $billingCustomerAddressId: Int, $sameAsShipping: Boolean!) {
     setBillingAddressOnCart(input: {
       cart_id: $cartId
@@ -12,21 +16,11 @@ export const SET_BILLING_ADDRESS = gql`
     }) {
       cart {
         id
+        prices {
+          ...CheckoutCartPrices
+        }
         billing_address {
-          firstname
-          lastname
-          street
-          city
-          region {
-            code
-            label
-          }
-          postcode
-          country {
-            code
-            label
-          }
-          telephone
+          ...CartBillingAddressFields
         }
       }
     }

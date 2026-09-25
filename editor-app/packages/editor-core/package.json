@@ -6,9 +6,11 @@
   "exports": {
     "./renderer": "./renderer.jsx",
     "./registry": "./registry.js",
+    "./routes": "./routes.js",
     "./blocks": "./blocks/index.jsx",
     "./blocks/*": "./blocks/*",
-    "./inline-edit-style": "./inline-edit-style.js"
+    "./inline-edit-style": "./inline-edit-style.js",
+    "./link-context": "./link-context.js"
   },
   "peerDependencies": {
     "react": "^18.2.0"

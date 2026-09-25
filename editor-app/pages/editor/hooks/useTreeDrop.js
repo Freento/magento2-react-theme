@@ -5,7 +5,9 @@ import {
     findBlockLocation,
     removeBlockFromTree,
     insertBlockInTree,
+    applyCellPin,
 } from '../lib/blockTree.js';
+import {simulateGridPlacement} from 'editor-core/renderer';
 import {generateId} from '../lib/color.js';
 
 export function useTreeDrop({
@@ -23,7 +25,7 @@ export function useTreeDrop({
                                 setActiveTab,
                             }) {
     const handleTreeDragOver = useCallback(
-        (e, block, blocks) => {
+        (e, block, blocks, side) => {
             if (!dragType) return;
             if (dragType === 'reorder' && dragData === block.id) return;
             e.preventDefault();
@@ -41,12 +43,13 @@ export function useTreeDrop({
                     blockId: block.id,
                     position: 'inside',
                     parentId: block.id,
-                    index: (block.children || []).length
+                    index: (block.children || []).length,
+                    side,
                 });
             } else if (y < h / 2) {
-                setTreeDropTarget({blockId: block.id, position: 'before', parentId: loc.parentId, index: loc.index});
+                setTreeDropTarget({blockId: block.id, position: 'before', parentId: loc.parentId, index: loc.index, side});
             } else {
-                setTreeDropTarget({blockId: block.id, position: 'after', parentId: loc.parentId, index: loc.index + 1});
+                setTreeDropTarget({blockId: block.id, position: 'after', parentId: loc.parentId, index: loc.index + 1, side});
             }
         },
         [dragType, dragData, findBlockLocation]
@@ -61,11 +64,26 @@ export function useTreeDrop({
                 return;
             }
             const rootId = 'root-page';
-            const side =
-                (dragType === 'reorder' && sideForBlockId(dragData)) ||
+            const targetSide =
+                treeDropTarget.side ||
                 sideForBlockId(treeDropTarget.parentId) ||
                 activeTarget;
-            const blocks = getBlocksFor(side);
+            const indexInTree = (tree) => {
+                if (treeDropTarget.position === 'inside') return treeDropTarget.index;
+                const loc = findBlockLocation(tree, treeDropTarget.blockId, rootId);
+                if (!loc) return treeDropTarget.index;
+                return loc.index + (treeDropTarget.position === 'after' ? 1 : 0);
+            };
+            const pinForTarget = (tree, block) => {
+                const parent = treeDropTarget.parentId && treeDropTarget.parentId !== rootId
+                    ? findBlock(tree, treeDropTarget.parentId)
+                    : null;
+                if (!parent || parent.component !== 'Grid') return block;
+                if (treeDropTarget.position === 'inside') return applyCellPin(block, null);
+                const idx = (parent.children || []).findIndex((k) => k.id === treeDropTarget.blockId);
+                const cell = idx >= 0 ? simulateGridPlacement(parent).childCells[idx] : null;
+                return cell ? applyCellPin(block, {r: cell.r, c: cell.c}) : applyCellPin(block, null);
+            };
             if (dragType === 'new' && dragData) {
                 if (!isDropAllowed(dragData, treeDropTarget.parentId)) {
                     handleDragEnd();
@@ -79,18 +97,27 @@ export function useTreeDrop({
                     style: {},
                     ...(reg.acceptsChildren ? {children: []} : {}),
                 };
-                setBlocksFor(side, insertBlockInTree(blocks, treeDropTarget.parentId, treeDropTarget.index, newBlock, rootId));
+                const targetTree = getBlocksFor(targetSide);
+                setBlocksFor(targetSide, insertBlockInTree(targetTree, treeDropTarget.parentId, treeDropTarget.index, pinForTarget(targetTree, newBlock), rootId));
                 setSelectedBlockId(newBlock.id);
                 setActiveTab('settings');
             } else if (dragType === 'reorder' && dragData) {
-                const movedPeek = findBlock(blocks, dragData);
+                const sourceSide = sideForBlockId(dragData) || targetSide;
+                const sourceBlocks = getBlocksFor(sourceSide);
+                const movedPeek = findBlock(sourceBlocks, dragData);
                 if (!movedPeek || !isDropAllowed(movedPeek.component, treeDropTarget.parentId)) {
                     handleDragEnd();
                     return;
                 }
-                const [tree, moved] = removeBlockFromTree(blocks, dragData);
+                const [sourceTree, moved] = removeBlockFromTree(sourceBlocks, dragData);
                 if (moved) {
-                    setBlocksFor(side, insertBlockInTree(tree, treeDropTarget.parentId, treeDropTarget.index, moved, rootId));
+                    if (sourceSide === targetSide) {
+                        setBlocksFor(targetSide, insertBlockInTree(sourceTree, treeDropTarget.parentId, indexInTree(sourceTree), pinForTarget(sourceTree, moved), rootId));
+                    } else {
+                        const targetTree = getBlocksFor(targetSide);
+                        setBlocksFor(sourceSide, sourceTree);
+                        setBlocksFor(targetSide, insertBlockInTree(targetTree, treeDropTarget.parentId, indexInTree(targetTree), pinForTarget(targetTree, moved), rootId));
+                    }
                 }
             }
             handleDragEnd();

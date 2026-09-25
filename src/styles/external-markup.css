@@ -1,0 +1,116 @@
+/* Styles for markup this app does not author, so Tailwind's content scanner
+   can never see the class names: HTML injected by Magento (product/compare
+   descriptions), the prerendered page-builder hero, and the Braintree SDK's
+   own iframe and state classes. Everything here is plain CSS by necessity —
+   it is the one bucket that cannot become utilities. */
+
+/* ── Magento-authored HTML (dangerouslySetInnerHTML) ── */
+.pdp__desc p {
+    color: var(--ink-2);
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.compare-attr-value p {
+    margin: 0 0 0.5em;
+}
+
+@media print {
+    body:has(.compare-page) .topbar,
+    body:has(.compare-page) .header,
+    body:has(.compare-page) .breadcrumbs,
+    body:has(.compare-page) .editor-core-page,
+    body:has(.compare-page) .mobile-bottom-nav,
+    body:has(.compare-page) .mini-cart-overlay,
+    body:has(.compare-page) .mini-cart-panel,
+    body:has(.compare-page) .toast-stack {
+        display: none !important;
+    }
+}
+
+/* ── Braintree SDK iframe + the classes its script toggles ── */
+.hosted-field iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.hosted-field.braintree-hosted-fields-focused {
+    border-color: var(--ink);
+    box-shadow: var(--focus-ring);
+}
+
+.hosted-field.braintree-hosted-fields-invalid {
+    border-color: var(--sale);
+}
+
+/* ── Prerendered editor hero (data-block-id markup baked into the HTML) ── */
+/* Targets prerendered editor markup (data-block-id attributes baked into the
+   page HTML) — injected markup is outside Tailwind's content scan, so this
+   stays plain CSS by design. */
+@media (min-width: 641px) {
+    /* The block's mobile override (marginBottom 5%) is baked into the prerendered
+     HTML as an inline style; cancel it on desktop. */
+    [data-block-id="home-hero"] {
+        margin-bottom: 0 !important;
+    }
+
+    div:has(> [data-block-id="home-hero-img"]):not(:has([data-cell-stack])) {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        min-height: 600px !important;
+        margin-bottom: 0 !important;
+        padding-left: 50% !important;
+        box-sizing: border-box !important;
+    }
+
+    div:has(> [data-block-id="home-hero-img"]):not(:has([data-cell-stack]))
+        > [data-block-id="home-hero-img"] {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        width: 50% !important;
+        height: 600px !important;
+        margin: 0 !important;
+    }
+
+    [data-block-id="home-hero-eyebrow"] {
+        margin: 0 64px 16px !important;
+    }
+
+    [data-block-id="home-hero-eyebrow"] p {
+        font-size: 12px !important;
+        text-align: left !important;
+    }
+
+    [data-block-id="home-hero-h1"] {
+        margin: 0 64px 20px !important;
+    }
+
+    [data-block-id="home-hero-h1"] h1 {
+        font-size: 48px !important;
+        text-align: left !important;
+    }
+
+    [data-block-id="home-hero-p"] {
+        margin: 0 64px 32px !important;
+        padding: 0 !important;
+    }
+
+    [data-block-id="home-hero-p"] p {
+        font-size: 16px !important;
+        text-align: left !important;
+    }
+
+    [data-block-id="home-hero-cta"] {
+        align-self: flex-start !important;
+        margin: 0 auto 0 64px !important;
+    }
+
+    [data-block-id="home-hero-cta"] a {
+        text-align: left !important;
+    }
+}

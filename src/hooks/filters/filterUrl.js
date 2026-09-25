@@ -25,6 +25,17 @@ export const parseActiveFilters = (urlParams, categoryId) => {
 export const countActiveFilters = (urlParams) =>
   Array.from(urlParams.entries()).filter(([key]) => !RESERVED.has(key)).length;
 
+export const countFilterValues = (filters) =>
+  Object.entries(filters || {}).filter(([key, value]) => {
+    if (key === 'category_uid' && value && typeof value === 'object' && value.eq) return false;
+    if (Array.isArray(value)) return value.length > 0;
+    if (key === 'price') return !!(value && value.from != null && value.to != null);
+    return value != null && value !== '';
+  }).length;
+
+export const clearFilterValues = (filters) =>
+  (filters?.category_uid ? { category_uid: filters.category_uid } : {});
+
 export const buildFilterParams = (newFilters, { categoryId, searchQuery, currentSort }) => {
   const params = new URLSearchParams();
 

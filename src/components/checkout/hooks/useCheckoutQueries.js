@@ -87,6 +87,7 @@ export default function useCheckoutQueries({ cartId, currentStep, user }) {
     },
     refetch: {
       shippingMethods: shippingMethods.refetch,
+      paymentMethods: paymentMethods.refetch,
     },
   };
 }

@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useContext } from 'react';
 import { DropIndicator, OverlayIconBtn, IconGripVertical, IconCopy, IconX } from '../overlay/icons.jsx';
 import { GridSizeControls } from './GridSizeControls.jsx';
 import registry from '../registry-runtime.js';
+import { InsideLinkContext } from '../link-context.js';
 
 export function BlockWrapper({ block, index, parentId, totalCount, onSelect, onDelete, onDuplicate, onUpdateProp, selectedId, hoveredId, isDragging, dropTarget, onDropTargetChange, onDragStartBlock, onDragEndBlock, inGrid, horizontal, gridLinear, gridCols, myCell, inStack, children }) {
   const isHorizontal = inGrid || horizontal;
@@ -11,6 +12,7 @@ export function BlockWrapper({ block, index, parentId, totalCount, onSelect, onD
   const isEditing = !!onSelect;
   const isSelfDragging = isDragging === block.id;
   const acceptsChildren = registry[block.component]?.acceptsChildren;
+  const insideLink = useContext(InsideLinkContext);
 
   const notSelf = isDragging !== block.id;
   const showZones = isDragging && notSelf && !isHorizontal;
@@ -113,6 +115,10 @@ export function BlockWrapper({ block, index, parentId, totalCount, onSelect, onD
     borderColor,
     link,
     linkTarget,
+    backgroundImage,
+    backgroundSize,
+    backgroundPosition,
+    backgroundOverlay,
     colSpan,
     rowSpan,
     colStart,
@@ -147,6 +153,31 @@ export function BlockWrapper({ block, index, parentId, totalCount, onSelect, onD
       gridSpanStyle.gridRow = `span ${rs}`;
     }
   }
+  // One link around another is invalid HTML — the browser's parser rearranges
+  // the markup and hydration fails against it. The outer link already covers
+  // this block's area.
+  const asLink = link && !insideLink;
+  const backgroundCss = (() => {
+    const scrim = Number(backgroundOverlay) || 0;
+    const layers = [];
+    // The scrim is a background layer rather than an element covering the
+    // block: it has to sit over the image and under the block's children,
+    // and the children are what carries the text.
+    if (scrim > 0) layers.push(`linear-gradient(rgba(0,0,0,${scrim}), rgba(0,0,0,${scrim}))`);
+    if (backgroundImage) layers.push(`url("${backgroundImage}")`);
+    if (!layers.length) return null;
+    const size = backgroundSize || 'cover';
+    const pos = backgroundPosition || 'center center';
+    // Per-layer values, or a `contain` image would shrink the scrim with it
+    // and leave the corners of the block unshaded. A gradient has no size of
+    // its own, so `auto` fills the block.
+    return {
+      backgroundImage: layers.join(', '),
+      backgroundSize: layers.length > 1 ? `auto, ${size}` : size,
+      backgroundPosition: layers.length > 1 ? `center, ${pos}` : pos,
+      backgroundRepeat: 'no-repeat',
+    };
+  })();
   const borderCss = (() => {
     if (!borderStyle || borderStyle === 'none') return null;
     const raw = borderWidth == null || borderWidth === '' ? 1 : borderWidth;
@@ -197,6 +228,7 @@ export function BlockWrapper({ block, index, parentId, totalCount, onSelect, onD
               ? 'inset -3px 0 0 0 #0F4C5C'
               : undefined,
           ...restStyle,
+          ...(backgroundCss || {}),
           ...(borderCss || {}),
           ...fullWidthStyle,
           ...gridSpanStyle,
@@ -302,7 +334,7 @@ export function BlockWrapper({ block, index, parentId, totalCount, onSelect, onD
             insert inside
           </div>
         )}
-        {link ? (
+        {asLink ? (
           <a
             href={link}
             target={linkTarget || undefined}
@@ -310,12 +342,13 @@ export function BlockWrapper({ block, index, parentId, totalCount, onSelect, onD
             style={{
               display: 'block',
               width: '100%',
+              height: '100%',
               color: 'inherit',
               textDecoration: 'inherit',
               pointerEvents: isEditing ? 'none' : 'auto',
             }}
           >
-            {children}
+            <InsideLinkContext.Provider value={true}>{children}</InsideLinkContext.Provider>
           </a>
         ) : (
           <div style={isEditing

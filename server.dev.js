@@ -6,11 +6,16 @@ import path from 'node:path';
 import { createServer as createHttpServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { resolveUrl, toRouteHint } from './server/resolveUrl.js';
+import { readRouteAreas, routeAreaPaths, findRouteArea } from './server/routeAreas.js';
+import { readCustomerTokenCookie } from './server/customerToken.js';
+import { ssrDebugEnabled, mergeStats, applyDebugHeaders, logSsrStats, writeSsrStats } from './server/ssrDebug.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = __dirname;
 const PORT      = Number(process.env.PORT || 5173);
 const PAGES_DIR = path.join(ROOT, 'editor-app/content/pages');
+const ROUTES_DIR = path.join(ROOT, 'editor-app/content/routes');
 
 if (!process.env.GRAPHQL_ORIGIN) {
   throw new Error('GRAPHQL_ORIGIN is not set — add it to .env');
@@ -19,10 +24,7 @@ const GRAPHQL_TARGET   = process.env.GRAPHQL_ORIGIN;
 const GRAPHQL_INSECURE = String(process.env.GRAPHQL_INSECURE || '').toLowerCase() === 'true';
 if (GRAPHQL_INSECURE) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const GRAPHQL_URI    = `${GRAPHQL_TARGET.replace(/\/$/, '')}/graphql`;
-const RESOLVE_URL_EP = `${GRAPHQL_TARGET.replace(/\/$/, '')}/getReactResolveUrl.php`;
-// "graphql" → the client resolves URLs itself; the server then skips resolution.
-const RESOLVE_VIA_GRAPHQL = process.env.VITE_URL_RESOLVE_MODE === 'graphql';
+const GRAPHQL_URI = `${GRAPHQL_TARGET.replace(/\/$/, '')}/graphql`;
 
 const readAllPages = () => {
   let files;
@@ -39,37 +41,6 @@ const collectEditorPagesByPath = () => {
   const map = {};
   for (const j of readAllPages()) if (j.path && !j.path.startsWith('/__')) map[j.path] = j;
   return map;
-};
-
-const TARGET_PATH_REGEX = {
-  category:   /^catalog\/category\/view\/id\/(\d+)/,
-  product:    /^catalog\/product\/view\/id\/(\d+)/,
-  'cms-page': /^cms\/page\/view\/page_id\/(\d+)/,
-};
-
-const resolveCatalogUrl = async (pathname) => {
-  if (RESOLVE_VIA_GRAPHQL) return null;
-  const requestPath = pathname.replace(/^\/+/, '');
-  if (!requestPath) return null;
-  try {
-    const res = await fetch(`${RESOLVE_URL_EP}?prefix=${encodeURIComponent(requestPath)}`, {
-      headers: { Accept: 'application/json' },
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const exact = (json.matches || []).find((m) => m.request_path === requestPath);
-    if (!exact) return null;
-    const matcher = TARGET_PATH_REGEX[exact.entity_type];
-    const targetMatch = matcher ? exact.target_path.match(matcher) : null;
-    return {
-      type:          exact.entity_type,
-      id:            targetMatch ? Number(targetMatch[1]) : null,
-      redirect_code: exact.redirect_type || null,
-      relative_url:  exact.redirect_type ? `/${exact.target_path}` : `/${exact.request_path}`,
-    };
-  } catch {
-    return null;
-  }
 };
 
 const app = express();
@@ -120,6 +91,16 @@ if (EDITOR_ENABLED && EDITOR_APP_URL) {
   }));
 }
 
+// Client-side navigation into a category whose area was not in the landing
+// document. Served here rather than proxied to the editor's /api/render so it
+// keeps working with EDITOR_ENABLED=off.
+app.get('/api/route-area', (req, res) => {
+  const area = findRouteArea(readRouteAreas(ROUTES_DIR), String(req.query.path || ''));
+  if (!area) return res.status(404).json({ error: 'Not found' });
+  res.set('Cache-Control', 'no-store');
+  res.json({ area });
+});
+
 const httpServer = createHttpServer(app);
 const vite = await import('vite');
 const viteDevServer = await vite.createServer({
@@ -134,6 +115,7 @@ app.use(viteDevServer.middlewares);
 const ASSET_RE = /\.(?:js|mjs|jsx|css|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|map|json|txt|xml)$/i;
 
 app.get('*', async (req, res, next) => {
+  const startedAt = performance.now();
   const pathname = new URL(req.url, 'http://x').pathname;
   if (ASSET_RE.test(pathname)) return next();
 
@@ -148,25 +130,43 @@ app.get('*', async (req, res, next) => {
     const footerData  = findPageByPath('/__footer__');
     const editorPages = collectEditorPagesByPath();
 
-    // Categories resolve from the map (id synchronously → products render in SSR);
-    // products resolve on the client via GraphQL `route`.
-    const category = !pageData ? resolveCategoryFromMap(pathname) : null;
-    const routeHint = category || null;
-    const resolvedUrl = category ? { path: category.path, data: category } : null;
+    const resolvedUrl = pageData ? null : await resolveUrl(pathname);
+    // entry-server reads `routeHint` (flattened, carries `path`) for the router
+    // state; the client hydrates from `resolvedUrl` ({ path, data }).
+    const routeHint = toRouteHint(resolvedUrl);
 
-    const initialData = { pageData, footerData, editorPages, routeHint, resolvedUrl };
-    const { html: appHtml, apolloState } = await renderApp(
-      req.url,
-      initialData,
-      { graphqlUri: GRAPHQL_URI },
-    );
+    // Only this path's area document travels in the document; the rest of the
+    // catalog gets a list of paths and fetches on demand.
+    const routeDocs = readRouteAreas(ROUTES_DIR);
+    const routeArea = findRouteArea(routeDocs, pathname);
 
-    const initialJson = JSON.stringify({ ...initialData, apolloCache: apolloState })
+    const initialData = {
+      pageData, footerData, editorPages, routeHint, resolvedUrl,
+      routeArea, routeAreaPaths: routeAreaPaths(routeDocs),
+    };
+    // Same as prod: render as the customer when their cookie is present, with one
+    // guest re-render if Magento rejects the token.
+    const customerToken = readCustomerTokenCookie(req);
+    const debug = ssrDebugEnabled();
+    let rendered = await renderApp(req.url, initialData, { graphqlUri: GRAPHQL_URI, customerToken, debug });
+    // Both renders count: the rejected one already paid for the full query set.
+    let debugStats = debug ? mergeStats(rendered.stats) : null;
+    if (rendered.authRejected) {
+      const rejected = rendered;
+      rendered = await renderApp(req.url, initialData, { graphqlUri: GRAPHQL_URI, debug });
+      debugStats = debug ? mergeStats(rejected.stats, rendered.stats) : null;
+    }
+    const { html: appHtml, apolloState, personalized } = rendered;
+
+    const initialJson = JSON.stringify({ ...initialData, apolloCache: apolloState, personalized })
       .replace(/</g, '\\u003c');
     const html = template.replace(
       '<div id="root"></div>',
       `<script>window.__INITIAL_DATA__=${initialJson}</script>\n    <div id="root">${appHtml}</div>`,
     );
+    applyDebugHeaders(res, debugStats, performance.now() - startedAt);
+    logSsrStats(req, debugStats, performance.now() - startedAt);
+    writeSsrStats(req, debugStats, performance.now() - startedAt);
     res.status(200).type('html').end(html);
   } catch (err) {
     viteDevServer.ssrFixStacktrace(err);

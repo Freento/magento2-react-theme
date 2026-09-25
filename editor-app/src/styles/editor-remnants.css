@@ -1,0 +1,286 @@
+/* Editor plain-CSS remnants: shared form primitives whose base is consumed
+   by many components, and JS/parent-state cascades that cannot be
+   purge-safe utilities. Everything else in the editor is Tailwind. */
+
+/* Inspector remnants kept as plain CSS during the Tailwind migration.
+   These cannot become element utilities cleanly:
+   - .field-input: shared form-control base with element-type variants
+     (select data-URI chevron, textarea) plus ::placeholder/:hover/:focus,
+     and it is extended by modifier classes owned by other files
+     (.color-field-text, .image-field-url); keeping the base here avoids
+     cross-file utility conflicts.
+   - .field-checkbox: a custom toggle switch built from ::after + :checked
+     + a parent-hover descendant rule.
+   - .seg-inline-*, .field-checkbox-inline-*: number inputs that extend
+     .field-input.
+   - [data-tooltip]: attr() content in ::before/::after pseudo-elements.
+   - scrollbar rules: ::-webkit-scrollbar pseudo-elements on preview panels. */
+
+.editor-root .field-input {
+    width: 100%;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--e-text);
+    background: var(--e-bg);
+    outline: none;
+    transition:
+        background-color 0.1s,
+        border-color 0.1s,
+        box-shadow 0.1s;
+}
+
+.editor-root .field-input::placeholder {
+    color: var(--e-text-soft);
+}
+
+.editor-root .field-input:hover {
+    background: var(--e-white);
+    border-color: var(--e-border-strong);
+}
+
+.editor-root .field-input:focus {
+    background: var(--e-white);
+    border-color: var(--e-primary);
+    box-shadow: 0 0 0 2px rgb(var(--e-accent-strong-rgb) / 0.18);
+}
+
+.editor-root textarea.field-input {
+    height: auto;
+    min-height: 64px;
+    padding: 7px 8px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.editor-root select.field-input {
+    padding-right: 24px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    cursor: pointer;
+}
+
+.editor-root .field-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0;
+    font-size: 12px;
+    color: var(--e-text);
+    user-select: none;
+}
+
+.editor-root .field-checkbox > span:not(.field-checkbox-inline-suffix) {
+    flex: 1;
+    font-weight: 400;
+    color: var(--e-text-muted);
+    cursor: pointer;
+}
+
+.editor-root .field-checkbox > input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 28px;
+    height: 16px;
+    margin: 0;
+    border-radius: 999px;
+    background: var(--e-border-strong);
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    flex-shrink: 0;
+}
+
+.editor-root .field-checkbox > input[type="checkbox"]::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--e-white);
+    box-shadow: 0 1px 2px rgb(var(--e-black-rgb) / 0.2);
+    transition: transform 0.15s;
+}
+
+.editor-root .field-checkbox > input[type="checkbox"]:checked {
+    background: var(--e-primary);
+}
+
+.editor-root .field-checkbox > input[type="checkbox"]:checked::after {
+    transform: translateX(12px);
+}
+
+.editor-root .field-checkbox:hover > input[type="checkbox"]:not(:checked) {
+    background: var(--e-text-soft);
+}
+
+.editor-root .field-checkbox-inline-number {
+    flex: 0 0 auto;
+    height: 24px !important;
+    text-align: right;
+}
+
+.editor-root .field-checkbox-inline-number:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.editor-root .field-checkbox-inline-suffix {
+    flex: 0 0 auto;
+    font-size: 11px;
+    color: var(--e-text-soft);
+    margin-left: -4px;
+}
+
+.editor-root .seg-inline-number {
+    flex: 0 0 auto;
+    height: 28px;
+    text-align: right;
+    padding: 0 6px;
+}
+
+.editor-root .seg-inline-number:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.editor-root .seg-inline-suffix {
+    flex: 0 0 auto;
+    font-size: 11px;
+    color: var(--e-text-soft);
+    margin-left: -2px;
+}
+
+.editor-root [data-tooltip] {
+    position: relative;
+}
+
+.editor-root [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%) translateY(2px);
+    padding: 4px 8px;
+    background: var(--e-code-text);
+    color: var(--e-white);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+        opacity 0.12s 0.2s,
+        transform 0.12s 0.2s;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgb(var(--e-black-rgb) / 0.18);
+}
+
+.editor-root [data-tooltip]::before {
+    content: "";
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--e-code-text);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s 0.2s;
+    z-index: 1000;
+}
+
+.editor-root [data-tooltip]:hover::after,
+.editor-root [data-tooltip]:focus-visible::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.editor-root [data-tooltip]:hover::before,
+.editor-root [data-tooltip]:focus-visible::before {
+    opacity: 1;
+}
+
+.editor-root .tab-content::-webkit-scrollbar,
+.editor-root .page-select-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.editor-root .tab-content::-webkit-scrollbar-thumb,
+.editor-root .page-select-list::-webkit-scrollbar-thumb {
+    background: rgb(var(--e-black-rgb) / 0.08);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+}
+
+.editor-root .tab-content::-webkit-scrollbar-thumb:hover,
+.editor-root .page-select-list::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--e-black-rgb) / 0.18);
+    background-clip: padding-box;
+    border: 3px solid transparent;
+}
+
+/* list-editor.less remnant. These rules cannot be Tailwind utilities on the JSX:
+   - parent-state -> descendant selectors (.list-item.open / :not(.open) / :hover
+     re-style child .list-item-header / .list-item-grip). State classes
+     (.open/.dragging/.drag-over) are toggled by React and kept on the JSX as hooks.
+   - the .list-item-field > label/input/textarea cascade styles raw children
+     (including a focus state) that the list editor does not add classes to.
+   Values are the resolved editor tokens (see abstracts/tokens.less). */
+
+.editor-root .list-item.open .list-item-header {
+    background: var(--e-primary-soft);
+}
+
+.editor-root .list-item.open .list-item-header:hover {
+    background: var(--e-sel-soft);
+}
+
+.editor-root .list-item:not(.open) .list-item-header {
+    border-radius: 4px;
+}
+
+.editor-root .list-item:hover .list-item-grip {
+    color: var(--e-text-muted);
+}
+
+.editor-root .list-item-field > label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--e-text-muted);
+    margin-bottom: 4px;
+    text-transform: capitalize;
+}
+
+.editor-root .list-item-field > input,
+.editor-root .list-item-field > textarea {
+    width: 100%;
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid var(--e-border);
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: inherit;
+    outline: none;
+    transition:
+        border-color 0.1s,
+        box-shadow 0.1s;
+    background: var(--e-white);
+}
+
+.editor-root .list-item-field > input:focus,
+.editor-root .list-item-field > textarea:focus {
+    border-color: var(--e-primary);
+    box-shadow: 0 0 0 2px rgb(var(--e-accent-strong-rgb) / 0.12);
+}

@@ -3,7 +3,9 @@ export default {
     category: 'content',
     icon: 'T',
     acceptsChildren: false,
-    allowedIn: ['page', 'Grid'],
+    // Has an href of its own; a second anchor around it would nest.
+    hideStyleFields: ['link'],
+    allowedIn: ['page', 'Grid', 'Box'],
     defaultProps: {
       text: 'Text block',
       href: '',
@@ -19,7 +21,7 @@ export default {
       letterSpacing: 'normal',
     },
     propsSchema: {
-      href: { label: 'Link (leave empty if not needed)', type: 'text', group: 'Text' },
+      href: { label: 'Link', type: 'text', placeholder: '/women.html', group: 'Text' },
       fontFamily: {
         label: 'Font',
         type: 'fontFamily',

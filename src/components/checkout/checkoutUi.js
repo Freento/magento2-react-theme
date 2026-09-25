@@ -1,0 +1,13 @@
+export const FORM_SECTION_CLS = 'form-section bg-bg border border-line rounded p-7 max640:px-4 max640:py-5';
+export const FORM_TITLE_CLS = 'form-title mb-5 font-sans text-lg font-semibold tracking-[-0.01em] text-ink';
+export const CO_BTN_CLS = 'gap-2.5 w-full h-11 mt-5 py-0';
+export const CO_SPINNER_CLS = 'loading-spinner w-[18px] h-[18px] rounded-full border-2 border-bg/40 border-t-bg animate-spin';
+export const CO_EMPTY_NOTE_CLS = 'mt-2 px-4 py-6 text-center text-sm italic text-ink-2 bg-surface rounded';
+export const METHOD_ITEM_CLS = 'block border rounded px-5 py-[18px] cursor-pointer [transition:border-color_120ms_ease,background_120ms_ease] hover:border-ink hover:bg-surface';
+export const METHOD_ITEM_ON = 'selected border-ink bg-surface';
+export const METHOD_ITEM_OFF = 'border-line bg-bg';
+export const RADIO_BTN_CLS = "radio-button relative w-[18px] h-[18px] rounded-full border-[1.5px] bg-bg shrink-0 [transition:border-color_120ms_ease] after:content-[''] after:absolute after:inset-0 after:m-auto after:w-2 after:h-2 after:rounded-full after:bg-ink after:[transition:transform_120ms_ease]";
+export const RADIO_BTN_ON = 'selected border-ink after:scale-100';
+export const RADIO_BTN_OFF = 'border-line-dark after:scale-0';
+export const CARD_FORM_CONTAINER_CLS = 'card-form-container border border-line rounded p-[22px] mt-3.5 bg-bg';
+export const CARD_FORM_TITLE_CLS = 'card-form-title mb-4 text-base font-semibold tracking-[0.04em] uppercase text-ink';

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import '../../styles/checkout/AcceptJsIntegration.less';
 
 const AcceptJsIntegration = ({
     cardData,
@@ -114,12 +113,12 @@ const AcceptJsIntegration = ({
                         type="button"
                         onClick={tokenizeCard}
                         disabled={isTokenizing || !cardData.number || !cardData.expiry || !cardData.cvv}
-                        className="btn-secondary"
+                        className="btn-secondary mt-4"
                     >
                         {isTokenizing ? 'Securing Payment Data...' : 'Secure Payment Data'}
                     </button>
 
-                    <p className="acceptjs-info">
+                    <p className="acceptjs-info text-[0.875rem] text-ink-2 mt-2">
                         Click to securely tokenize your payment data with Authorize.Net
                     </p>
                 </div>

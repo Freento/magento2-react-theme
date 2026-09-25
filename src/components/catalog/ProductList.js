@@ -4,7 +4,7 @@ import ProductCard from './ProductCard';
 import Pagination from '../ui/Pagination';
 import LayerNavigation from './LayerNavigation';
 import { GET_AGGREGATIONS } from '../../queries/category';
-import '../../styles/catalog/ProductList.less';
+import { addFilterValue, removeFilterValue, countFilterValues, clearFilterValues } from '../../hooks/filters/filterUrl';
 const FilterIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <line x1="4" y1="6" x2="20" y2="6" />
@@ -62,6 +62,7 @@ const ProductList = ({
   activeFilters = [],
   onAddFilter,
   onRemoveFilter,
+  onApplyFilters,
   onClearAllFilters,
   hasActiveFilters = false,
   onSetPriceRange,
@@ -70,6 +71,24 @@ const ProductList = ({
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hasOpenedDrawer, setHasOpenedDrawer] = useState(false);
+  const [pendingFilters, setPendingFilters] = useState(activeFilters);
+  useEffect(() => {
+    if (!drawerOpen) setPendingFilters(activeFilters);
+  }, [activeFilters, drawerOpen]);
+  const openDrawer = () => {
+    setPendingFilters(activeFilters);
+    setDrawerOpen(true);
+    setHasOpenedDrawer(true);
+  };
+  const pendingAdd = (attribute, value) => setPendingFilters((f) => addFilterValue(f, attribute, value));
+  const pendingRemove = (attribute, value = null) => setPendingFilters((f) => removeFilterValue(f, attribute, value));
+  const pendingPrice = (from, to) => setPendingFilters((f) => ({ ...f, price: { from, to } }));
+  const pendingClear = () => setPendingFilters((f) => clearFilterValues(f));
+  const hasPendingFilters = countFilterValues(pendingFilters) > 0;
+  const applyPending = () => {
+    if (onApplyFilters) onApplyFilters(pendingFilters);
+    setDrawerOpen(false);
+  };
   const plpDrawerRef = useRef(null);
   const aggVariables = useMemo(() => {
     const filters = {};
@@ -114,39 +133,39 @@ const ProductList = ({
   }, [drawerOpen]);
 
   return (
-    <div className="plp">
-      <div className="plp-toolbar">
-        <div className="plp-toolbar-row">
-          <div className="plp-toolbar-left">
+    <div className="plp relative">
+      <div className="plp-toolbar sticky top-[64px] max900:top-[56px] max480:!top-[52px] z-30 bg-bg/[0.96] backdrop-blur-[10px] [-webkit-backdrop-filter:blur(10px)] border-t border-b border-line mb-6 max768:-mx-gutter max768:px-gutter">
+        <div className="plp-toolbar-row flex items-center justify-between gap-4 py-2.5">
+          <div className="plp-toolbar-left flex items-center gap-3.5">
             {enabledLayerNavigation && (
               <button
                 type="button"
-                className="toolbar-btn"
-                onClick={() => { setDrawerOpen(true); setHasOpenedDrawer(true); }}
+                className="toolbar-btn inline-flex items-center gap-1.5 text-13 font-medium py-2 px-3 rounded bg-transparent text-ink border border-line cursor-pointer transition-colors duration-fast ease-[ease] hover:border-ink hover:bg-surface"
+                onClick={openDrawer}
                 aria-label="Open filters"
               >
                 <FilterIcon />
                 <Caret />
               </button>
             )}
-            <span className="total-count">
+            <span className="total-count font-serif italic font-normal text-ink-2 text-md whitespace-nowrap max768:hidden">
               {totalCount === 1 ? '1 item' : `${totalCount} items`}
             </span>
           </div>
 
-          <div className="plp-toolbar-right">
-            <label className="plp-sort">
-              <span className="plp-sort-label">Sort</span>
+          <div className="plp-toolbar-right flex items-center gap-3.5">
+            <label className="plp-sort relative inline-flex items-center gap-2 text-13 text-ink">
+              <span className="plp-sort-label text-xs font-medium tracking-[0.12em] uppercase text-ink-2">Sort</span>
               <select
                 value={currentSort || 'name_asc'}
                 onChange={(e) => onSortChange(e.target.value || null)}
-                className="plp-sort-select"
+                className="plp-sort-select appearance-none [font-family:inherit] leading-base text-13 font-medium bg-transparent border border-line rounded py-[7px] pr-7 pl-3 text-ink cursor-pointer [transition:border-color_120ms_ease] hover:border-ink focus:border-ink focus:outline-none"
               >
                 {SORT_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
-              <span className="plp-sort-caret" aria-hidden="true"><Caret /></span>
+              <span className="plp-sort-caret absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-ink-2 inline-flex" aria-hidden="true"><Caret /></span>
             </label>
           </div>
         </div>
@@ -155,21 +174,22 @@ const ProductList = ({
           const chips = flattenActiveFilters(activeFilters, labelMap);
           if (!chips.length) return null;
           return (
-            <div className="plp-chips">
+            <div className="plp-chips flex flex-wrap gap-2 pb-3">
               {chips.map((c, i) => (
-                <span key={`${c.attribute}-${c.value}-${i}`} className="plp-chip">
-                  <span className="plp-chip-label">{c.label}:</span>
-                  <span className="plp-chip-value">{c.display}</span>
+                <span key={`${c.attribute}-${c.value}-${i}`} className="plp-chip inline-flex items-center gap-1.5 text-sm py-[5px] px-2.5 rounded-pill bg-surface border border-line">
+                  <span className="plp-chip-label font-medium text-ink">{c.label}:</span>
+                  <span className="plp-chip-value text-ink-2">{c.display}</span>
                   <button
                     type="button"
                     aria-label={`Remove ${c.label} ${c.display}`}
                     onClick={() => onRemoveFilter && onRemoveFilter(c.attribute, c.value)}
+                    className="cursor-pointer text-ink-2 text-base leading-none pl-1 [transition:color_120ms_ease] hover:text-ink"
                   >×</button>
                 </span>
               ))}
               <button
                 type="button"
-                className="plp-clear-all"
+                className="plp-clear-all bg-transparent cursor-pointer text-ink-2 text-sm font-medium underline underline-offset-2 [transition:color_120ms_ease] hover:text-ink"
                 onClick={onClearAllFilters}
               >
                 Clear all
@@ -179,14 +199,14 @@ const ProductList = ({
         })()}
       </div>
 
-      <div className="product-grid">
+      <div className="product-grid grid grid-cols-4 max900:grid-cols-2 gap-y-[clamp(16px,2vw,32px)] gap-x-[clamp(12px,1.6vw,24px)] mt-[clamp(20px,3vw,32px)]">
         {products.map((product, index) => (
           <ProductCard key={product.id} product={product} priority={index < 4} />
         ))}
       </div>
 
       {totalCount === 0 && (
-        <div className="no-products">
+        <div className="no-products text-center px-5 py-20 text-ink-2 text-md bg-surface rounded-lg mt-6">
           {hasActiveFilters
             ? 'No products match your current filters. Try adjusting your selection.'
             : 'No products found.'}
@@ -202,15 +222,15 @@ const ProductList = ({
       {enabledLayerNavigation && (
         <>
           {drawerOpen && (
-            <div className="plp-scrim" onClick={() => setDrawerOpen(false)} />
+            <div className="plp-scrim fixed inset-0 bg-ink/40 z-[80] animate-scrim" onClick={() => setDrawerOpen(false)} />
           )}
           <aside
             ref={plpDrawerRef}
-            className={`plp-drawer ${drawerOpen ? 'is-open' : ''}`}
+            className={`plp-drawer ${drawerOpen ? 'is-open' : ''} fixed top-0 right-0 h-screen w-[380px] max-w-[100vw] bg-bg border-l border-line translate-x-full [transition:transform_240ms_ease] z-[90] flex flex-col max900:w-full max900:border-l-0 [&.is-open]:translate-x-0`}
             aria-label="Filters"
           >
-            <div className="plp-drawer-head">
-              <h3>Filters</h3>
+            <div className="plp-drawer-head flex justify-between items-center py-4 px-5 border-b border-line">
+              <h3 className="m-0 text-base font-semibold tracking-[-0.01em] text-ink">Filters</h3>
               <button
                 type="button"
                 className="icon-square"
@@ -223,38 +243,38 @@ const ProductList = ({
                 </svg>
               </button>
             </div>
-            <div className="plp-drawer-body">
+            <div className="plp-drawer-body flex-1 overflow-y-auto py-[18px] px-5">
               {hasOpenedDrawer && (
                 <LayerNavigation
-                  filters={activeFilters}
-                  onAddFilter={onAddFilter}
-                  onRemoveFilter={onRemoveFilter}
-                  onClearAllFilters={onClearAllFilters}
-                  hasActiveFilters={hasActiveFilters}
+                  filters={pendingFilters}
+                  onAddFilter={pendingAdd}
+                  onRemoveFilter={pendingRemove}
+                  onClearAllFilters={pendingClear}
+                  hasActiveFilters={hasPendingFilters}
                   isVisible={true}
-                  onHide={() => {}}
+                  onHide={() => setDrawerOpen(false)}
                   onShow={() => {}}
-                  onSetPriceRange={onSetPriceRange}
+                  onSetPriceRange={pendingPrice}
                   enabledLayerNavigation={enabledLayerNavigation}
                   categoryId={categoryId}
                   searchTerm={searchTerm}
                 />
               )}
             </div>
-            <div className="plp-drawer-foot">
-              {hasActiveFilters && (
+            <div className="plp-drawer-foot py-3.5 px-5 border-t border-line flex gap-2">
+              {hasPendingFilters && (
                 <button
                   type="button"
-                  className="btn-ghost"
-                  onClick={onClearAllFilters}
+                  className="btn-ghost flex-1 px-[18px] py-3 [transition:background-color_200ms_ease,border-color_200ms_ease]"
+                  onClick={pendingClear}
                 >
                   Clear all
                 </button>
               )}
               <button
                 type="button"
-                className="btn-primary"
-                onClick={() => setDrawerOpen(false)}
+                className="btn-primary flex-1 px-[18px] py-3 [transition:background-color_200ms_ease,border-color_200ms_ease]"
+                onClick={applyPending}
               >
                 Apply
               </button>

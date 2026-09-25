@@ -3,7 +3,7 @@ export default {
     category: 'content',
     icon: '⟨⟩',
     acceptsChildren: false,
-    allowedIn: ['page', 'Grid'],
+    allowedIn: ['page', 'Grid', 'Box'],
     defaultProps: { html: '<p>Enter HTML...</p>', css: '' },
     propsSchema: {
       html: { label: 'HTML', type: 'textarea', group: 'HTML' },

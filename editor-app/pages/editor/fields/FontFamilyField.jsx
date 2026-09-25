@@ -34,17 +34,17 @@ export function FontFamilyField({value, onChange}) {
         };
     }, [open]);
     return (
-        <div ref={wrapRef} className={`fw-field${open ? ' open' : ''}`}>
+        <div ref={wrapRef} className={`fw-field group/fw relative${open ? ' open' : ''}`}>
             <button
                 type="button"
-                className="fw-field-trigger"
+                className="flex items-center justify-between gap-1.5 w-full h-7 px-2 bg-e-surface border border-e-border rounded-e text-[12px] text-e-text text-left cursor-pointer transition-colors duration-100 hover:border-e-border-strong group-[.open]/fw:border-e-primary group-[.open]/fw:shadow-[0_0_0_2px_rgba(59,130,246,0.18)] [&>svg]:shrink-0 [&>svg]:text-e-text-soft"
                 onClick={() => setOpen((o) => !o)}
             >
                 <span style={{fontFamily: current.value}}>{current.label}</span>
                 <UI.ChevronDown size={14} strokeWidth={1.75}/>
             </button>
             {open && (
-                <div className="fw-popup" role="listbox">
+                <div className="absolute z-[200] left-0 right-0 top-[calc(100%+4px)] flex flex-col gap-px p-1 bg-e-surface border border-e-border rounded-e-xl shadow-[0_10px_28px_rgba(15,23,42,0.18)] max-h-[280px] overflow-y-auto" role="listbox">
                     {FONT_FAMILY_OPTIONS.map((opt) => {
                         const active = opt.value === current.value;
                         return (
@@ -53,16 +53,16 @@ export function FontFamilyField({value, onChange}) {
                                 type="button"
                                 role="option"
                                 aria-selected={active}
-                                className={`fw-option${active ? ' active' : ''}`}
+                                className={`flex items-center gap-1.5 w-full h-7 pl-1 pr-2 bg-transparent border-none rounded-e text-[12.5px] text-e-text text-left cursor-pointer hover:bg-e-surface-hover [&.active]:text-e-primary${active ? ' active' : ''}`}
                                 onClick={() => {
                                     onChange(opt.value);
                                     setOpen(false);
                                 }}
                             >
-                <span className="fw-option-check">
+                <span className="shrink-0 basis-4 inline-flex items-center justify-center text-e-primary">
                   {active && <UI.Check size={13} strokeWidth={2.25}/>}
                 </span>
-                                <span className="fw-option-label" style={{fontFamily: opt.value}}>
+                                <span className="flex-1 min-w-0 truncate" style={{fontFamily: opt.value}}>
                   {opt.label}
                 </span>
                             </button>

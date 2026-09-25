@@ -83,8 +83,8 @@ export default function useAddressManagement({
       const errors = validateAddress(
         state.shippingAddress,
         state.email,
-        state.billingAddress,
-        state.useSameAsShipping,
+        null,
+        true,
         OPTIONAL_ZIP_FALLBACK,
       );
       if (Object.keys(errors).length > 0) {
@@ -112,22 +112,19 @@ export default function useAddressManagement({
             variables: { cartId, shippingAddress: addressFields, customerAddressId, email: state.email },
           });
 
-      let billingAddressFields = null;
-      let billingCustomerAddressId = null;
-      if (state.useSameAsShipping) {
-        billingAddressFields = addressFields;
-        billingCustomerAddressId = customerAddressId;
-      } else {
-        billingAddressFields = buildAddressFields(state.billingAddress, persistFreshAddress);
+      const keepCustomBilling = !state.useSameAsShipping && state.billingApplied;
+      if (!keepCustomBilling) {
+        await mutations.setBillingAddress({
+          variables: {
+            cartId,
+            billingAddress: addressFields,
+            billingCustomerAddressId: customerAddressId,
+            sameAsShipping: true,
+          },
+        });
+        actions.setUseSameAsShipping(true);
+        actions.setBillingEditing(false);
       }
-      await mutations.setBillingAddress({
-        variables: {
-          cartId,
-          billingAddress: billingAddressFields,
-          billingCustomerAddressId,
-          sameAsShipping: state.useSameAsShipping,
-        },
-      });
 
       const savedAddress = shippingResult?.data?.setShippingAddressesOnCart?.cart?.shipping_addresses?.[0];
       if (!savedAddress || !savedAddress.street?.length) {

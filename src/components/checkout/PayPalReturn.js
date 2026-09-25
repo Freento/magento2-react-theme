@@ -3,7 +3,6 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { SET_PAYMENT_METHOD_AND_PLACE_ORDER } from '../../queries/checkout';
 import { useCart } from '../../context/CartContext';
-import '../../styles/checkout/Checkout.less';
 
 const PayPalReturn = () => {
     const [searchParams] = useSearchParams();
@@ -61,17 +60,20 @@ const PayPalReturn = () => {
         })();
     }, [searchParams, cartId, clearCart, navigate, setPaymentAndPlaceOrder]);
 
+    const titleCls = 'paypal-return-title font-sans text-xl font-semibold tracking-[-0.01em] leading-[1.2] mb-3';
+    const textCls = 'paypal-return-text text-base leading-[1.6] text-ink-2';
+
     return (
-        <div className="paypal-return">
-            <div className="paypal-return-card">
+        <div className="paypal-return min-h-[calc(100vh-200px)] max600:min-h-[calc(100vh-140px)] flex items-center justify-center px-gutter py-10 max600:px-4 max600:py-6">
+            <div className="paypal-return-card w-full max-w-[480px] px-10 py-12 max600:px-6 max600:py-8 bg-bg border border-line rounded text-center text-ink">
                 {error ? (
                     <>
-                        <div className="paypal-return-icon paypal-return-icon--error" aria-hidden="true">!</div>
-                        <h1 className="paypal-return-title">Payment processing error</h1>
-                        <p className="paypal-return-text">{error}</p>
+                        <div className="paypal-return-icon w-14 h-14 mx-auto mb-5 rounded-full flex items-center justify-center font-sans text-[28px] font-semibold leading-none bg-danger-bg text-danger border border-danger-border" aria-hidden="true">!</div>
+                        <h1 className={titleCls}>Payment processing error</h1>
+                        <p className={textCls}>{error}</p>
                         <button
                             type="button"
-                            className="btn-primary paypal-return-action"
+                            className="btn-primary paypal-return-action w-full h-11 py-0 gap-2.5 mt-7 min-w-[200px]"
                             onClick={() => navigate('/checkout')}
                         >
                             Return to Checkout
@@ -79,9 +81,9 @@ const PayPalReturn = () => {
                     </>
                 ) : (
                     <>
-                        <div className="loading-spinner paypal-return-spinner" aria-hidden="true" />
-                        <h1 className="paypal-return-title">Processing your PayPal payment</h1>
-                        <p className="paypal-return-text">Hold tight — we’re finalising your order with PayPal.</p>
+                        <div className="paypal-return-spinner w-10 h-10 mx-auto mb-6 rounded-full border-2 border-line border-t-ink animate-spin" aria-hidden="true" />
+                        <h1 className={titleCls}>Processing your PayPal payment</h1>
+                        <p className={textCls}>Hold tight — we’re finalising your order with PayPal.</p>
                     </>
                 )}
             </div>

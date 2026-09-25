@@ -1,73 +1,58 @@
-import { useQuery } from '@apollo/client';
 import { useLocation } from 'react-router-dom';
-import { RESOLVE_URL } from '../queries/url';
 
-const RESOLVE_VIA_GRAPHQL = import.meta.env.VITE_URL_RESOLVE_MODE === 'graphql';
+/**
+ * Returns the catalog entity a storefront URL resolves to, or `null`.
+ *
+ * Resolution always happens on the Node server: a full page load carries the
+ * result in `window.__INITIAL_DATA__.resolvedUrl`, a client-side navigation
+ * carries it in the link's router state. The browser never resolves URLs itself,
+ * so this hook only reads what is already there — it never loads or errors.
+ *
+ * @param {string} urlPath
+ * @returns {object|null}
+ */
+const STORAGE_KEY = 'resolvedUrls';
+const isBrowser = typeof window !== 'undefined';
 
-const normalizeEntityType = (routeTypeEnum) => routeTypeEnum.toLowerCase().replace(/_/g, '-');
-
-function getAlreadyResolvedPage(requestPath, pageFromClickedLink) {
-  if (pageFromClickedLink?.path === requestPath) {
-    return pageFromClickedLink;
+const readStore = () => {
+  try {
+    return JSON.parse(window.sessionStorage.getItem(STORAGE_KEY) || '{}') || {};
+  } catch {
+    return {};
   }
+};
 
-  if (typeof window !== 'undefined') {
-    const resolvedUrlFromServer = window.__INITIAL_DATA__?.resolvedUrl; // { path, data: page }
-    if (resolvedUrlFromServer?.path === requestPath) {
-      return resolvedUrlFromServer.data;
-    }
+const remember = (path, data) => {
+  if (!isBrowser || !data) return;
+  try {
+    const store = readStore();
+    if (store[path]) return;
+    store[path] = data;
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  } catch {
+    return;
   }
+};
 
-  return null;
-}
-
-function shouldRetryWithHtmlSuffix(requestPath, skip, resolvedUrl) {
-  if (skip) return false;
-  if (!requestPath) return false;
-  if (requestPath.endsWith('.html')) return false;
-  if (resolvedUrl.loading) return false;
-
-  return !resolvedUrl.data?.route;
-}
-
-function usePageFromGraphql(requestPath, skip) {
-  const resolvedUrl = useQuery(RESOLVE_URL, {
-    variables: { url: `/${requestPath}` },
-    skip: skip || !requestPath,
-    fetchPolicy: 'cache-first',
-  });
-  const retryWithHtmlSuffix = shouldRetryWithHtmlSuffix(requestPath, skip, resolvedUrl);
-  const resolvedUrlWithHtml = useQuery(RESOLVE_URL, {
-    variables: { url: `/${requestPath}.html` },
-    skip: !retryWithHtmlSuffix,
-    fetchPolicy: 'cache-first',
-  });
-
-  const route = resolvedUrl.data?.route || resolvedUrlWithHtml.data?.route;
-  if (route) {
-    return {
-      loading: false,
-      error: null,
-      data: { ...route, type: normalizeEntityType(route.type) }
-    };
-  }
-
-  return {
-    loading: resolvedUrl.loading || (retryWithHtmlSuffix && resolvedUrlWithHtml.loading),
-    error: resolvedUrl.error || resolvedUrlWithHtml.error || null,
-    data: null,
-  };
-}
+const recall = (path) => (isBrowser ? readStore()[path] || null : null);
 
 export function useResolvedUrl(urlPath) {
   const location = useLocation();
   const requestPath = (urlPath || '').replace(/^\/+/, '');
 
-  const alreadyResolvedPage = getAlreadyResolvedPage(requestPath, location.state?.resolved);
-  const pageFromGraphql = usePageFromGraphql(requestPath, Boolean(alreadyResolvedPage) || !RESOLVE_VIA_GRAPHQL);
+  const pageFromClickedLink = location.state?.resolved;
+  if (pageFromClickedLink?.path === requestPath) {
+    remember(requestPath, pageFromClickedLink);
+    return pageFromClickedLink;
+  }
 
-  if (alreadyResolvedPage) return { loading: false, error: null, data: alreadyResolvedPage };
-  if (!RESOLVE_VIA_GRAPHQL) return { loading: false, error: null, data: null };
+  if (isBrowser) {
+    const resolvedUrlFromServer = window.__INITIAL_DATA__?.resolvedUrl; // { path, data: page }
+    if (resolvedUrlFromServer?.path === requestPath) {
+      remember(requestPath, resolvedUrlFromServer.data);
+      return resolvedUrlFromServer.data;
+    }
+  }
 
-  return pageFromGraphql;
+  return recall(requestPath);
 }

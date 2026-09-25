@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import '../../styles/checkout/AuthNetCommunicator.less';
 
 const AuthNetCommunicator = () => {
     useEffect(() => {
@@ -78,15 +77,15 @@ const AuthNetCommunicator = () => {
     }, []);
 
     return (
-        <div className="authnet-communicator">
-            <div className="authnet-communicator__icon">🔒</div>
-            <h3 className="authnet-communicator__title">
+        <div className="authnet-communicator flex flex-col items-center justify-center min-h-[200px] font-sans text-ink-2 text-center p-5">
+            <div className="authnet-communicator__icon text-[2rem] mb-4">🔒</div>
+            <h3 className="authnet-communicator__title mb-4 text-ink">
                 Secure Payment Communication
             </h3>
-            <p className="authnet-communicator__text">
+            <p className="authnet-communicator__text text-base">
                 This page handles secure communication between the payment form and your checkout page.
             </p>
-            <p className="authnet-communicator__note">
+            <p className="authnet-communicator__note mt-2 text-sm opacity-70">
                 If you see this page, the communication handler is working correctly.
             </p>
         </div>

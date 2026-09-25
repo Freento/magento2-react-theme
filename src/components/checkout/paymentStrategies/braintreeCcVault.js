@@ -1,15 +1,14 @@
-const userError = (msg) => {
-  const err = new Error(msg);
-  err.userMessage = msg;
-  return err;
-};
-
 export default {
   code: 'braintree_cc_vault',
-  validate: () => ({
-    payment: 'Saved card payment is not available. Please select "Check / Money order" or enter new card details with "Credit Card" option.',
+  validate: (state) => (
+    state.selectedVaultHash
+      ? null
+      : { payment: 'Please select one of your saved cards.' }
+  ),
+  prepare: async (state) => ({
+    code: 'braintree_cc_vault',
+    braintree_cc_vault: {
+      public_hash: state.selectedVaultHash,
+    },
   }),
-  prepare: () => {
-    throw userError('Saved card payment not implemented yet.');
-  },
 };

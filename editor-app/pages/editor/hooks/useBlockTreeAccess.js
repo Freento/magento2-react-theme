@@ -95,6 +95,15 @@ export function useBlockTreeAccess({
         ? resolveBlockForDevices(selectedBlockRaw, devices)
         : null;
     const selectedRegistry = selectedBlock ? registry[selectedBlock.component] : null;
+    // A block under one that the style layer made a link renders no anchor of
+    // its own — one link inside another is invalid HTML. Offering it a link
+    // field would promise something the page cannot keep.
+    const selectedInsideLink = selectedBlockId
+        ? [
+            ...ancestorsOf(pageBlocksData, selectedBlockId),
+            ...ancestorsOf(footerData?.blocks || [], selectedBlockId),
+        ].some((b) => !!b?.style?.link)
+        : false;
     const currentBlocks = getCurrentBlocks();
 
     return {
@@ -110,6 +119,7 @@ export function useBlockTreeAccess({
         selectedBlockRaw,
         selectedBlock,
         selectedRegistry,
+        selectedInsideLink,
         currentBlocks,
     };
 }

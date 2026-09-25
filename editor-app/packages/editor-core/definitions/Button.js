@@ -3,7 +3,9 @@ export default {
     category: 'content',
     icon: '▢',
     acceptsChildren: false,
-    allowedIn: ['page', 'Grid'],
+    // Has an href of its own; a second anchor around it would nest.
+    hideStyleFields: ['link'],
+    allowedIn: ['page', 'Grid', 'Box'],
     defaultProps: {
       text: 'Button',
       href: '#',

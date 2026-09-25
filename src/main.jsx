@@ -6,19 +6,25 @@ import { getClientApolloClient } from './apollo/client';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { CompareProvider } from './context/CompareContext';
 import { BreadcrumbProvider } from './context/BreadcrumbContext';
 import { attachPrefetcher, resetPrefetchDedupe } from './lib/prefetch';
+import { registerRouteAreaPaths } from './hooks/useRouteArea';
+import { migrateLegacyCustomerToken } from './lib/customerToken';
 import App from './App.jsx';
-import './styles/base/general.less';
-import './styles/base/controls.less';
-import './styles/base/forms.less';
-import './styles/base/buttons.less';
-import './styles/base/skeleton.less';
-import './styles/critical/home-hero.less';
+import './styles/tailwind.css';
+import './styles/external-markup.css';
 
 const initialData = typeof window !== 'undefined' ? (window.__INITIAL_DATA__ || {}) : {};
+
+// Carry pre-cookie sessions over before anything reads the token.
+migrateLegacyCustomerToken();
+
 const apollo = getClientApolloClient(initialData.apolloCache || null);
 
+// Which URLs the editor has content for, so hovering one prefetches that
+// content — and skips the product query when the content is the whole page.
+registerRouteAreaPaths(initialData.routeAreaPaths);
 attachPrefetcher();
 
 const CACHE_FLUSH_MS = 60 * 60 * 1000;
@@ -38,11 +44,13 @@ const tree = (
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
+            <CompareProvider>
             <BreadcrumbProvider>
               <BrowserRouter>
                 <App initialData={initialData} />
               </BrowserRouter>
             </BreadcrumbProvider>
+            </CompareProvider>
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

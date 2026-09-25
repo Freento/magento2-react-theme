@@ -5,13 +5,14 @@ import Breadcrumbs from './components/layout/Breadcrumbs';
 import MiniCart from './components/layout/MiniCart';
 import MobileBottomNav from './components/layout/MobileBottomNav';
 import WishlistToast from './components/ui/WishlistToast';
+import CartErrorToast from './components/ui/CartErrorToast';
+import CompareToast from './components/ui/CompareToast';
 import EditorPageRoute from './components/ui/EditorPageRoute';
 import ClientOnly from './components/ui/ClientOnly';
 import { renderPage, useActiveDevices } from 'editor-core/renderer';
 import * as defaultBlocks from 'editor-core/blocks';
 import NewsletterForm from './components/layout/NewsletterForm';
 import { useAuth } from './context/AuthContext';
-import './styles/base/toast.less';
 
 const LoginModal          = lazy(() => import('./components/auth/LoginModal'));
 const RegisterModal       = lazy(() => import('./components/auth/RegisterModal'));
@@ -32,6 +33,8 @@ function AuthModals() {
 const Category              = lazy(() => import('./components/catalog/Category'));
 const MyAccount             = lazy(() => import('./components/account/MyAccount'));
 const Search                = lazy(() => import('./components/search/Search'));
+const ShoppingCart          = lazy(() => import('./components/cart/ShoppingCart'));
+const ComparePage           = lazy(() => import('./components/catalog/ComparePage'));
 const Checkout              = lazy(() => import('./components/checkout/Checkout'));
 const CheckoutSuccess       = lazy(() => import('./components/checkout/CheckoutSuccess'));
 const PayPalCancel          = lazy(() => import('./components/checkout/PayPalCancel'));
@@ -60,6 +63,7 @@ function ScrollbarWidthVar() {
 }
 
 const footerBlocks = { ...defaultBlocks, NewsletterForm };
+const EMPTY_PATHS = [];
 
 function Footer({ footerData, ssrHint }) {
   const devices = useActiveDevices(undefined, ssrHint);
@@ -71,9 +75,14 @@ export default function App({ initialData = {} }) {
   const editorPages = initialData.editorPages || {};
   const footerData = initialData.footerData || null;
   const ssrHint = initialData.ssrHint || null;
+  // Editor blocks placed on a route the storefront owns (a category, for now).
+  // Only the current path's document travels in the response; the paths list
+  // tells the catalog route which other URLs are worth fetching one for.
+  const routeArea = initialData.routeArea || null;
+  const routeAreaPaths = initialData.routeAreaPaths || EMPTY_PATHS;
 
   return (
-    <div className="App">
+    <div className="App max900:pb-16">
       <ScrollToTop />
       <ScrollbarWidthVar />
       <Header />
@@ -92,6 +101,8 @@ export default function App({ initialData = {} }) {
           <Route path="/my-account" element={<MyAccount />} />
           <Route path="/my-account/*" element={<MyAccount />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/cart" element={<ShoppingCart />} />
+          <Route path="/compare" element={<ComparePage />} />
 
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout/success" element={<CheckoutSuccess />} />
@@ -102,7 +113,10 @@ export default function App({ initialData = {} }) {
 
           <Route path="/authnetcim/hosted/communicator" element={<AuthNetCommunicator />} />
 
-          <Route path="/*" element={<Category />} />
+          <Route
+            path="/*"
+            element={<Category routeArea={routeArea} routeAreaPaths={routeAreaPaths} ssrHint={ssrHint} />}
+          />
         </Routes>
         </Suspense>
       </main>
@@ -113,6 +127,8 @@ export default function App({ initialData = {} }) {
       <AuthModals />
       <MobileBottomNav />
       <WishlistToast />
+      <CartErrorToast />
+      <CompareToast />
       <div id="toast-stack" className="toast-stack" />
     </div>
   );

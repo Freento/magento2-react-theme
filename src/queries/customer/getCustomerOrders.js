@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-export const GET_CUSTOMER_ORDERS = gql`
+const customerOrdersQuery = (extraFields) => gql`
   query getCustomerOrders($pageSize: Int!, $currentPage: Int!) {
     customer {
       orders(pageSize: $pageSize, currentPage: $currentPage) {
@@ -9,7 +9,15 @@ export const GET_CUSTOMER_ORDERS = gql`
           number
           order_date
           status
+          ${extraFields}
           total {
+            discounts {
+              amount {
+                value
+                currency
+              }
+              label
+            }
             grand_total {
               value
               currency
@@ -84,3 +92,11 @@ export const GET_CUSTOMER_ORDERS = gql`
     }
   }
 `;
+
+export const GET_CUSTOMER_ORDERS = customerOrdersQuery('');
+
+export const GET_CUSTOMER_ORDERS_WITH_COUPONS = customerOrdersQuery(`
+          applied_coupons {
+            code
+          }
+`);

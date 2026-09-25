@@ -51,7 +51,7 @@ export function SpacingField({style, value, variant = 'margin', onPatch, onChang
 
     const inp = (side, title) => (
         <input
-            className="spacing-input"
+            className="spacing-input w-11 h-6 px-1 border border-transparent bg-e-surface-alt rounded-e [font-family:inherit] text-[12px] font-[inherit] text-center text-e-text outline-none transition-[background-color,border-color,box-shadow] duration-100 placeholder:text-e-text-soft hover:bg-e-surface hover:border-e-border-strong focus:bg-e-surface focus:border-e-primary focus:shadow-[0_0_0_2px_rgba(37,99,235,0.2)]"
             type="text"
             inputMode="decimal"
             placeholder="·"
@@ -63,15 +63,15 @@ export function SpacingField({style, value, variant = 'margin', onPatch, onChang
     );
 
     return (
-        <div className={`spacing-box spacing-box--${variant}`}>
-            <div className="spacing-box-top">{inp('top', 'Top')}</div>
-            <div className="spacing-box-right">{inp('right', 'Right')}</div>
-            <div className="spacing-box-bottom">{inp('bottom', 'Bottom')}</div>
-            <div className="spacing-box-left">{inp('left', 'Left')}</div>
-            <div className="spacing-box-center">
+        <div className={`spacing-box spacing-box--${variant} relative w-full h-[92px] grid grid-cols-[8px_1fr_8px] grid-rows-[8px_1fr_8px] gap-1 before:content-[''] before:col-start-2 before:row-start-2 before:border before:border-dashed before:border-e-border-strong before:rounded-e before:pointer-events-none`}>
+            <div className="col-start-2 row-start-1 flex items-center justify-center">{inp('top', 'Top')}</div>
+            <div className="col-start-3 row-start-2 flex items-center justify-center">{inp('right', 'Right')}</div>
+            <div className="col-start-2 row-start-3 flex items-center justify-center">{inp('bottom', 'Bottom')}</div>
+            <div className="col-start-1 row-start-2 flex items-center justify-center">{inp('left', 'Left')}</div>
+            <div className="col-start-2 row-start-2 z-[1] flex items-center justify-center">
                 <button
                     type="button"
-                    className={`spacing-link${linked ? ' active' : ''}`}
+                    className={`spacing-link w-[22px] h-[22px] border-none bg-e-surface rounded-e text-e-text-soft cursor-pointer inline-flex items-center justify-center transition-[background-color,color,box-shadow] duration-100 shadow-[0_0_0_1px_#E8E8E5] hover:text-e-text hover:shadow-[0_0_0_1px_#D8D8D4] [&.active]:bg-e-primary [&.active]:text-white [&.active]:shadow-[0_0_0_1px_#0F4C5C]${linked ? ' active' : ''}`}
                     onClick={() => setLinked((v) => !v)}
                     title={linked ? 'Different sides' : 'All sides equal'}
                 >

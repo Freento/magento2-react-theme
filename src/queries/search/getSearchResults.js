@@ -1,6 +1,8 @@
 import { gql } from '@apollo/client';
+import { CONFIGURABLE_CARD_FIELDS } from '../catalog/configurableCardFields';
 
 export const GET_SEARCH_RESULTS = gql`
+    ${CONFIGURABLE_CARD_FIELDS}
     query getSearchResults($inputText: String!, $currentPage: Int, $pageSize: Int, $filters: ProductAttributeFilterInput, $sort: ProductAttributeSortInput) {
         products(search: $inputText, currentPage: $currentPage, pageSize: $pageSize, filter: $filters, sort: $sort) {
             aggregations {
@@ -47,6 +49,7 @@ export const GET_SEARCH_RESULTS = gql`
                 review_count
                 stock_status
                 __typename
+                ...ConfigurableCardFields
             }
             page_info {
                 current_page

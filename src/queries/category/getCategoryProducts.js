@@ -1,6 +1,8 @@
 import { gql } from '@apollo/client';
+import { CONFIGURABLE_CARD_FIELDS } from '../catalog/configurableCardFields';
 
 export const GET_CATEGORY_PRODUCTS = gql`
+    ${CONFIGURABLE_CARD_FIELDS}
     query getCategoryProducts(
         $filters: ProductAttributeFilterInput!
         $categoryUid: String!
@@ -49,6 +51,7 @@ export const GET_CATEGORY_PRODUCTS = gql`
                 rating_summary
                 review_count
                 stock_status
+                ...ConfigurableCardFields
             }
             total_count
             page_info {

@@ -1,0 +1,272 @@
+{
+  "title": "What Is New",
+  "path": "/what-is-new.html",
+  "route": {
+    "type": "category",
+    "id": 38
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-new-main",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "420px",
+          "backgroundImage": "/uploads/promo-new-main.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "/collections/yoga-new.html",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-new-main-title",
+            "component": "Heading",
+            "props": {
+              "text": "The very latest yoga styles plus twists on timeless classics",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-new-main-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "New Luma Yoga Collection",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          },
+          {
+            "id": "promo-new-main-cta",
+            "component": "Text",
+            "props": {
+              "text": "Shop New Yoga",
+              "fontSize": 14,
+              "fontWeight": 500,
+              "color": "#1a1a1a",
+              "textAlign": "center"
+            },
+            "style": {
+              "backgroundColor": "#ffffff",
+              "padding": "10px 22px",
+              "borderRadius": "4px",
+              "width": "fit-content",
+              "marginTop": "8px"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "300px"
+            }
+          }
+        }
+      },
+      {
+        "id": "promo-row-1",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 2,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-new-performance",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "320px",
+              "backgroundImage": "/uploads/promo-new-performance.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/collections/performance-new.html"
+            },
+            "children": [
+              {
+                "id": "promo-new-performance-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Whatever day brings",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-new-performance-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Luma Cocona ™ for breathability, CoolTech ™ for wicking, or a blend of both.",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              },
+              {
+                "id": "promo-new-performance-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Performance Fabrics",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          },
+          {
+            "id": "promo-new-eco",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "320px",
+              "backgroundImage": "/uploads/promo-new-eco.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/collections/eco-new.html"
+            },
+            "children": [
+              {
+                "id": "promo-new-eco-title",
+                "component": "Heading",
+                "props": {
+                  "text": "A sense of renewal",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-new-eco-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Enjoy comfort of body and mind with Luma eco-friendly choices",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              },
+              {
+                "id": "promo-new-eco-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Eco Friendly",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "what-is-new-products",
+        "component": "ProductsCarousel",
+        "props": {
+          "title": "Luma's Latest",
+          "eyebrow": "",
+          "skus": [
+            {
+              "sku": "WSH07"
+            },
+            {
+              "sku": "WSH03"
+            },
+            {
+              "sku": "WSH01"
+            },
+            {
+              "sku": "WP03"
+            }
+          ],
+          "pageSize": 4,
+          "itemsPerSlide": 4,
+          "source": "skus"
+        },
+        "style": {
+          "width": "100%",
+          "marginTop": "3%"
+        }
+      }
+    ]
+  }
+}

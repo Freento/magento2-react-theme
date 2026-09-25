@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { renderPage, renderPageBlocks, useActiveDevices } from 'editor-core/renderer';
 import PreviewChrome from '../../src/editor/PreviewChrome.jsx';
+import RoutePreview from '../../src/editor/RoutePreview.jsx';
 
 function makeHostBlock(loader, fallbackTitle) {
   return function HostBlock(props) {
@@ -25,10 +26,12 @@ function makeHostBlock(loader, fallbackTitle) {
 
 const HostProductsCarousel = makeHostBlock(() => import('@host/components/catalog/ProductsCarousel'), 'Products Carousel');
 const HostNewsletterForm = makeHostBlock(() => import('@host/components/layout/NewsletterForm'), 'Newsletter Form');
+const HostContactForm = makeHostBlock(() => import('@host/components/contact/ContactForm'), 'Contact Form');
 
 const previewBlocks = {
   ProductsCarousel: HostProductsCarousel,
   NewsletterForm: HostNewsletterForm,
+  ContactForm: HostContactForm,
 };
 
 export default function PreviewFramePage() {
@@ -105,17 +108,24 @@ export default function PreviewFramePage() {
       }) : null}
     >
       <main>
-        {renderPage(pageData, {
-          onSelect: handleSelect,
-          onDelete: handleDelete,
-          onDuplicate: handleDuplicate,
-          onUpdateProp: handleUpdateProp,
-          selectedId,
-          hoveredId,
-          devices,
-          blocks: previewBlocks,
-          editingTarget: 'page',
-        })}
+        {(() => {
+          const opts = {
+            onSelect: handleSelect,
+            onDelete: handleDelete,
+            onDuplicate: handleDuplicate,
+            onUpdateProp: handleUpdateProp,
+            selectedId,
+            hoveredId,
+            devices,
+            blocks: previewBlocks,
+            editingTarget: 'page',
+          };
+          // `pageData` is the editor's per-area view of a route document when it
+          // carries a `route`; otherwise it is a plain page.
+          return pageData.route
+            ? <RoutePreview doc={pageData}>{renderPageBlocks(pageData, opts)}</RoutePreview>
+            : renderPage(pageData, opts);
+        })()}
       </main>
     </PreviewChrome>
   );

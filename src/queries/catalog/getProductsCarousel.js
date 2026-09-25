@@ -1,9 +1,11 @@
 import { gql } from '@apollo/client';
+import { CONFIGURABLE_CARD_FIELDS } from './configurableCardFields';
 
 export const GET_PRODUCTS_CAROUSEL = gql`
-  query getProductsCarousel($categoryId: String, $pageSize: Int!) {
+  ${CONFIGURABLE_CARD_FIELDS}
+  query getProductsCarousel($filter: ProductAttributeFilterInput!, $pageSize: Int!) {
     products(
-      filter: { category_id: { eq: $categoryId } },
+      filter: $filter,
       currentPage: 1,
       pageSize: $pageSize
     ) {
@@ -26,6 +28,7 @@ export const GET_PRODUCTS_CAROUSEL = gql`
         rating_summary
         review_count
         stock_status
+        ...ConfigurableCardFields
       }
     }
   }

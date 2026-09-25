@@ -1,0 +1,171 @@
+{
+  "title": "Training",
+  "path": "/training.html",
+  "route": {
+    "type": "category",
+    "id": 9
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-training-main",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "343px",
+          "backgroundImage": "/uploads/promo-training-main.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "/training.html",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-training-main-title",
+            "component": "Heading",
+            "props": {
+              "text": "Motivate",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "300px"
+            }
+          }
+        }
+      },
+      {
+        "id": "promo-training-erin",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "320px",
+          "backgroundImage": "/uploads/promo-training-erin.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "/collections/erin-recommends.html",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-training-erin-title",
+            "component": "Heading",
+            "props": {
+              "text": "Before creating Luma, pro trainer Erin Renny helped world-class athletes reach peak fitness",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-training-erin-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "Hand-selected by Erin, our training downloads reflect a commitment to yoga, health and wellness.",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "300px"
+            }
+          }
+        }
+      },
+      {
+        "id": "promo-training-on-demand",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "240px",
+          "backgroundColor": "#f2f0ed",
+          "link": "/training/training-video.html",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-training-on-demand-title",
+            "component": "Heading",
+            "props": {
+              "text": "Training on demand",
+              "level": 2,
+              "color": "#1a1a1a",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-training-on-demand-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "Luma downloads to inspire and challenge. Your space, your pace",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#4a4a4a"
+            }
+          },
+          {
+            "id": "promo-training-on-demand-cta",
+            "component": "Text",
+            "props": {
+              "text": "Videos",
+              "fontSize": 14,
+              "fontWeight": 500,
+              "color": "#ffffff",
+              "textAlign": "center"
+            },
+            "style": {
+              "backgroundColor": "#1a1a1a",
+              "padding": "10px 22px",
+              "borderRadius": "4px",
+              "width": "fit-content",
+              "marginTop": "8px"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "240px"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

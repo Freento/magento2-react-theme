@@ -29,6 +29,10 @@ const initialStateFactory = (initialStep) => ({
   email: '',
   useSameAsShipping: true,
   saveAddressToBook: false,
+  billingAddressId: null,
+  billingEditing: false,
+  billingLoading: false,
+  billingApplied: false,
 
   // ───────────────────────────────────────── Saved-address UX (logged-in)
   selectedAddressId: null,
@@ -43,6 +47,8 @@ const initialStateFactory = (initialStep) => ({
   // ───────────────────────────────────────── Payment
   selectedPayment: '',
   cardData: { ...EMPTY_CARD },
+  selectedVaultHash: '',
+  saveCard: true,
   acceptJsToken: null,
   paymentLoading: false,
   orderLoading: false,
@@ -59,6 +65,12 @@ function reducer(state, action) {
     case 'COMPLETE_STEP': {
       const next = new Set(state.completedSteps);
       next.add(action.step);
+      return { ...state, completedSteps: next };
+    }
+    case 'UNCOMPLETE_STEP': {
+      if (!state.completedSteps.has(action.step)) return state;
+      const next = new Set(state.completedSteps);
+      next.delete(action.step);
       return { ...state, completedSteps: next };
     }
     case 'RESET_COMPLETED_STEPS':
@@ -78,6 +90,14 @@ function reducer(state, action) {
       return { ...state, useSameAsShipping: action.value };
     case 'SET_SAVE_ADDRESS_TO_BOOK':
       return { ...state, saveAddressToBook: action.value };
+    case 'SET_BILLING_ADDRESS_ID':
+      return { ...state, billingAddressId: action.value };
+    case 'SET_BILLING_EDITING':
+      return { ...state, billingEditing: action.value };
+    case 'SET_BILLING_LOADING':
+      return { ...state, billingLoading: action.value };
+    case 'SET_BILLING_APPLIED':
+      return { ...state, billingApplied: action.value };
 
     // Saved-address UX
     case 'SET_SELECTED_ADDRESS_ID':
@@ -114,6 +134,10 @@ function reducer(state, action) {
       return { ...state, cardData: typeof action.value === 'function'
         ? action.value(state.cardData)
         : { ...state.cardData, ...action.value } };
+    case 'SET_VAULT_HASH':
+      return { ...state, selectedVaultHash: action.value };
+    case 'SET_SAVE_CARD':
+      return { ...state, saveCard: action.value };
     case 'SET_ACCEPT_JS_TOKEN':
       return { ...state, acceptJsToken: action.value };
     case 'SET_PAYMENT_LOADING':
@@ -146,6 +170,7 @@ export default function useCheckoutState(initialStep = 1) {
   const actions = useCallback(() => ({
     setStep: (step) => dispatch({ type: 'SET_STEP', step }),
     completeStep: (step) => dispatch({ type: 'COMPLETE_STEP', step }),
+    uncompleteStep: (step) => dispatch({ type: 'UNCOMPLETE_STEP', step }),
     resetCompletedSteps: () => dispatch({ type: 'RESET_COMPLETED_STEPS' }),
 
     setShippingAddress: (patch) => dispatch({ type: 'SET_SHIPPING_ADDRESS', patch }),
@@ -155,6 +180,10 @@ export default function useCheckoutState(initialStep = 1) {
     setEmail: (value) => dispatch({ type: 'SET_EMAIL', value }),
     setUseSameAsShipping: (value) => dispatch({ type: 'SET_USE_SAME_AS_SHIPPING', value }),
     setSaveAddressToBook: (value) => dispatch({ type: 'SET_SAVE_ADDRESS_TO_BOOK', value }),
+    setBillingAddressId: (value) => dispatch({ type: 'SET_BILLING_ADDRESS_ID', value }),
+    setBillingEditing: (value) => dispatch({ type: 'SET_BILLING_EDITING', value }),
+    setBillingLoading: (value) => dispatch({ type: 'SET_BILLING_LOADING', value }),
+    setBillingApplied: (value) => dispatch({ type: 'SET_BILLING_APPLIED', value }),
 
     setSelectedAddressId: (value) => dispatch({ type: 'SET_SELECTED_ADDRESS_ID', value }),
     setShowAddressSelector: (value) => dispatch({ type: 'SET_SHOW_ADDRESS_SELECTOR', value }),
@@ -167,6 +196,8 @@ export default function useCheckoutState(initialStep = 1) {
 
     setSelectedPayment: (value) => dispatch({ type: 'SET_SELECTED_PAYMENT', value }),
     setCardData: (value) => dispatch({ type: 'SET_CARD_DATA', value }),
+    setVaultHash: (value) => dispatch({ type: 'SET_VAULT_HASH', value }),
+    setSaveCard: (value) => dispatch({ type: 'SET_SAVE_CARD', value }),
     setAcceptJsToken: (value) => dispatch({ type: 'SET_ACCEPT_JS_TOKEN', value }),
     setPaymentLoading: (value) => dispatch({ type: 'SET_PAYMENT_LOADING', value }),
     setOrderLoading: (value) => dispatch({ type: 'SET_ORDER_LOADING', value }),

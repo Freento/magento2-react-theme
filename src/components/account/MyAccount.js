@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { GET_CUSTOMER_DATA, GET_CUSTOMER_ORDERS, CREATE_CUSTOMER_ADDRESS, UPDATE_CUSTOMER_ADDRESS, DELETE_CUSTOMER_ADDRESS, GET_CUSTOMER_WISHLIST, REMOVE_PRODUCTS_FROM_WISHLIST, REORDER_ITEMS } from '../../queries/customer';
+import { GET_CUSTOMER_DATA, GET_CUSTOMER_ORDERS, GET_CUSTOMER_ORDERS_WITH_COUPONS, GET_CUSTOMER_ORDER_FIELDS, CREATE_CUSTOMER_ADDRESS, UPDATE_CUSTOMER_ADDRESS, DELETE_CUSTOMER_ADDRESS, GET_CUSTOMER_WISHLIST, REMOVE_PRODUCTS_FROM_WISHLIST, REORDER_ITEMS } from '../../queries/customer';
 import { GET_COUNTRIES } from '../../queries/checkout';
 import useAddressValidation from '../../hooks/useAddressValidation';
 import useProfileForm from './hooks/useProfileForm';
@@ -16,7 +16,10 @@ import ProfileTab from './tabs/ProfileTab';
 import AddressBookTab from './tabs/AddressBookTab';
 import OrdersTab from './tabs/OrdersTab';
 import WishlistTab from './tabs/WishlistTab';
-import '../../styles/account/MyAccount.less';
+import NewsletterTab from './tabs/NewsletterTab';
+import StoredPaymentsTab from './tabs/StoredPaymentsTab';
+import CompareSidebarBlock from './CompareSidebarBlock';
+import '../../styles/account/MyAccount.css';
 
 const MyAccount = () => {
   const { user, logout, initialLoading, openLoginModal } = useAuth();
@@ -47,6 +50,10 @@ const MyAccount = () => {
   const [addressError, setAddressError] = useState('');
   const [addressSuccess, setAddressSuccess] = useState('');
 
+  // Newsletter subscription state
+  const [newsletterSuccess, setNewsletterSuccess] = useState('');
+  const [newsletterError, setNewsletterError] = useState('');
+
   // Wishlist management state
   const [wishlistActionError, setWishlistActionError] = useState('');
   const [wishlistActionSuccess, setWishlistActionSuccess] = useState('');
@@ -56,9 +63,13 @@ const MyAccount = () => {
   const { data: customerData, loading: customerLoading, error: customerError, refetch: refetchCustomerData } = useQuery(GET_CUSTOMER_DATA);
   const [ordersPage, setOrdersPage] = useState(1);
   const ordersPageSize = 10;
-  const { data: ordersData, loading: ordersLoading, error: ordersError } = useQuery(GET_CUSTOMER_ORDERS, {
-    variables: { pageSize: ordersPageSize, currentPage: ordersPage }
-  });
+  const { data: orderFieldsData, loading: orderFieldsLoading } = useQuery(GET_CUSTOMER_ORDER_FIELDS, { fetchPolicy: 'cache-first' });
+  const ordersSupportCoupons = (orderFieldsData?.__type?.fields || []).some((f) => f.name === 'applied_coupons');
+  const { data: ordersData, loading: ordersQueryLoading, error: ordersError } = useQuery(
+    ordersSupportCoupons ? GET_CUSTOMER_ORDERS_WITH_COUPONS : GET_CUSTOMER_ORDERS,
+    { variables: { pageSize: ordersPageSize, currentPage: ordersPage }, skip: orderFieldsLoading }
+  );
+  const ordersLoading = orderFieldsLoading || ordersQueryLoading;
   const { data: wishlistData, loading: wishlistLoading, error: wishlistError, refetch: refetchWishlist } = useQuery(GET_CUSTOMER_WISHLIST, {
     variables: { currentPage: wishlistPage, pageSize: wishlistPageSize },
     notifyOnNetworkStatusChange: true,
@@ -203,64 +214,64 @@ const MyAccount = () => {
       'profile';
 
     const profileSkel = (
-      <div className="ma-skel-profile">
-        <div className="ma-skel-row">
-          <div className="ma-skel-field-group">
-            <span className="skeleton ma-skel-label" />
-            <span className="skeleton ma-skel-value" />
+      <div className="flex flex-col gap-[18px]">
+        <div className="grid grid-cols-2 gap-[18px] max640:grid-cols-1">
+          <div className="flex flex-col gap-1.5">
+            <span className="skeleton w-[30%] h-[11px]" />
+            <span className="skeleton w-full h-11" />
           </div>
-          <div className="ma-skel-field-group">
-            <span className="skeleton ma-skel-label" />
-            <span className="skeleton ma-skel-value" />
-          </div>
-        </div>
-        <div className="ma-skel-row">
-          <div className="ma-skel-field-group">
-            <span className="skeleton ma-skel-label" />
-            <span className="skeleton ma-skel-value" />
-          </div>
-          <div className="ma-skel-field-group">
-            <span className="skeleton ma-skel-label" />
-            <span className="skeleton ma-skel-value" />
+          <div className="flex flex-col gap-1.5">
+            <span className="skeleton w-[30%] h-[11px]" />
+            <span className="skeleton w-full h-11" />
           </div>
         </div>
-        <span className="skeleton ma-skel-btn" />
+        <div className="grid grid-cols-2 gap-[18px] max640:grid-cols-1">
+          <div className="flex flex-col gap-1.5">
+            <span className="skeleton w-[30%] h-[11px]" />
+            <span className="skeleton w-full h-11" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <span className="skeleton w-[30%] h-[11px]" />
+            <span className="skeleton w-full h-11" />
+          </div>
+        </div>
+        <span className="skeleton w-[140px] h-10 mt-1" />
       </div>
     );
 
     const addressesSkel = (
-      <div className="ma-skel-addresses">
-        <span className="skeleton ma-skel-addr-eyebrow" />
-        <div className="address-defaults-grid">
+      <div className="flex flex-col gap-3.5">
+        <span className="skeleton w-20 h-2.5" />
+        <div className="grid grid-cols-2 gap-4 max768:grid-cols-1">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div key={`addr-def-${i}`} className="address-default-card" aria-hidden="true">
-              <span className="skeleton ma-skel-addr-eyebrow" />
-              <span className="skeleton ma-skel-addr-name" />
-              <span className="skeleton ma-skel-addr-line" />
-              <span className="skeleton ma-skel-addr-line" />
-              <span className="skeleton ma-skel-addr-line" />
-              <span className="skeleton ma-skel-addr-line" />
-              <div className="address-actions">
-                <span className="skeleton ma-skel-addr-btn" />
-                <span className="skeleton ma-skel-addr-btn" />
+            <div key={`addr-def-${i}`} className="flex flex-col gap-2.5 px-6 py-[22px] bg-bg border border-line rounded transition-colors duration-fast ease-[ease] hover:border-ink" aria-hidden="true">
+              <span className="skeleton w-20 h-2.5" />
+              <span className="skeleton w-3/5 h-5 mt-1 mb-2" />
+              <span className="skeleton w-[85%] h-3 my-1" />
+              <span className="skeleton w-[85%] h-3 my-1" />
+              <span className="skeleton w-[85%] h-3 my-1" />
+              <span className="skeleton w-[85%] h-3 my-1" />
+              <div className="mt-4 flex gap-2 flex-wrap">
+                <span className="skeleton inline-block w-[72px] h-8" />
+                <span className="skeleton inline-block w-[72px] h-8" />
               </div>
             </div>
           ))}
         </div>
-        <span className="skeleton ma-skel-addr-eyebrow ma-skel-mt-28" />
-        <div className="address-table" aria-hidden="true">
-          <div className="address-table-head">
+        <span className="skeleton w-20 h-2.5 mt-7" />
+        <div className="grid grid-cols-[1fr_1.4fr_1.4fr_0.8fr_1fr_auto] bg-bg border border-line rounded overflow-hidden max768:min-w-[720px]" aria-hidden="true">
+          <div className="contents">
             {Array.from({ length: 6 }).map((_, i) => (
-              <span key={`addr-th-${i}`} role="columnheader">
-                <span className="skeleton ma-skel-addr-th" />
+              <span key={`addr-th-${i}`} role="columnheader" className="px-4 py-3 bg-surface text-2xs font-semibold tracking-[0.1em] uppercase text-ink-2">
+                <span className="skeleton w-3/5 h-2.5" />
               </span>
             ))}
           </div>
           {Array.from({ length: 4 }).map((_, r) => (
-            <div key={`addr-tr-${r}`} className="address-table-row">
+            <div key={`addr-tr-${r}`} className="contents">
               {Array.from({ length: 6 }).map((_, c) => (
-                <span key={`addr-tc-${r}-${c}`} role="cell">
-                  <span className="skeleton ma-skel-addr-td" />
+                <span key={`addr-tc-${r}-${c}`} role="cell" className="px-4 py-3.5 border-t border-line text-sm text-ink-2 flex items-center min-w-0">
+                  <span className="skeleton w-3/4 h-3.5" />
                 </span>
               ))}
             </div>
@@ -273,27 +284,27 @@ const MyAccount = () => {
     if (pendingTab === 'addresses') mainSkel = addressesSkel;
 
     return (
-      <div className="my-account-container ma-skel" aria-busy="true" aria-live="polite">
-        <div className="account-header">
+      <div className="max-w-[1280px] mx-auto pt-8 px-6 pb-20 max768:pt-5 max768:px-0 max768:pb-0 pointer-events-none" aria-busy="true" aria-live="polite">
+        <div className="flex justify-between items-center gap-4 pb-7 mb-8 border-b border-line max768:gap-3 max768:pb-5 max768:mb-6">
           <div>
-            <span className="skeleton ma-skel-page-title" />
-            <span className="skeleton ma-skel-page-sub" />
+            <span className="skeleton w-[220px] h-8 mb-2" />
+            <span className="skeleton w-[280px] h-3.5" />
           </div>
-          <span className="skeleton ma-skel-page-btn" />
+          <span className="skeleton w-[88px] h-10 self-end" />
         </div>
-        <div className="account-content">
-          <nav className="account-nav">
-            <ul className="nav-tabs">
-              {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid grid-cols-[240px_1fr] gap-10 items-start max1024:grid-cols-[200px_1fr] max1024:gap-8 max768:grid-cols-1 max768:gap-5">
+          <nav className="sticky top-6 max768:static max768:min-w-0">
+            <ul className="list-none p-0 m-0 flex flex-col gap-0.5 max768:flex-row max768:gap-0 max768:overflow-x-auto max768:[-webkit-overflow-scrolling:touch] max768:[scrollbar-width:none] max768:[&::-webkit-scrollbar]:hidden max768:border-b max768:border-line max768:-mx-4 max768:px-4 max768:max-w-full max768:flex-nowrap">
+              {Array.from({ length: 5 }).map((_, i) => (
                 <li key={`tab-${i}`}>
-                  <span className="skeleton ma-skel-nav-tab" />
+                  <span className="skeleton w-4/5 h-9 my-0.5" />
                 </li>
               ))}
             </ul>
           </nav>
-          <main className="account-main">
+          <main className="w-full min-w-0">
             <div className="account-section">
-              <span className="skeleton ma-skel-section-title" />
+              <span className="skeleton w-[180px] h-[22px] mb-6" />
               {mainSkel}
             </div>
           </main>
@@ -304,23 +315,23 @@ const MyAccount = () => {
 
   if (!user) {
     return (
-      <div className="my-account-container">
-        <section className="ma-gate" aria-labelledby="ma-gate-title">
-          <span className="ma-gate-eyebrow">Sign in required</span>
-          <h2 id="ma-gate-title" className="ma-gate-title">This area is for members.</h2>
-          <p className="ma-gate-text">
+      <div className="max-w-[1280px] mx-auto pt-8 px-6 pb-20 max768:pt-5 max768:px-0 max768:pb-0">
+        <section className="max-w-[560px] my-20 mx-auto px-12 py-14 bg-bg border border-line rounded text-center max480:px-5 max480:py-10 max480:my-6 max480:border-x-0" aria-labelledby="ma-gate-title">
+          <span className="inline-block text-xs font-medium tracking-eyebrow uppercase text-ink-2 mb-3">Sign in required</span>
+          <h2 id="ma-gate-title" className="mt-0 mb-3.5 text-[26px] font-semibold tracking-[-0.015em] text-ink leading-[1.25] max480:text-[20px]">This area is for members.</h2>
+          <p className="mx-auto mt-0 mb-7 max-w-[420px] text-base leading-relaxed text-ink-2 max480:text-13">
             Sign in to view your orders, addresses, and saved items. New here?
             You can create an account in under a minute.
           </p>
-          <div className="ma-gate-actions">
+          <div className="flex gap-2.5 justify-center flex-wrap">
             <button
               type="button"
-              className="ma-gate-btn ma-gate-btn--primary"
+              className="inline-flex items-center justify-center min-w-[140px] h-11 px-[22px] rounded text-base font-medium tracking-[0.02em] cursor-pointer transition-colors duration-fast ease-[ease] bg-ink text-bg border border-ink hover:bg-black max480:w-full"
               onClick={openLoginModal}
             >
               Sign in
             </button>
-            <Link to="/" className="ma-gate-btn ma-gate-btn--ghost">
+            <Link to="/" className="inline-flex items-center justify-center min-w-[140px] h-11 px-[22px] rounded text-base font-medium tracking-[0.02em] cursor-pointer transition-colors duration-fast ease-[ease] bg-bg text-ink border border-line hover:border-ink hover:text-ink-2 max480:w-full">
               Back to home
             </Link>
           </div>
@@ -333,7 +344,9 @@ const MyAccount = () => {
     { id: 'profile', label: 'Profile Information' },
     { id: 'addresses', label: 'Address Book' },
     { id: 'orders', label: 'Order History' },
-    { id: 'wishlist', label: 'My Wishlist' }
+    { id: 'wishlist', label: 'My Wishlist' },
+    { id: 'payments', label: 'Stored Payment Methods' },
+    { id: 'newsletter', label: 'Newsletter Subscription' }
   ];
 
   // Address management functions
@@ -603,20 +616,47 @@ const MyAccount = () => {
             onRemoveItem={handleRemoveFromWishlist}
           />
         );
+      case 'payments':
+        return (
+          <StoredPaymentsTab
+            onSuccess={(msg) => {
+              setAddressSuccess(msg);
+              setTimeout(() => setAddressSuccess(''), 3000);
+            }}
+            onError={(msg) => {
+              setAddressError(msg);
+              setTimeout(() => setAddressError(''), 5000);
+            }}
+          />
+        );
+      case 'newsletter':
+        return (
+          <NewsletterTab
+            customer={customerData?.customer || {}}
+            onSuccess={(msg) => {
+              setNewsletterSuccess(msg);
+              setTimeout(() => setNewsletterSuccess(''), 3000);
+            }}
+            onError={(msg) => {
+              setNewsletterError(msg);
+              setTimeout(() => setNewsletterError(''), 5000);
+            }}
+          />
+        );
       default:
         return profileTab;
     }
   };
 
   return (
-    <div className="my-account-container">
-      <div className="account-header">
-        <div className="account-header-text">
-          <h1>My Account</h1>
-          <p>Welcome back, {customerData?.customer?.firstname || user.email}!</p>
+    <div className="max-w-[1280px] mx-auto pt-8 px-6 pb-20 max768:pt-5 max768:px-0 max768:pb-0">
+      <div className="flex justify-between items-center gap-4 pb-7 mb-8 border-b border-line max768:gap-3 max768:pb-5 max768:mb-6">
+        <div className="min-w-0">
+          <h1 className="mb-1.5 text-3xl max768:text-[24px]">My Account</h1>
+          <p className="text-base text-ink-2 max768:text-13">Welcome back, {customerData?.customer?.firstname || user.email}!</p>
         </div>
-        <button type="button" className="logout-btn" onClick={logout} aria-label="Logout">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <button type="button" className="inline-flex items-center gap-2 h-10 px-4 bg-bg text-ink border border-line rounded text-13 font-medium tracking-[0.02em] cursor-pointer transition-colors duration-fast ease-[ease] shrink-0 hover:border-ink max768:px-3" onClick={logout} aria-label="Logout">
+          <svg className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
@@ -625,9 +665,9 @@ const MyAccount = () => {
         </button>
       </div>
 
-      <div className="account-content">
-        <nav className="account-nav">
-          <ul className="nav-tabs">
+      <div className="grid grid-cols-[240px_1fr] gap-10 items-start max1024:grid-cols-[200px_1fr] max1024:gap-8 max768:grid-cols-1 max768:gap-5">
+        <nav className="sticky top-6 max768:static max768:min-w-0">
+          <ul className="list-none p-0 m-0 flex flex-col gap-0.5 max768:flex-row max768:gap-0 max768:overflow-x-auto max768:[-webkit-overflow-scrolling:touch] max768:[scrollbar-width:none] max768:[&::-webkit-scrollbar]:hidden max768:border-b max768:border-line max768:-mx-4 max768:px-4 max768:max-w-full max768:flex-nowrap">
             {tabs.map((tab) => (
               <li key={tab.id}>
                 <button
@@ -639,9 +679,10 @@ const MyAccount = () => {
               </li>
             ))}
           </ul>
+          <CompareSidebarBlock />
         </nav>
 
-        <main className="account-main">
+        <main className="w-full min-w-0">
           {renderTabContent()}
         </main>
       </div>
@@ -686,6 +727,8 @@ const MyAccount = () => {
           {renderToast(passwordSuccess, () => setPasswordSuccess(''), 'success')}
           {renderToast(passwordError, () => setPasswordError(''), 'error')}
           {renderToast(reorderError, () => setReorderError(''), 'error')}
+          {renderToast(newsletterSuccess, () => setNewsletterSuccess(''), 'success')}
+          {renderToast(newsletterError, () => setNewsletterError(''), 'error')}
         </>
       )}
     </div>

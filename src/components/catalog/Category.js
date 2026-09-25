@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { useLocation, Navigate } from 'react-router-dom';
 import { useSyncBreadcrumbs } from '../../context/BreadcrumbContext';
-import { getCategoryUid } from '../../hooks/filters/filterUrl';
 import useFilters from '../../hooks/useFilters';
 import { useResolvedUrl } from '../../hooks/useResolvedUrl';
 import useMenuData from '../layout/Menu/hooks/useMenuData';
@@ -10,8 +9,16 @@ import ProductDetail from './ProductDetail';
 import ProductList from './ProductList';
 import CategorySkeleton from './CategorySkeleton';
 import NotFound from '../ui/NotFound';
-import { GET_CATEGORY_PRODUCTS } from '../../queries/category';
-import { CATEGORY_PAGE_SIZE } from '../../lib/catalog';
+import EditorArea from '../ui/EditorArea';
+import { GET_CATEGORY_PRODUCTS, GET_CATEGORY_META } from '../../queries/category';
+import { categoryProductsVariables } from '../../lib/catalog';
+import { getCategoryUid } from '../../hooks/filters/filterUrl';
+import { useRouteArea } from '../../hooks/useRouteArea';
+import {
+  CATEGORY_TOP_AREA, areaBlocks, displayModeOf, showsBlocks, showsRouteContent,
+} from 'editor-core/routes';
+import { useAuth } from '../../context/AuthContext';
+import { isSsrPersonalized } from '../../lib/ssrPersonalized';
 
 const findCategoryNameById = (menuData, id) => {
   if (id == null) return null;
@@ -27,13 +34,46 @@ const findCategoryNameById = (menuData, id) => {
   return walk(menuData?.categoryList || []);
 };
 
-const Category = ({ enabledLayerNavigation = true }) => {
+/**
+ * The catalog route: a category listing, or the product page a product URL
+ * resolves to.
+ *
+ * `resolved`, `areaSlot` and `displayOverride` exist for the page editor, which
+ * mounts this same component to preview a category around the area being
+ * edited. On the storefront none of them are passed and nothing changes.
+ *
+ * @param {object}  [props.resolved]         Route info instead of resolving the URL.
+ * @param {ReactNode} [props.areaSlot]       Rendered in place of the saved area blocks.
+ * @param {string}  [props.displayOverride]  Display mode instead of the document's.
+ */
+const Category = ({
+  enabledLayerNavigation = true,
+  routeArea = null,
+  routeAreaPaths = [],
+  ssrHint = null,
+  resolved = null,
+  areaSlot = null,
+  displayOverride = null,
+}) => {
   const location = useLocation();
   const urlPath = location.pathname;
 
-  const { loading: urlLoading, error: urlError, data: routeData } = useResolvedUrl(urlPath);
+  const resolvedFromUrl = useResolvedUrl(urlPath);
+  const routeData = resolved || resolvedFromUrl;
+  const { isAuthenticated } = useAuth();
 
   const categoryId = routeData?.id;
+
+  // What the editor says goes on this URL, and what it says about the
+  // storefront's own content next to it. No document means "products only" —
+  // a category nobody has edited renders exactly as it always did.
+  const { doc: areaDoc, pending: areaPending } = useRouteArea(urlPath, routeArea, routeAreaPaths);
+  const displayMode = displayOverride || displayModeOf(areaDoc);
+  const topBlocks = areaBlocks(areaDoc, CATEGORY_TOP_AREA);
+  const areaContent = areaSlot
+    || (topBlocks.length ? <EditorArea className="category-area mt-4 mb-8 max768:mt-3 max768:mb-6" blocks={topBlocks} ssrHint={ssrHint} /> : null);
+  const showBlocks = showsBlocks(displayMode) && !!areaContent;
+  const showProducts = showsRouteContent(displayMode);
 
   const { menuData } = useMenuData({ isOpen: true });
   const categoryName = findCategoryNameById(menuData, categoryId) || 'Category';
@@ -48,6 +88,7 @@ const Category = ({ enabledLayerNavigation = true }) => {
     enabledLayerNavigation: isEnabled,
     addFilter,
     removeFilter,
+    applyFilters,
     clearAllFilters,
     setSort,
     setPage,
@@ -59,34 +100,42 @@ const Category = ({ enabledLayerNavigation = true }) => {
   } = useFilters(categoryId, enabledLayerNavigation);
 
   // Prepare variables for GraphQL query
-  const queryVariables = useMemo(() => {
-    const vars = {
+  const queryVariables = useMemo(
+    () => categoryProductsVariables(categoryId, {
       filters: graphqlFilters,
-      // categoryList in the same query resolves the breadcrumb trail for this
-      // category (no extra request); keyed by the same uid used in `filters`.
-      categoryUid: getCategoryUid(categoryId),
-      currentPage: currentPage,
-      pageSize: CATEGORY_PAGE_SIZE
-    };
+      sort: graphqlSort,
+      page: currentPage,
+    }),
+    [graphqlFilters, graphqlSort, currentPage, categoryId]
+  );
 
-    if (graphqlSort) {
-      vars.sort = graphqlSort;
-    }
+  const isCategory = !!categoryId && routeData?.type === 'category';
 
-    return vars;
-  }, [graphqlFilters, graphqlSort, currentPage, categoryId]);
-
-  const { loading: productsLoading, error: productsError, data: productsData } = useQuery(GET_CATEGORY_PRODUCTS, {
+  // Both catalog queries wait for the document on a path that has one: it is
+  // what says which of the two to run, and it comes off our own server in a
+  // few milliseconds.
+  const { loading: productsLoading, error: productsError, data, previousData } = useQuery(GET_CATEGORY_PRODUCTS, {
     variables: queryVariables,
-    skip: !categoryId || routeData?.type !== 'category',
-    fetchPolicy: 'cache-first',
+    skip: !isCategory || !showProducts || areaPending,
+    // Personalized SSR already put the customer's prices in the cache; otherwise
+    // (prerender, rejected token, blocked cookie) they have to be fetched.
+    fetchPolicy: isAuthenticated && !isSsrPersonalized() ? 'cache-and-network' : 'cache-first',
   });
+
+  // The name and breadcrumbs ride along with the products; when the list is
+  // hidden they still have to come from somewhere, so they come alone.
+  const { data: metaOnly } = useQuery(GET_CATEGORY_META, {
+    variables: { categoryUid: getCategoryUid(categoryId) },
+    skip: !isCategory || showProducts || areaPending,
+  });
+
+  const productsData = data ?? previousData;
 
   // Breadcrumb trail from the categoryList metadata returned by the same query
   // (ancestors root-first by level; the current category is the last, unlinked
   // crumb). `null` unless this is a loaded category page — so on a product URL,
   // where this component renders <ProductDetail>, the child owns the crumbs.
-  const categoryMeta = productsData?.categoryList?.[0] || null;
+  const categoryMeta = productsData?.categoryList?.[0] || metaOnly?.categoryList?.[0] || null;
   const categorySuffix = categoryMeta?.url_suffix || '';
   const categoryCrumbs = (routeData?.type === 'category' && categoryMeta) ? [
     { label: 'Home', path: '/' },
@@ -101,13 +150,16 @@ const Category = ({ enabledLayerNavigation = true }) => {
   ] : null;
   useSyncBreadcrumbs(categoryCrumbs);
 
-  // Handle loading and errors
-  if (urlLoading) return <CategorySkeleton />;
-  if (urlError) return <div>Error resolving URL: {urlError.message || 'unknown'}</div>;
-
   // Handle redirects
   if (routeData?.redirect_code) {
-    return <Navigate to={routeData.relative_url} replace />;
+    const target = routeData.relative_url || '/';
+    return (
+      <Navigate
+        to={target}
+        replace
+        state={{ resolved: { ...routeData, redirect_code: null, relative_url: target, path: target.replace(/^\/+/, '') } }}
+      />
+    );
   }
 
   // Handle product URLs
@@ -125,43 +177,69 @@ const Category = ({ enabledLayerNavigation = true }) => {
     return <NotFound />;
   }
 
-  if (productsLoading && !productsData) return <CategorySkeleton />;
-  if (productsError && !productsData) return <div>Error: {productsError.message}</div>;
+  // "Hide everything" keeps the header, breadcrumbs and footer — the heading
+  // alone over an empty page is worse than no page content at all.
+  if (displayMode === 'none') return <div className="category-page pt-10 max768:pt-4" />;
+
+  const listPending = showProducts && !productsData && (areaPending || productsLoading || !!productsError);
+
+  // A page with no editor content of its own has nothing to show while the list
+  // loads, so the skeleton still stands in for the whole page. With blocks they
+  // render at once and the skeleton takes the list's place further down.
+  if (listPending && !showBlocks) {
+    return productsError ? <div>Error: {productsError.message}</div> : <CategorySkeleton />;
+  }
 
   const products = productsData?.products?.items || [];
   const totalCount = productsData?.products?.total_count || 0;
   const pageInfo = productsData?.products?.page_info;
 
+  // A category holding no products of its own is a landing page, whatever its
+  // display mode says. Next to editor blocks an empty toolbar over "No products
+  // found" tells the visitor nothing, so the list is left out. Without blocks it
+  // stays — an empty state beats a blank page. An active filter always keeps it:
+  // that empty result is an answer, and the visitor needs the control that
+  // clears it.
+  const emptyCategory = !!productsData && totalCount === 0 && !hasActiveFilters;
+  const showList = showProducts && !listPending && !(emptyCategory && showBlocks);
+
   return (
-    <div className="category-page">
-      <h1 className="page-title">{categoryMeta?.name || categoryName}</h1>
-      {totalCount > 0 && (
-        <div className="page-count-mobile">
+    <div className="category-page pt-10 max768:pt-4">
+      <h1 className="page-title text-hero text-ink mb-1.5 tracking-[-0.02em] max768:text-2xl max768:leading-[1.2]">{categoryMeta?.name || categoryName}</h1>
+      {showProducts && totalCount > 0 && (
+        <div className="page-count-mobile hidden max768:block mt-1 mb-3.5 font-serif italic text-ink-2 text-md">
           {totalCount}
           {totalCount === 1 ? ' item' : ' items'}
         </div>
       )}
 
-      <ProductList
-        products={products}
-        totalCount={totalCount}
-        pageInfo={pageInfo}
-        currentPage={currentPage}
-        onPageChange={setPage}
-        currentSort={currentSort}
-        onSortChange={setSort}
-        enabledLayerNavigation={isEnabled}
-        activeFilters={activeFilters}
-        onAddFilter={addFilter}
-        onRemoveFilter={removeFilter}
-        onClearAllFilters={clearAllFilters}
-        hasActiveFilters={hasActiveFilters}
-        isLayerNavigationVisible={isLayerNavigationVisible}
-        onHideLayerNavigation={hideLayerNavigation}
-        onShowLayerNavigation={showLayerNavigation}
-        onSetPriceRange={setPriceRange}
-        categoryId={categoryId}
-      />
+      {showBlocks && areaContent}
+
+      {listPending && (productsError ? <div>Error: {productsError.message}</div> : <CategorySkeleton />)}
+
+      {showList && (
+        <ProductList
+          products={products}
+          totalCount={totalCount}
+          pageInfo={pageInfo}
+          currentPage={currentPage}
+          onPageChange={setPage}
+          currentSort={currentSort}
+          onSortChange={setSort}
+          enabledLayerNavigation={isEnabled}
+          activeFilters={activeFilters}
+          onAddFilter={addFilter}
+          onRemoveFilter={removeFilter}
+          onApplyFilters={applyFilters}
+          onClearAllFilters={clearAllFilters}
+          hasActiveFilters={hasActiveFilters}
+          isLayerNavigationVisible={isLayerNavigationVisible}
+          onHideLayerNavigation={hideLayerNavigation}
+          onShowLayerNavigation={showLayerNavigation}
+          onSetPriceRange={setPriceRange}
+          categoryId={categoryId}
+        />
+      )}
     </div>
   );
 };

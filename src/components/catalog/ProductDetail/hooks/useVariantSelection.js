@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { findMatchingVariant, isSwatchable } from '../helpers/productVariants';
 
-export default function useVariantSelection(product, isConfigurable) {
+export default function useVariantSelection(product, isConfigurable, initialValueUids) {
   const [selectedOptions, setSelectedOptions] = useState({});
   const [selectedVariant, setSelectedVariant] = useState(null);
 
@@ -10,6 +10,22 @@ export default function useVariantSelection(product, isConfigurable) {
       setSelectedVariant(findMatchingVariant(product.variants, selectedOptions));
     }
   }, [selectedOptions, isConfigurable, product]);
+
+  // Editing a cart line: pre-select the options that line was configured with,
+  // once the product (and therefore its option values) has loaded.
+  const preselected = useRef(false);
+  useEffect(() => {
+    if (preselected.current || !isConfigurable) return;
+    if (!initialValueUids?.length || !product?.configurable_options?.length) return;
+    const preset = {};
+    product.configurable_options.forEach((option) => {
+      const value = option.values?.find((v) => initialValueUids.includes(v.uid));
+      if (value) preset[option.attribute_code] = Number(value.value_index);
+    });
+    if (!Object.keys(preset).length) return;
+    preselected.current = true;
+    setSelectedOptions(preset);
+  }, [isConfigurable, initialValueUids, product]);
 
   const handleOptionChange = (attributeCode, valueIndex) => {
     setSelectedOptions((prev) => {

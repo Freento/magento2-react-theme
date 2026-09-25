@@ -1,0 +1,463 @@
+{
+  "title": "Sale",
+  "path": "/sale.html",
+  "route": {
+    "type": "category",
+    "id": 37
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-sale-main",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "padding": "32px",
+          "borderRadius": "8px",
+          "height": "420px",
+          "backgroundImage": "/uploads/promo-sale-main.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "/promotions/women-sale.html",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-sale-main-title",
+            "component": "Heading",
+            "props": {
+              "text": "Pristine prices on pants, tanks and bras.",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-sale-main-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "Women’s Deals",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          },
+          {
+            "id": "promo-sale-main-cta",
+            "component": "Text",
+            "props": {
+              "text": "Shop Women’s Deals",
+              "fontSize": 14,
+              "fontWeight": 500,
+              "color": "#1a1a1a",
+              "textAlign": "center"
+            },
+            "style": {
+              "backgroundColor": "#ffffff",
+              "padding": "10px 22px",
+              "borderRadius": "4px",
+              "width": "fit-content",
+              "marginTop": "8px"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "300px"
+            }
+          }
+        }
+      },
+      {
+        "id": "promo-row-1",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 2,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-sale-mens",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "320px",
+              "backgroundImage": "/uploads/promo-sale-mens.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/promotions/men-sale.html"
+            },
+            "children": [
+              {
+                "id": "promo-sale-mens-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Men’s Bargains",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-sale-mens-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Stretch your budget with active attire",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              },
+              {
+                "id": "promo-sale-mens-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Men’s Deals",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          },
+          {
+            "id": "promo-sale-women",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "320px",
+              "backgroundImage": "/uploads/promo-sale-women.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/gear.html"
+            },
+            "children": [
+              {
+                "id": "promo-sale-women-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma Gear Steals",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-sale-women-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Your best efforts deserve a deal",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              },
+              {
+                "id": "promo-sale-women-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Luma Gear",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "promo-row-2",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 3,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-sale-20-off",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-sale-20-off-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-sale-20-off.avif",
+                  "alt": "20% OFF",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-sale-20-off-title",
+                "component": "Heading",
+                "props": {
+                  "text": "20% OFF",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-sale-20-off-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Every $200-plus purchase!",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-sale-free-shipping",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-sale-free-shipping-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-sale-free-shipping.avif",
+                  "alt": "Spend $50 or more — shipping is free!",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-sale-free-shipping-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Spend $50 or more — shipping is free!",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-sale-free-shipping-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Buy more, save more",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-sale-womens-t-shirts",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/women/tops-women/tees-women.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-sale-womens-t-shirts-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-sale-womens-t-shirts.avif",
+                  "alt": "You can't have too many tees",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-sale-womens-t-shirts-title",
+                "component": "Heading",
+                "props": {
+                  "text": "You can't have too many tees",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-sale-womens-t-shirts-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "4 tees for the price of 3. Right now",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-sale-womens-t-shirts-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Tees on sale",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,6 +1,8 @@
 import { gql } from '@apollo/client';
+import { CHECKOUT_CART_PRICES } from './cartPricesFragment';
 
 export const SET_SHIPPING_ADDRESS_FOR_CUSTOMER = gql`
+  ${CHECKOUT_CART_PRICES}
   mutation setShippingAddressForCustomer($cartId: String!, $shippingAddress: CartAddressInput, $customerAddressId: Int) {
     setShippingAddressesOnCart(input: {
       cart_id: $cartId
@@ -11,6 +13,9 @@ export const SET_SHIPPING_ADDRESS_FOR_CUSTOMER = gql`
     }) {
       cart {
         id
+        prices {
+          ...CheckoutCartPrices
+        }
         shipping_addresses {
           firstname
           lastname

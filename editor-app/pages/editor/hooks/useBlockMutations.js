@@ -6,15 +6,27 @@ import {generateId} from '../lib/color.js';
 export function useBlockMutations({
                                       getCurrentBlocks,
                                       setCurrentBlocks,
+                                      sideForBlockId,
+                                      getBlocksFor,
+                                      setBlocksFor,
                                       selectedBlockRaw,
                                       selectedBlockId,
                                       device,
                                       setSelectedBlockId,
                                       setActiveTab,
                                   }) {
-    const handleSelect = useCallback((id) => {
+    const handleSelect = useCallback((id, options = {}) => {
         setSelectedBlockId(id);
-        setActiveTab('settings');
+        if (!options.keepTab) setActiveTab('settings');
+        if (options.scrollIntoView && id) {
+            let attempts = 0;
+            const tryScroll = () => {
+                const el = document.querySelector(`[data-block-id="${id}"]`);
+                if (el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                else if (++attempts < 10) requestAnimationFrame(tryScroll);
+            };
+            requestAnimationFrame(tryScroll);
+        }
     }, []);
 
     const addBlock = useCallback(
@@ -50,10 +62,12 @@ export function useBlockMutations({
                 blocks
                     .filter((b) => b.id !== id)
                     .map((b) => (b.children ? {...b, children: removeFromTree(b.children)} : b));
-            setCurrentBlocks(removeFromTree(getCurrentBlocks()));
+            const side = sideForBlockId(id);
+            if (side) setBlocksFor(side, removeFromTree(getBlocksFor(side)));
+            else setCurrentBlocks(removeFromTree(getCurrentBlocks()));
             if (selectedBlockId === id) setSelectedBlockId(null);
         },
-        [getCurrentBlocks, setCurrentBlocks, selectedBlockId]
+        [getCurrentBlocks, setCurrentBlocks, sideForBlockId, getBlocksFor, setBlocksFor, selectedBlockId]
     );
 
 
@@ -78,10 +92,12 @@ export function useBlockMutations({
                 }
                 return out;
             };
-            setCurrentBlocks(dupInTree(getCurrentBlocks(), null));
+            const side = sideForBlockId(id);
+            if (side) setBlocksFor(side, dupInTree(getBlocksFor(side), null));
+            else setCurrentBlocks(dupInTree(getCurrentBlocks(), null));
             if (inserted) setSelectedBlockId(inserted.id);
         },
-        [getCurrentBlocks, setCurrentBlocks, cloneBlockDeep]
+        [getCurrentBlocks, setCurrentBlocks, sideForBlockId, getBlocksFor, setBlocksFor, cloneBlockDeep]
     );
 
     const writeField = useCallback(

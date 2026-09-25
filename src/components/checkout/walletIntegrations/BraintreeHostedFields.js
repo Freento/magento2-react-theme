@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { loadBraintreeClient, loadBraintreeHostedFields, useBraintreeClientToken } from '../lib/braintree';
-import '../../../styles/checkout/walletIntegrations/BraintreeHostedFields.less';
+import { CARD_FORM_CONTAINER_CLS, CARD_FORM_TITLE_CLS } from '../checkoutUi';
 
 const readVar = (name, fallback) => {
   if (typeof window === 'undefined') return fallback;
@@ -101,38 +101,52 @@ export default function BraintreeHostedFields({ onReady, onError }) {
     };
   }, []);
 
+  const hostedFieldCls = 'form-input hosted-field h-11 px-3 py-0 flex items-center';
+
   return (
-    <div className="card-form-container">
-      <h4 className="card-form-title">Credit Card Information</h4>
+    <div className={CARD_FORM_CONTAINER_CLS}>
+      <h4 className={CARD_FORM_TITLE_CLS}>Credit Card Information</h4>
 
       {phase === 'error' && (
         <div className="form-error" role="alert">{error || 'Card form could not be loaded.'}</div>
       )}
 
-      <div className="card-form-grid">
+      <div className="card-form-grid grid gap-3.5" aria-busy={phase === 'init'}>
         <div className="form-group">
           <label className="form-label" htmlFor="braintree-hosted-card-number">Card Number *</label>
-          <div id="braintree-hosted-card-number" className="form-input hosted-field" />
+          <div className="relative">
+            <div id="braintree-hosted-card-number" className={hostedFieldCls} />
+            {phase === 'init' && <span className="skeleton absolute inset-0 rounded" />}
+          </div>
         </div>
 
         <div className="form-group">
           <label className="form-label" htmlFor="braintree-hosted-cardholder">Cardholder Name *</label>
-          <div id="braintree-hosted-cardholder" className="form-input hosted-field" />
+          <div className="relative">
+            <div id="braintree-hosted-cardholder" className={hostedFieldCls} />
+            {phase === 'init' && <span className="skeleton absolute inset-0 rounded" />}
+          </div>
         </div>
 
         <div className="form-row-3">
-          <div className="form-group braintree-hosted-fields-span-2">
+          <div className="form-group col-span-2">
             <label className="form-label" htmlFor="braintree-hosted-expiration">Expiry Date *</label>
-            <div id="braintree-hosted-expiration" className="form-input hosted-field" />
+            <div className="relative">
+              <div id="braintree-hosted-expiration" className={hostedFieldCls} />
+              {phase === 'init' && <span className="skeleton absolute inset-0 rounded" />}
+            </div>
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="braintree-hosted-cvv">CVV *</label>
-            <div id="braintree-hosted-cvv" className="form-input hosted-field" />
+            <div className="relative">
+              <div id="braintree-hosted-cvv" className={hostedFieldCls} />
+              {phase === 'init' && <span className="skeleton absolute inset-0 rounded" />}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="card-security-note">
+      <div className="card-security-note mt-4 px-3 py-2.5 bg-surface rounded text-sm text-ink-2 leading-base">
         <p>🔒 Card data is captured by Braintree's secure iframe — never touches this page.</p>
       </div>
     </div>

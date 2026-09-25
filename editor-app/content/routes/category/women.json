@@ -1,0 +1,624 @@
+{
+  "title": "Women",
+  "path": "/women.html",
+  "route": {
+    "type": "category",
+    "id": 20
+  },
+  "display": "blocks",
+  "areas": {
+    "category-top": [
+      {
+        "id": "promo-womens-main",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "alignX": "stretch",
+          "alignY": "end"
+        },
+        "style": {
+          "backgroundImage": "/uploads/promo-womens-main.avif",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center center",
+          "backgroundOverlay": 0.35,
+          "link": "/women.html",
+          "height": "420px",
+          "padding": "32px",
+          "borderRadius": "8px",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-womens-main-title",
+            "component": "Heading",
+            "props": {
+              "text": "Yoga is ancient\nClothing shouldn’t be",
+              "level": 2,
+              "color": "#ffffff",
+              "fontSize": "26px",
+              "fontWeight": "bold"
+            },
+            "style": {
+              "whiteSpace": "pre-line"
+            }
+          },
+          {
+            "id": "promo-womens-main-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "New Luma Yoga Collection",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#f0f0f0"
+            }
+          },
+          {
+            "id": "promo-womens-main-cta",
+            "component": "Text",
+            "props": {
+              "text": "Shop New Yoga",
+              "fontSize": 14,
+              "fontWeight": 500,
+              "color": "#1a1a1a",
+              "textAlign": "center"
+            },
+            "style": {
+              "backgroundColor": "#ffffff",
+              "padding": "10px 22px",
+              "borderRadius": "4px",
+              "width": "fit-content",
+              "marginTop": "8px"
+            }
+          }
+        ],
+        "responsive": {
+          "mobile": {
+            "style": {
+              "height": "300px"
+            }
+          }
+        }
+      },
+      {
+        "id": "promo-row-1",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 2,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-womens-t-shirts",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/women/tops-women/tees-women.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-womens-t-shirts-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-womens-t-shirts.avif",
+                  "alt": "You can’t have too many tees",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-womens-t-shirts-title",
+                "component": "Heading",
+                "props": {
+                  "text": "You can’t have too many tees",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-womens-t-shirts-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "4 tees for the price of 3. Right now",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-womens-t-shirts-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Women’s Tees",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-womens-pants",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end"
+            },
+            "style": {
+              "backgroundImage": "/uploads/promo-womens-pants.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/women/bottoms-women/pants-women.html",
+              "height": "320px",
+              "padding": "32px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-womens-pants-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Hot pants\nHot deals",
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold"
+                },
+                "style": {
+                  "whiteSpace": "pre-line"
+                }
+              },
+              {
+                "id": "promo-womens-pants-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "20% OFF",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0"
+                }
+              },
+              {
+                "id": "promo-womens-pants-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Pants",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "promo-womens-erin",
+        "component": "Box",
+        "props": {
+          "direction": "column",
+          "gap": 10,
+          "alignX": "stretch",
+          "alignY": "start"
+        },
+        "style": {
+          "backgroundColor": "#f2f0ed",
+          "link": "/collections/erin-recommends.html",
+          "padding": "20px",
+          "borderRadius": "8px",
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-womens-erin-image",
+            "component": "Image",
+            "props": {
+              "src": "/uploads/promo-womens-erin.avif",
+              "alt": "What would Erin wear?",
+              "objectFit": "contain",
+              "objectPosition": "center center"
+            },
+            "style": {
+              "height": "150px"
+            },
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "120px"
+                }
+              }
+            }
+          },
+          {
+            "id": "promo-womens-erin-title",
+            "component": "Heading",
+            "props": {
+              "text": "What would Erin wear?",
+              "level": 3,
+              "color": "#1a1a1a",
+              "fontSize": "20px",
+              "fontWeight": "bold"
+            }
+          },
+          {
+            "id": "promo-womens-erin-subtitle",
+            "component": "Text",
+            "props": {
+              "text": "It’s no secret: see Luma founder Erin Renny’s wardrobe go-to’s",
+              "fontSize": 15,
+              "lineHeight": 1.4,
+              "color": "#4a4a4a"
+            }
+          },
+          {
+            "id": "promo-womens-erin-cta",
+            "component": "Text",
+            "props": {
+              "text": "Shop Erin Recommends",
+              "fontSize": 14,
+              "fontWeight": 500,
+              "color": "#ffffff",
+              "textAlign": "center"
+            },
+            "style": {
+              "backgroundColor": "#1a1a1a",
+              "padding": "10px 22px",
+              "borderRadius": "4px",
+              "width": "fit-content",
+              "marginTop": "8px"
+            }
+          }
+        ]
+      },
+      {
+        "id": "promo-row-3",
+        "component": "Grid",
+        "props": {
+          "direction": "grid",
+          "columns": 3,
+          "rows": 0,
+          "rowGap": 16,
+          "columnGap": 16,
+          "alignItems": "stretch",
+          "justifyItems": "stretch"
+        },
+        "responsive": {
+          "mobile": {
+            "props": {
+              "columns": 1
+            }
+          }
+        },
+        "style": {
+          "marginBottom": 16
+        },
+        "children": [
+          {
+            "id": "promo-womens-category-pants",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/women/bottoms-women/pants-women.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-womens-category-pants-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-womens-category-pants.avif",
+                  "alt": "Luma pants",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-womens-category-pants-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma pants",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-womens-category-pants-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Pants for yoga, gym and outdoors",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-womens-category-pants-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Pants",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-womens-category-shorts",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/women/bottoms-women/shorts-women.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-womens-category-shorts-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-womens-category-shorts.avif",
+                  "alt": "Luma shorts",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-womens-category-shorts-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma shorts",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                }
+              },
+              {
+                "id": "promo-womens-category-shorts-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Exercise comfort",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-womens-category-shorts-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Shorts",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          },
+          {
+            "id": "promo-womens-category-tanks",
+            "component": "Box",
+            "props": {
+              "direction": "column",
+              "gap": 10,
+              "alignX": "stretch",
+              "alignY": "start"
+            },
+            "style": {
+              "backgroundColor": "#f2f0ed",
+              "link": "/women/tops-women/tanks-women.html",
+              "padding": "20px",
+              "borderRadius": "8px"
+            },
+            "children": [
+              {
+                "id": "promo-womens-category-tanks-image",
+                "component": "Image",
+                "props": {
+                  "src": "/uploads/promo-womens-category-tanks.avif",
+                  "alt": "Luma Bras\nTanks",
+                  "objectFit": "contain",
+                  "objectPosition": "center center"
+                },
+                "style": {
+                  "height": "150px"
+                },
+                "responsive": {
+                  "mobile": {
+                    "style": {
+                      "height": "120px"
+                    }
+                  }
+                }
+              },
+              {
+                "id": "promo-womens-category-tanks-title",
+                "component": "Heading",
+                "props": {
+                  "text": "Luma Bras\nTanks",
+                  "level": 3,
+                  "color": "#1a1a1a",
+                  "fontSize": "20px",
+                  "fontWeight": "bold"
+                },
+                "style": {
+                  "whiteSpace": "pre-line"
+                }
+              },
+              {
+                "id": "promo-womens-category-tanks-subtitle",
+                "component": "Text",
+                "props": {
+                  "text": "Stock up for summer!",
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#4a4a4a"
+                }
+              },
+              {
+                "id": "promo-womens-category-tanks-cta",
+                "component": "Text",
+                "props": {
+                  "text": "Shop Now",
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#ffffff",
+                  "textAlign": "center"
+                },
+                "style": {
+                  "backgroundColor": "#1a1a1a",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "women-products",
+        "component": "ProductsCarousel",
+        "props": {
+          "title": "Hot Sellers",
+          "eyebrow": "",
+          "skus": [
+            {
+              "sku": "WS12"
+            },
+            {
+              "sku": "WT09"
+            },
+            {
+              "sku": "WH05"
+            },
+            {
+              "sku": "WP12"
+            }
+          ],
+          "pageSize": 4,
+          "itemsPerSlide": 4,
+          "source": "skus"
+        },
+        "style": {
+          "width": "100%",
+          "marginTop": "3%"
+        }
+      }
+    ]
+  }
+}

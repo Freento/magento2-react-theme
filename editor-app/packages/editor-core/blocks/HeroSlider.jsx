@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { INLINE_EDIT_STYLE } from '../inline-edit-style';
+import { InsideLinkContext } from '../link-context.js';
 
 const DEFAULT_BUTTON_COLOR = '#c52327';
 const DEFAULT_TEXT_COLOR = '#ffffff';
@@ -7,6 +8,8 @@ const DEFAULT_TEXT_COLOR = '#ffffff';
 export default function HeroSlider({ slides = [], autoplay = true, interval = 4000, height = 400, borderRadius = 8, overlayOpacity = 0.3, _editor }) {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
+  const insideLink = useContext(InsideLinkContext);
+  const CtaTag = insideLink ? 'span' : 'a';
 
   const editable = !!_editor?.isSelected;
 
@@ -67,8 +70,8 @@ export default function HeroSlider({ slides = [], autoplay = true, interval = 40
             </p>
           )}
           {(slide.buttonText || editable) && (
-            <a
-              href={slide.buttonHref || '#'}
+            <CtaTag
+              {...(insideLink ? {} : { href: slide.buttonHref || '#' })}
               onClick={editable ? (e) => e.preventDefault() : undefined}
               style={{
                 display: 'inline-block',
@@ -80,7 +83,7 @@ export default function HeroSlider({ slides = [], autoplay = true, interval = 40
               {...editableTextProps('buttonText')}
             >
               {slide.buttonText}
-            </a>
+            </CtaTag>
           )}
         </div>
       </div>

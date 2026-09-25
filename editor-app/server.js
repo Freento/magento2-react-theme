@@ -5,6 +5,7 @@ import path from 'node:path';
 import { execFile } from 'node:child_process';
 import multer from 'multer';
 import { renderPage } from 'vike/server';
+import { DEFAULT_DISPLAY_MODE } from 'editor-core/routes';
 import { BUILD_ID, STARTED_AT } from './buildId.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -12,9 +13,13 @@ const port = process.env.PORT || 3100;
 const root = process.cwd();
 
 const EDITOR_PAGES_DIR = path.join(root, 'content/pages');
+// Route documents — blocks placed into named areas of a storefront route —
+// live apart from pages so nothing ever mistakes one for a standalone page.
+const EDITOR_ROUTES_DIR = path.join(root, 'content/routes');
 const UPLOADS_DIR = path.join(root, 'public/uploads');
 
 fs.mkdirSync(EDITOR_PAGES_DIR, { recursive: true });
+fs.mkdirSync(EDITOR_ROUTES_DIR, { recursive: true });
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const ALLOWED_UPLOAD_EXT = new Set(['.avif', '.webp']);
@@ -58,9 +63,13 @@ function blockLabel(b) {
   return b?.component || b?.type || 'block';
 }
 
+// A page keeps its blocks in one list, a route document in one list per area.
+const docBlocks = (doc) =>
+  Array.isArray(doc?.blocks) ? doc.blocks : Object.values(doc?.areas || {}).flat();
+
 function buildCommitMessage(title, oldPage, newPage) {
-  const oldBlocks = collectBlocks(oldPage?.blocks);
-  const newBlocks = collectBlocks(newPage?.blocks);
+  const oldBlocks = collectBlocks(docBlocks(oldPage));
+  const newBlocks = collectBlocks(docBlocks(newPage));
   const oldById = new Map(oldBlocks.filter((b) => b.id).map((b) => [b.id, b]));
   const newById = new Map(newBlocks.filter((b) => b.id).map((b) => [b.id, b]));
 
@@ -139,6 +148,29 @@ async function startServer() {
       });
     });
 
+  /**
+   * Stages and commits one saved document, describing the edit in the message.
+   * A save that changes nothing on disk commits nothing.
+   */
+  const commitDoc = async (filePath, oldDoc, newDoc, fallbackTitle) => {
+    try {
+      const relPath = path.relative(REPO_DIR, filePath);
+      const title = (typeof newDoc.title === 'string' && newDoc.title.trim()) || fallbackTitle;
+      const commitMsg = buildCommitMessage(title, oldDoc, newDoc);
+      const logFailure = (step, r) => {
+        if (r && r.code !== 0) console.error(`[editor save commit] ${step} (exit ${r.code}):`, r.stderr || r.error || '');
+      };
+      const add = await runGit(['add', '--', relPath]); logFailure('add', add);
+      const status = await runGit(['status', '--porcelain', '--', relPath]); logFailure('status', status);
+      if (status.stdout.trim().length === 0) return null;
+      const commit = await runGit(['commit', '-m', commitMsg]); logFailure('commit', commit);
+      return commit;
+    } catch (err) {
+      console.error('[editor save commit]', err.message);
+      return null;
+    }
+  };
+
   // Version handshake. Cheap & frequently polled — keep it small.
   app.get('/api/editor/version', (_req, res) => {
     res.json({ version: BUILD_ID, startedAt: STARTED_AT });
@@ -172,24 +204,7 @@ async function startServer() {
     writeJson(filePath, req.body);
     await notifyStorefront({ path: req.body?.path });
 
-    let commit = null;
-    try {
-      const relPath = path.relative(REPO_DIR, filePath);
-      const newPage = req.body || {};
-      const title = (typeof newPage.title === 'string' && newPage.title.trim())
-        || (id === '__footer__' ? 'Footer' : id);
-      const commitMsg = buildCommitMessage(title, oldPage, newPage);
-      const logFailure = (step, r) => {
-        if (r && r.code !== 0) console.error(`[editor save commit] ${step} (exit ${r.code}):`, r.stderr || r.error || '');
-      };
-      const add = await runGit(['add', '--', relPath]); logFailure('add', add);
-      const status = await runGit(['status', '--porcelain', '--', relPath]); logFailure('status', status);
-      if (status.stdout.trim().length > 0) {
-        commit = await runGit(['commit', '-m', commitMsg]); logFailure('commit', commit);
-      }
-    } catch (err) {
-      console.error('[editor save commit]', err.message);
-    }
+    const commit = await commitDoc(filePath, oldPage, req.body || {}, id === '__footer__' ? 'Footer' : id);
     res.json({ ok: true, committed: !!commit && commit.code === 0 });
   });
 
@@ -228,6 +243,93 @@ async function startServer() {
     try { removedPath = readJson(filePath).path; } catch { /* ignore */ }
     fs.unlinkSync(filePath);
     if (removedPath) await notifyStorefront({ path: removedPath, deleted: true });
+    res.json({ ok: true });
+  });
+
+  // --- Route documents ---------------------------------------------------
+  // Same shape of API as pages, but the payload is a map of areas rather than
+  // one block list, and the `path` points at a route the storefront owns.
+
+  // One subdirectory per route type, so `id` is `<type>/<slug>` throughout.
+  const routeFile = (type, id) => path.join(EDITOR_ROUTES_DIR, type, `${id}.json`);
+  const isSafeRouteId = (req) => isSafePageId(req.params.type) && isSafePageId(req.params.id);
+
+  const readRouteDocs = () => {
+    const out = [];
+    for (const entry of fs.readdirSync(EDITOR_ROUTES_DIR, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const typeDir = path.join(EDITOR_ROUTES_DIR, entry.name);
+      for (const f of fs.readdirSync(typeDir)) {
+        if (!f.endsWith('.json')) continue;
+        out.push({ id: `${entry.name}/${f.replace('.json', '')}`, data: readJson(path.join(typeDir, f)) });
+      }
+    }
+    return out;
+  };
+
+  app.get('/api/editor/routes', (_req, res) => {
+    res.json(readRouteDocs().map(({ id, data }) => ({
+      id,
+      title: data.title,
+      path: data.path,
+      routeType: data.route?.type || null,
+    })));
+  });
+
+  app.get('/api/editor/routes/:type/:id', (req, res) => {
+    if (!isSafeRouteId(req)) return res.status(400).json({ error: 'Bad id' });
+    const filePath = routeFile(req.params.type, req.params.id);
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' });
+    res.json(readJson(filePath));
+  });
+
+  app.post('/api/editor/routes', (req, res) => {
+    const { title, path: urlPath, route, display, areas } = req.body || {};
+    if (!urlPath || typeof urlPath !== 'string' || !urlPath.startsWith('/')) {
+      return res.status(400).json({ error: 'path must start with /' });
+    }
+    if (!route || typeof route.type !== 'string') {
+      return res.status(400).json({ error: 'route.type is required' });
+    }
+    const existing = readRouteDocs().find(({ data }) => data.path === urlPath);
+    if (existing) return res.status(409).json({ error: 'this URL already has a document', id: existing.id });
+
+    if (!isSafePageId(route.type)) return res.status(400).json({ error: 'Bad route type' });
+    const base = urlPath.replace(/^\/+|\/+$/g, '').replace(/\.[a-z0-9]+$/i, '').replace(/[^a-zA-Z0-9_-]+/g, '-') || 'route';
+    fs.mkdirSync(path.join(EDITOR_ROUTES_DIR, route.type), { recursive: true });
+    let slug = base;
+    let i = 2;
+    while (fs.existsSync(routeFile(route.type, slug))) slug = `${base}-${i++}`;
+
+    const doc = {
+      title: (typeof title === 'string' && title.trim()) || base,
+      path: urlPath,
+      route,
+      display: display || DEFAULT_DISPLAY_MODE,
+      areas: areas && typeof areas === 'object' ? areas : {},
+    };
+    writeJson(routeFile(route.type, slug), doc);
+    res.status(201).json({ id: `${route.type}/${slug}`, ...doc });
+  });
+
+  app.put('/api/editor/routes/:type/:id', async (req, res) => {
+    if (!isSafeRouteId(req)) return res.status(400).json({ error: 'Bad id' });
+    const filePath = routeFile(req.params.type, req.params.id);
+
+    let oldDoc = null;
+    try { oldDoc = readJson(filePath); } catch {}
+
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    writeJson(filePath, req.body);
+    const commit = await commitDoc(filePath, oldDoc, req.body || {}, req.params.id);
+    res.json({ ok: true, committed: !!commit && commit.code === 0 });
+  });
+
+  app.delete('/api/editor/routes/:type/:id', (req, res) => {
+    if (!isSafeRouteId(req)) return res.status(400).json({ error: 'Bad id' });
+    const filePath = routeFile(req.params.type, req.params.id);
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' });
+    fs.unlinkSync(filePath);
     res.json({ ok: true });
   });
 

@@ -15,24 +15,24 @@ const AddressBookTab = ({ addresses = [], onEditAddress, onAddAddress, onDeleteA
 
   const renderDefaultCard = (label, address) => (
     address ? (
-      <div className="address-default-card">
-        <span className="address-default-eyebrow">{label}</span>
-        <h4 className="address-default-name">{address.firstname} {address.lastname}</h4>
-        <div className="address-default-body">
-          <p>{address.street?.join(', ')}</p>
-          <p>{address.city}, {address.region?.region || ''} {address.postcode}</p>
-          <p>{address.country_code}</p>
-          {address.telephone && <p>{address.telephone}</p>}
-          {address.company && <p>{address.company}</p>}
+      <div className="flex flex-col gap-2.5 px-6 py-[22px] bg-bg border border-line rounded transition-colors duration-fast ease-[ease] hover:border-ink">
+        <span className="text-2xs font-semibold tracking-eyebrow uppercase text-ink">{label}</span>
+        <h4 className="m-0 text-lg font-semibold tracking-[-0.01em] text-ink">{address.firstname} {address.lastname}</h4>
+        <div className="mt-1 mb-1.5">
+          <p className="my-[3px] text-sm text-ink-2 leading-relaxed">{address.street?.join(', ')}</p>
+          <p className="my-[3px] text-sm text-ink-2 leading-relaxed">{address.city}, {address.region?.region || ''} {address.postcode}</p>
+          <p className="my-[3px] text-sm text-ink-2 leading-relaxed">{address.country_code}</p>
+          {address.telephone && <p className="my-[3px] text-sm text-ink-2 leading-relaxed">{address.telephone}</p>}
+          {address.company && <p className="my-[3px] text-sm text-ink-2 leading-relaxed">{address.company}</p>}
         </div>
-        <div className="address-actions">
+        <div className="mt-4 flex gap-2 flex-wrap">
           <button type="button" className="btn-secondary" onClick={() => onEditAddress(address)}>Edit</button>
         </div>
       </div>
     ) : (
-      <div className="address-default-card address-default-card--empty">
-        <span className="address-default-eyebrow">{label}</span>
-        <p className="address-default-empty-text">No {label.toLowerCase()} address set yet.</p>
+      <div className="flex flex-col gap-2.5 px-6 py-[22px] bg-surface border border-dashed border-line rounded transition-colors duration-fast ease-[ease]">
+        <span className="text-2xs font-semibold tracking-eyebrow uppercase text-ink">{label}</span>
+        <p className="mt-1 mb-3 text-sm text-ink-2">No {label.toLowerCase()} address set yet.</p>
         <button type="button" className="btn-secondary" onClick={onAddAddress}>Set {label.toLowerCase()}</button>
       </div>
     )
@@ -47,11 +47,11 @@ const AddressBookTab = ({ addresses = [], onEditAddress, onAddAddress, onDeleteA
         </div>
       ) : (
         <>
-          <section className="address-section">
-            <header className="address-section-head">
-              <span className="address-section-eyebrow">Defaults</span>
+          <section className="mb-6 last:mb-0">
+            <header className="flex items-center justify-between gap-3 mb-3.5">
+              <span className="inline-flex items-center gap-2.5 text-2xs font-semibold tracking-eyebrow uppercase text-ink-2">Defaults</span>
             </header>
-            <div className={`address-defaults-grid${sharedDefault ? ' address-defaults-grid--single' : ''}`}>
+            <div className={`grid gap-4 max768:grid-cols-1 ${sharedDefault ? 'grid-cols-1' : 'grid-cols-2'}`}>
               {sharedDefault ? (
                 renderDefaultCard('Default Shipping & Billing', sharedDefault)
               ) : (
@@ -63,13 +63,13 @@ const AddressBookTab = ({ addresses = [], onEditAddress, onAddAddress, onDeleteA
             </div>
           </section>
 
-          <section className="address-section">
-            <header className="address-section-head">
-              <span className="address-section-eyebrow">
+          <section className="mb-6 last:mb-0">
+            <header className="flex items-center justify-between gap-3 mb-3.5">
+              <span className="inline-flex items-center gap-2.5 text-2xs font-semibold tracking-eyebrow uppercase text-ink-2">
                 Other addresses
-                <span className="address-section-count">{otherAddresses.length}</span>
+                <span className="inline-flex items-center justify-center min-w-[22px] h-[18px] px-1.5 rounded-pill bg-surface text-ink text-2xs font-semibold tracking-normal">{otherAddresses.length}</span>
               </span>
-              <button type="button" className="address-add-link" onClick={onAddAddress}>
+              <button type="button" className="inline-flex items-center gap-1.5 h-8 px-3 border border-line rounded bg-bg text-sm font-medium text-ink cursor-pointer transition-colors duration-fast ease-[ease] hover:border-ink hover:bg-surface" onClick={onAddAddress}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -78,37 +78,37 @@ const AddressBookTab = ({ addresses = [], onEditAddress, onAddAddress, onDeleteA
               </button>
             </header>
             {otherAddresses.length > 0 ? (
-              <div className="address-table-scroll">
-              <div className="address-table" role="table" aria-label="Saved addresses">
-                <div className="address-table-head" role="row">
-                  <span role="columnheader">Name</span>
-                  <span role="columnheader">Street</span>
-                  <span role="columnheader">City / Region / ZIP</span>
-                  <span role="columnheader">Country</span>
-                  <span role="columnheader">Phone</span>
-                  <span role="columnheader" className="address-col-actions">Actions</span>
+              <div className="w-full max768:overflow-x-auto max768:[-webkit-overflow-scrolling:touch]">
+              <div className="grid grid-cols-[1fr_1.4fr_1.4fr_0.8fr_1fr_auto] bg-bg border border-line rounded overflow-hidden max768:min-w-[720px]" role="table" aria-label="Saved addresses">
+                <div className="contents" role="row">
+                  <span role="columnheader" className="px-4 py-3 bg-surface text-2xs font-semibold tracking-[0.1em] uppercase text-ink-2">Name</span>
+                  <span role="columnheader" className="px-4 py-3 bg-surface text-2xs font-semibold tracking-[0.1em] uppercase text-ink-2">Street</span>
+                  <span role="columnheader" className="px-4 py-3 bg-surface text-2xs font-semibold tracking-[0.1em] uppercase text-ink-2">City / Region / ZIP</span>
+                  <span role="columnheader" className="px-4 py-3 bg-surface text-2xs font-semibold tracking-[0.1em] uppercase text-ink-2">Country</span>
+                  <span role="columnheader" className="px-4 py-3 bg-surface text-2xs font-semibold tracking-[0.1em] uppercase text-ink-2">Phone</span>
+                  <span role="columnheader" className="px-4 py-3 bg-surface text-2xs font-semibold tracking-[0.1em] uppercase text-ink-2 text-right">Actions</span>
                 </div>
                 {otherAddresses.map((address) => (
-                  <div key={address.id} className="address-table-row" role="row">
-                    <span role="cell" data-label="Name" className="address-cell-name">
+                  <div key={address.id} className="contents" role="row">
+                    <span role="cell" data-label="Name" className="px-4 py-3.5 border-t border-line text-sm flex items-center min-w-0 font-semibold text-ink">
                       {address.firstname} {address.lastname}
                     </span>
-                    <span role="cell" data-label="Street">{address.street?.join(', ')}</span>
-                    <span role="cell" data-label="City / Region / ZIP">
+                    <span className="px-4 py-3.5 border-t border-line text-sm text-ink-2 flex items-center min-w-0" role="cell" data-label="Street">{address.street?.join(', ')}</span>
+                    <span className="px-4 py-3.5 border-t border-line text-sm text-ink-2 flex items-center min-w-0" role="cell" data-label="City / Region / ZIP">
                       {address.city}{address.region?.region ? `, ${address.region.region}` : ''} {address.postcode}
                     </span>
-                    <span role="cell" data-label="Country">{address.country_code}</span>
-                    <span role="cell" data-label="Phone">{address.telephone || '—'}</span>
-                    <span role="cell" className="address-cell-actions">
-                      <button type="button" className="btn-secondary" onClick={() => onEditAddress(address)}>Edit</button>
-                      <button type="button" className="btn-danger" onClick={() => onDeleteAddress(address.id)}>Delete</button>
+                    <span className="px-4 py-3.5 border-t border-line text-sm text-ink-2 flex items-center min-w-0" role="cell" data-label="Country">{address.country_code}</span>
+                    <span className="px-4 py-3.5 border-t border-line text-sm text-ink-2 flex items-center min-w-0" role="cell" data-label="Phone">{address.telephone || '—'}</span>
+                    <span role="cell" className="px-4 py-3.5 border-t border-line text-sm text-ink-2 flex flex-nowrap items-center min-w-0 justify-end gap-2">
+                      <button type="button" className="btn-secondary h-8 px-3 py-0 text-sm m-0 w-auto" onClick={() => onEditAddress(address)}>Edit</button>
+                      <button type="button" className="btn-danger h-8 px-3 py-0 text-sm m-0 w-auto" onClick={() => onDeleteAddress(address.id)}>Delete</button>
                     </span>
                   </div>
                 ))}
               </div>
               </div>
             ) : (
-              <p className="address-others-empty">No additional addresses saved.</p>
+              <p className="m-0 p-6 border border-dashed border-line rounded text-sm text-ink-2 text-center">No additional addresses saved.</p>
             )}
           </section>
         </>

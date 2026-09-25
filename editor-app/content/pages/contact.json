@@ -182,6 +182,18 @@
         "color": "#333"
       },
       "style": {
+        "marginBottom": 48
+      }
+    },
+    {
+      "id": "contact-form",
+      "component": "ContactForm",
+      "props": {
+        "heading": "Write Us",
+        "intro": "Jot us a note and we\u2019ll get back to you as quickly as possible.",
+        "buttonText": "Submit"
+      },
+      "style": {
         "marginBottom": 64
       }
     }

@@ -6,20 +6,21 @@ import useProductGallery from './useProductGallery';
 import useAddToCart from './useAddToCart';
 import useWishlistAction from './useWishlistAction';
 
-export default function useProductDetail(urlKeyProp) {
+export default function useProductDetail(urlKeyProp, editContext) {
   const data = useProductData(urlKeyProp);
   const { product, isConfigurable } = data;
 
-  const variant = useVariantSelection(product, isConfigurable);
+  const variant = useVariantSelection(product, isConfigurable, editContext?.valueUids);
   const gallery = useProductGallery(product, variant.previewVariant, variant.selectedVariant);
-  const cart = useAddToCart(product, isConfigurable, variant.selectedVariant, variant.selectedOptions);
+  const cart = useAddToCart(product, isConfigurable, variant.selectedVariant, variant.selectedOptions, editContext);
   const wishlist = useWishlistAction(product);
 
-  // Review modal toggle (gated on auth).
+  // Review modal toggle. Guests get the form when Magento allows them to write
+  // reviews, and the login modal when it doesn't.
   const { isAuthenticated, openLoginModal } = useAuth();
   const [showReviewModal, setShowReviewModal] = useState(false);
   const handleWriteReviewClick = () => {
-    if (!isAuthenticated) { openLoginModal(); return; }
+    if (!isAuthenticated && !data.guestReviewsAllowed) { openLoginModal(); return; }
     setShowReviewModal(true);
   };
 

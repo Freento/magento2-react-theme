@@ -65,15 +65,6 @@ export default defineConfig(({ mode, isSsrBuild }) => {
         rollupOptions: { output: { inlineDynamicImports: true } },
       }),
     },
-    css: {
-      preprocessorOptions: {
-        less: {
-          // Less 4 default; `/` stays CSS outside parens.
-          math: 'parens-division',
-          paths: [path.resolve(__dirname, 'src/styles')],
-        },
-      },
-    },
     plugins: [
       {
         name: 'load-js-as-jsx',

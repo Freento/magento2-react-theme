@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { CREATE_PAYPAL_EXPRESS_TOKEN } from '../../../queries/checkout';
-import '../../../styles/checkout/walletIntegrations/MagentoPayPalButton.less';
 
 const MagentoPayPalButton = ({
     cartId,
@@ -55,7 +54,7 @@ const MagentoPayPalButton = ({
     return (
         <div className="magento-paypal-container">
             <button
-                className="magento-paypal-button magento-paypal-button-static"
+                className="magento-paypal-button magento-paypal-button-static bg-[#0070ba] text-white border-0 rounded px-6 py-3 text-[16px] font-semibold flex items-center justify-center gap-2 w-full [transition:background-color_0.2s] min-h-12"
                 onClick={handlePayPalClick}
                 disabled={disabled || isLoading}
                 style={{
@@ -74,7 +73,7 @@ const MagentoPayPalButton = ({
                 }}
             >
                 {isLoading && (
-                    <div className="magento-paypal-spinner" />
+                    <div className="magento-paypal-spinner w-4 h-4 rounded-full border-2 border-white border-t-transparent [animation:spin_1s_linear_infinite]" />
                 )}
                 <span>
           {isLoading

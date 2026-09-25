@@ -1,27 +1,45 @@
+import { displayModeOf, showsRouteContent } from 'editor-core/routes';
 import { getClientApolloClient } from '../apollo/client';
 import { GET_CATEGORY_PRODUCTS } from '../queries/category';
 import { GET_PRODUCT_DETAILS } from '../queries/product';
-import { CATEGORY_PAGE_SIZE } from './catalog';
+import { categoryProductsVariables } from './catalog';
+import { hasRouteArea, prefetchRouteArea } from '../hooks/useRouteArea';
 
-const categoryUid = (id) => btoa(String(id));
+const ask = (cfg) => getClientApolloClient().query({ ...cfg, fetchPolicy: 'cache-first' });
 
+/** The path a react-router <Link> resolved to, without origin or query. */
+const pathOf = (el) => {
+  const href = el.getAttribute?.('href');
+  if (!href || !href.startsWith('/')) return null;
+  return href.split(/[?#]/)[0];
+};
+
+/**
+ * Each handler warms whatever the target page will actually ask for, and
+ * resolves when it has. Returning null means there is nothing to warm.
+ */
 const handlers = {
   category: (el) => {
     const id = el.dataset.prefetchId;
     if (!id) return null;
-    return {
+    const products = () => ask({
       query: GET_CATEGORY_PRODUCTS,
-      variables: {
-        filters: { category_uid: { eq: categoryUid(id) } },
-        currentPage: 1,
-        pageSize: CATEGORY_PAGE_SIZE,
-      },
-    };
+      variables: categoryProductsVariables(id),
+    });
+
+    // A category the editor has decorated renders its blocks first, and its
+    // document is the cheaper thing to ask for — a small JSON off our own
+    // server rather than a page of products out of the shop. It also carries
+    // the display mode, which decides whether the product query follows.
+    const path = pathOf(el);
+    if (!path || !hasRouteArea(path)) return products();
+    return prefetchRouteArea(path)
+      .then((doc) => (showsRouteContent(displayModeOf(doc)) ? products() : null));
   },
   product: (el) => {
     const key = el.dataset.prefetchKey;
     if (!key) return null;
-    return { query: GET_PRODUCT_DETAILS, variables: { urlKey: key } };
+    return ask({ query: GET_PRODUCT_DETAILS, variables: { urlKey: key } });
   },
 };
 
@@ -37,11 +55,10 @@ const fire = (el) => {
   const dedupeKey = `${type}:${id}`;
   if (seen.has(dedupeKey)) return;
   if (seen.size >= MAX_ENTRIES) return;
-  const cfg = handlers[type]?.(el);
-  if (!cfg) return;
+  const started = handlers[type]?.(el);
+  if (!started) return;
   seen.add(dedupeKey);
-  const client = getClientApolloClient();
-  client.query({ ...cfg, fetchPolicy: 'cache-first' }).catch(() => {
+  started.catch(() => {
     seen.delete(dedupeKey);
   });
 };

@@ -3,7 +3,6 @@ import MobileMenuDrawer from './MobileMenuDrawer';
 import DesktopMenu from './DesktopMenu';
 import MenuSkeleton from './MenuSkeleton';
 import useMenuData from './hooks/useMenuData';
-import '../../../styles/layout/Menu.less';
 
 const Menu = ({ isMobile = false, isOpen = false, onClose = () => {} }) => {
   const { menuData, loading, error } = useMenuData({ isMobile, isOpen });

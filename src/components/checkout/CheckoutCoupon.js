@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useMutation } from '@apollo/client';
 import { APPLY_COUPON_TO_CART, REMOVE_COUPON_FROM_CART } from '../../queries/checkout';
+import CloseIcon from '../ui/icons/CloseIcon';
 
 export default function CheckoutCoupon({ cartId, cartData, onChanged }) {
   const applied = cartData?.applied_coupons || [];
@@ -40,36 +41,37 @@ export default function CheckoutCoupon({ cartId, cartData, onChanged }) {
     }
   };
 
+  const inputCls = 'form-input co-coupon-input flex-1 min-w-0 disabled:bg-surface disabled:text-ink-2 disabled:border-line disabled:cursor-not-allowed disabled:opacity-100 disabled:[-webkit-text-fill-color:#6B6B6B]';
+  const applyCls = 'btn-primary co-coupon-apply w-auto h-11 m-0 flex-none min-w-[110px] gap-2 py-0 max480:min-w-[92px] max480:px-3.5 disabled:bg-ink disabled:border-ink disabled:text-bg disabled:cursor-not-allowed';
+
   return (
-    <div className="co-coupon" role="group" aria-labelledby="co-coupon-title">
-      <h3 id="co-coupon-title" className="co-coupon-title">Discount code</h3>
+    <div className="co-coupon mt-4 px-6 py-[22px] bg-bg border border-line rounded max480:px-4 max480:py-[18px]" role="group" aria-labelledby="co-coupon-title">
+      <h3 id="co-coupon-title" className="co-coupon-title mb-3.5 text-xs font-medium tracking-eyebrow uppercase text-ink-2">Discount code</h3>
 
       {applied.length > 0 ? (
-        <div className="co-coupon-applied">
-          {applied.map((c) => (
-            <div key={c.code} className="co-coupon-chip">
-              <span className="co-coupon-chip-main">
-                <span className="co-coupon-chip-label">Code</span>
-                <span className="co-coupon-chip-code">{c.code}</span>
-              </span>
-              <button
-                type="button"
-                className="co-coupon-chip-remove"
-                onClick={handleRemove}
-                disabled={removing}
-                aria-label={`Remove code ${c.code}`}
-                title="Remove code"
-              >
-                <span className="co-coupon-chip-remove-x" aria-hidden="true">×</span>
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <form className="co-coupon-form" onSubmit={handleApply}>
+        <form className="co-coupon-form flex gap-2 items-stretch" onSubmit={(e) => { e.preventDefault(); handleRemove(); }}>
           <input
             type="text"
-            className="form-input co-coupon-input"
+            className={inputCls}
+            value={applied[0].code}
+            readOnly
+            disabled
+            aria-label="Applied coupon code"
+          />
+          <button
+            type="submit"
+            className={applyCls}
+            disabled={removing}
+            aria-busy={removing}
+          >
+            <span>{removing ? 'Removing…' : 'Cancel Coupon'}</span>
+          </button>
+        </form>
+      ) : (
+        <form className="co-coupon-form flex gap-2 items-stretch" onSubmit={handleApply}>
+          <input
+            type="text"
+            className={inputCls}
             placeholder="Coupon code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
@@ -79,7 +81,7 @@ export default function CheckoutCoupon({ cartId, cartData, onChanged }) {
           />
           <button
             type="submit"
-            className={`btn-primary co-coupon-apply${applying ? ' is-loading' : ''}`}
+            className={`${applyCls}${applying ? ' opacity-85' : ''}`}
             disabled={applying}
             aria-busy={applying}
           >
@@ -107,10 +109,7 @@ function renderCouponToast(message, onClose, kind) {
     >
       <span className="wl-toast-text">{message}</span>
       <button type="button" className="wl-toast-close" onClick={onClose} aria-label="Dismiss">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+        <CloseIcon size={14} strokeWidth={2} />
       </button>
     </div>,
     target

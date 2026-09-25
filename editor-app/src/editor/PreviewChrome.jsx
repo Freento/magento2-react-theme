@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
-import '../styles/previewChrome.less';
-// Host global styles (App.css was split into these base partials). Keeps the
-// embedded storefront chrome (Header, etc.) looking like the live shop.
-import '@host/styles/base/general.less';
-import '@host/styles/base/controls.less';
-import '@host/styles/base/forms.less';
-import '@host/styles/base/buttons.less';
+import '../styles/previewChrome.css';
+// The preview renders host storefront components; in the tablet/mobile iframe
+// this is a separate document, so it needs the host Tailwind layer imported
+// here (Vite dedupes it with the editor shell's copy in the same document).
+import '@host/styles/tailwind.css';
 
 const CHROME_PAGES = {
   '/__footer__': { hideFooter: true, label: 'Global Block' },
 };
 
-function GlobalBlock({ label, onEdit, children }) {
+function GlobalBlock({ id, label, onEdit, children }) {
   return (
     <div
+      data-global-block={id}
       style={{
         position: 'relative',
         outline: '2px dashed #0F4C5C',
@@ -73,7 +72,7 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
     let cancelled = false;
     (async () => {
       try {
-        const [apollo, routerDom, clientMod, cartMod, authMod, breadcrumbMod, wishlistMod, headerMod] = await Promise.all([
+        const [apollo, routerDom, clientMod, cartMod, authMod, breadcrumbMod, wishlistMod, compareMod, headerMod] = await Promise.all([
           import('@apollo/client'),
           import('react-router-dom'),
           import('@host/apollo/client'),
@@ -81,6 +80,7 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
           import('@host/context/AuthContext'),
           import('@host/context/BreadcrumbContext'),
           import('@host/context/WishlistContext'),
+          import('@host/context/CompareContext'),
           import('@host/components/layout/Header'),
         ]);
         if (cancelled) return;
@@ -92,6 +92,7 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
           AuthProvider: authMod.AuthProvider,
           BreadcrumbProvider: breadcrumbMod.BreadcrumbProvider,
           WishlistProvider: wishlistMod.WishlistProvider,
+          CompareProvider: compareMod.CompareProvider,
           Header: headerMod.default,
         });
       } catch (err) {
@@ -111,7 +112,7 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
 
   const {
     ApolloProvider, BrowserRouter, apolloClient,
-    CartProvider, AuthProvider, BreadcrumbProvider, WishlistProvider,
+    CartProvider, AuthProvider, BreadcrumbProvider, WishlistProvider, CompareProvider,
     Header,
   } = chrome;
   const footerLabel = CHROME_PAGES['/__footer__'].label;
@@ -123,15 +124,17 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
-                <BreadcrumbProvider>
-                  <LiveChromeBlocker><Header /></LiveChromeBlocker>
-                  {children}
-                  {!flags.hideFooter && footerContent && (
-                    <GlobalBlock label={footerLabel} onEdit={() => onEditGlobal?.('/__footer__')}>
-                      {footerContent}
-                    </GlobalBlock>
-                  )}
-                </BreadcrumbProvider>
+                <CompareProvider>
+                  <BreadcrumbProvider>
+                    <LiveChromeBlocker><Header /></LiveChromeBlocker>
+                    {children}
+                    {!flags.hideFooter && footerContent && (
+                      <GlobalBlock id="__footer__" label={footerLabel} onEdit={() => onEditGlobal?.('/__footer__')}>
+                        {footerContent}
+                      </GlobalBlock>
+                    )}
+                  </BreadcrumbProvider>
+                </CompareProvider>
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>

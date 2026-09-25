@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { INLINE_EDIT_STYLE } from '../inline-edit-style';
+import { InsideLinkContext } from '../link-context.js';
 
 export default function Heading({
   text = 'Heading',
@@ -16,6 +18,8 @@ export default function Heading({
   _editor,
 }) {
   const Tag = `h${level}`;
+  // Already inside a link: the heading keeps its look and drops its anchor.
+  const insideLink = useContext(InsideLinkContext);
   const defaults = { 1: 36, 2: 28, 3: 22, 4: 18 };
   const headingStyle = {
     fontSize: fontSize || defaults[level] || 28,
@@ -48,7 +52,7 @@ export default function Heading({
     );
   }
 
-  if (href) {
+  if (href && !insideLink) {
     return (
       <Tag style={headingStyle}>
         <a href={href} style={{ color: 'inherit', textDecoration: textDecoration || 'none' }}>

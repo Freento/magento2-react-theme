@@ -3,7 +3,11 @@ export default {
     category: 'content',
     icon: 'Star',
     acceptsChildren: false,
-    allowedIn: ['page', 'Grid'],
+    // The link lives in the style layer but belongs with the block's own
+    // settings: every block offers one, and an author looks for it in the
+    // same place each time.
+    regroupStyleFields: { link: 'Icon' },
+    allowedIn: ['page', 'Grid', 'Box'],
     hideStyleFields: ['backgroundColor', 'borderSides', 'borderStyle', 'borderColor', 'borderWidth', 'fontFamily', 'fontSize', 'textAlign'],
     defaultProps: { name: 'star', size: 24, strokeWidth: 1.5 },
     propsSchema: {

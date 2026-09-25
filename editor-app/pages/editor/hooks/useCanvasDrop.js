@@ -1,3 +1,4 @@
+import {simulateGridPlacement} from 'editor-core/renderer';
 import {useCallback} from 'react';
 import registry from 'editor-core/registry';
 import {
@@ -82,15 +83,7 @@ export function useCanvasDrop({
             const {parentId: srcParentId, cell: srcCell} = dragData;
             const tgt = dropTarget.cell;
             const dropSide = dropTarget.side || 'right';
-            if (srcParentId !== dropTarget.parentId) {
-                handleDragEnd();
-                return;
-            }
-            if (srcCell.r !== tgt.r) {
-                handleDragEnd();
-                return;
-            }
-            if (srcCell.c === tgt.c) {
+            if (srcParentId !== dropTarget.parentId || (srcCell.r === tgt.r && srcCell.c === tgt.c)) {
                 handleDragEnd();
                 return;
             }
@@ -98,38 +91,43 @@ export function useCanvasDrop({
                 if (b.id !== srcParentId) {
                     return b.children ? {...b, children: mapTree(b.children)} : b;
                 }
-                const kids = b.children || [];
-                const inRow = [];
-                const others = [];
-                for (const k of kids) {
-                    if (Number(k.style?.rowStart) === srcCell.r) inRow.push(k);
-                    else others.push(k);
-                }
-                const byCol = new Map();
-                for (const k of inRow) {
-                    const c = Number(k.style?.colStart);
-                    if (!byCol.has(c)) byCol.set(c, []);
-                    byCol.get(c).push(k);
-                }
-                const cols = [...byCol.keys()].sort((a, b) => a - b);
-                const seq = cols.map((c) => byCol.get(c));
-                const srcIdx = cols.indexOf(srcCell.c);
-                let dstIdx = cols.indexOf(tgt.c);
-                if (srcIdx < 0 || dstIdx < 0) return b;
-                let insertAt = dropSide === 'right' ? dstIdx + 1 : dstIdx;
-                if (srcIdx < insertAt) insertAt -= 1;
-                const [moved] = seq.splice(srcIdx, 1);
-                seq.splice(insertAt, 0, moved);
-                const rebuilt = [];
-                seq.forEach((group, i) => {
-                    for (const k of group) {
-                        rebuilt.push({
-                            ...k,
-                            style: {...(k.style || {}), colStart: i + 1, rowStart: srcCell.r},
-                        });
-                    }
+                const sim = simulateGridPlacement(b);
+                const kids = (b.children || []).map((k, i) => {
+                    const cc = sim.childCells[i];
+                    return cc ? {...k, style: {...(k.style || {}), colStart: cc.c, rowStart: cc.r}} : k;
                 });
-                return {...b, children: [...others, ...rebuilt]};
+                const rowOf = (k) => Number(k.style?.rowStart);
+                const colOf = (k) => Number(k.style?.colStart);
+                const isMoving = (k) => rowOf(k) === srcCell.r && colOf(k) === srcCell.c;
+                const moving = kids.filter(isMoving);
+                if (!moving.length) return b;
+                const rest = kids.filter((k) => !isMoving(k));
+                const rowSeq = (r) => {
+                    const byCol = new Map();
+                    for (const k of rest) {
+                        if (rowOf(k) !== r) continue;
+                        if (!byCol.has(colOf(k))) byCol.set(colOf(k), []);
+                        byCol.get(colOf(k)).push(k);
+                    }
+                    return [...byCol.keys()].sort((a, c) => a - c).map((c) => byCol.get(c));
+                };
+                const pins = new Map();
+                const renumber = (seq, r) => seq.forEach((group, i) => group.forEach((k) => pins.set(k.id, {colStart: i + 1, rowStart: r})));
+                const targetOccupied = rest.some((k) => rowOf(k) === tgt.r && colOf(k) === tgt.c);
+                if (targetOccupied) {
+                    const seq = rowSeq(tgt.r);
+                    const dstIdx = seq.findIndex((group) => colOf(group[0]) === tgt.c);
+                    seq.splice(dropSide === 'right' ? dstIdx + 1 : dstIdx, 0, moving);
+                    renumber(seq, tgt.r);
+                } else {
+                    moving.forEach((k) => pins.set(k.id, {colStart: tgt.c, rowStart: tgt.r}));
+                }
+                if (srcCell.r !== tgt.r) renumber(rowSeq(srcCell.r), srcCell.r);
+                const children = kids.map((k) => (pins.has(k.id) ? {...k, style: {...k.style, ...pins.get(k.id)}} : k));
+                const maxCol = children.reduce((m, k) => Math.max(m, colOf(k) || 0), 0);
+                const columns = Math.max(1, Number(b.props?.columns) || 1);
+                const props = maxCol > columns ? {...(b.props || {}), columns: maxCol} : b.props;
+                return {...b, props, children};
             });
             setBlocksFor(side, mapTree(blocks));
         }

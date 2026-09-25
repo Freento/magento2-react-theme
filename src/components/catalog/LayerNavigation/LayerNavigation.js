@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/client';
 import LayerNavigationSkeleton from './LayerNavigationSkeleton';
 import PriceRangeSlider from './PriceRangeSlider';
 import prepareGraphQLFilters from './prepareGraphQLFilters';
-import '../../../styles/catalog/LayerNavigation.less';
 import { GET_AGGREGATIONS } from '../../../queries/category';
 
 const LayerNavigation = ({
@@ -139,9 +138,9 @@ const LayerNavigation = ({
 
   if (!isVisible) {
     return (
-      <div className="layer-navigation-collapsed">
+      <div className="layer-navigation-collapsed mb-5">
         <button
-          className="show-filters-btn"
+          className="show-filters-btn inline-flex items-center gap-2 bg-transparent text-ink border border-line py-2.5 px-3.5 rounded cursor-pointer text-13 font-medium tracking-[0.02em] transition-colors duration-fast ease-[ease] hover:border-ink hover:bg-surface"
           onClick={onShow}
           aria-label="Show filters"
         >
@@ -157,18 +156,18 @@ const LayerNavigation = ({
 
   if (error) {
     return (
-      <div className="layer-navigation">
-        <div className="layer-navigation-header">
-          <h3>Filters</h3>
+      <div className="layer-navigation mb-6 max768:mb-3">
+        <div className="layer-navigation-header flex justify-between items-center pb-3.5 max768:pb-2.5 border-b border-line [.plp-drawer-body_&]:hidden">
+          <h3 className="m-0 text-sm font-medium tracking-[0.12em] uppercase text-ink">Filters</h3>
           <button
-            className="hide-filters-btn"
+            className="hide-filters-btn cursor-pointer text-base py-1 px-2 rounded text-ink-2 [transition:color_120ms_ease] hover:text-ink hover:bg-surface"
             onClick={onHide}
             aria-label="Hide filters"
           >
             ✕
           </button>
         </div>
-        <div className="error">Error loading filters</div>
+        <div className="error py-5 text-center text-sale text-13">Error loading filters</div>
       </div>
     );
   }
@@ -194,11 +193,11 @@ const LayerNavigation = ({
   });
 
   return (
-    <div className="layer-navigation">
-      <div className="layer-navigation-header">
-        <h3>Shop By</h3>
+    <div className="layer-navigation mb-6 max768:mb-3">
+      <div className="layer-navigation-header flex justify-between items-center pb-3.5 max768:pb-2.5 border-b border-line [.plp-drawer-body_&]:hidden">
+        <h3 className="m-0 text-sm font-medium tracking-[0.12em] uppercase text-ink">Shop By</h3>
         <button
-          className="hide-filters-btn"
+          className="hide-filters-btn cursor-pointer text-base py-1 px-2 rounded text-ink-2 [transition:color_120ms_ease] hover:text-ink hover:bg-surface"
           onClick={onHide}
           aria-label="Hide filters"
           title="Hide filters"
@@ -208,11 +207,11 @@ const LayerNavigation = ({
       </div>
 
       {hasActiveFilters && (
-        <div className="active-filters-section">
-          <div className="active-filters-header">
-            <span className="active-filters-title">Active Filters:</span>
+        <div className="active-filters-section py-3.5 max768:py-3 border-b border-line">
+          <div className="active-filters-header flex justify-between items-center mb-2.5">
+            <span className="active-filters-title font-medium text-ink text-sm tracking-[0.08em] uppercase">Active Filters:</span>
             <button
-              className="clear-all-btn"
+              className="clear-all-btn bg-transparent cursor-pointer text-ink-2 py-1 px-2 rounded text-sm font-medium underline underline-offset-2 [transition:color_120ms_ease] hover:text-ink"
               onClick={onClearAllFilters}
               title="Clear all filters"
             >
@@ -220,7 +219,7 @@ const LayerNavigation = ({
             </button>
           </div>
 
-          <div className="active-filters-list">
+          <div className="active-filters-list flex flex-wrap gap-1.5">
             {Object.entries(filters).map(([attributeCode, value]) => {
               // Skip category_uid only if it's the base filter (object with eq property)
               // Show it if it's a user-selected filter (array or string)
@@ -245,11 +244,11 @@ const LayerNavigation = ({
                 }
 
                 return (
-                  <div key={`${attributeCode}-${val}`} className="active-filter-tag">
-                    <span className="filter-label">{label}:</span>
-                    <span className="filter-value">{displayValue}</span>
+                  <div key={`${attributeCode}-${val}`} className="active-filter-tag inline-flex items-center bg-surface text-ink py-[5px] px-2.5 rounded-pill border border-line text-sm gap-1">
+                    <span className="filter-label font-medium">{label}:</span>
+                    <span className="filter-value text-ink-2">{displayValue}</span>
                     <button
-                      className="remove-filter-btn"
+                      className="remove-filter-btn cursor-pointer text-ink-2 pl-1 text-base leading-none [transition:color_120ms_ease] hover:text-ink"
                       onClick={() => onRemoveFilter(attributeCode, val)}
                       title="Remove filter"
                     >
@@ -269,27 +268,27 @@ const LayerNavigation = ({
           const hasActiveFilters = getActiveFilterValues(aggregation.attribute_code).length > 0;
 
           return (
-            <div key={aggregation.attribute_code} className="filter-section">
+            <div key={aggregation.attribute_code} className="filter-section border-b border-line py-1 last:border-b-0">
               <button
-                className={`filter-header ${hasActiveFilters ? 'has-active-filters' : ''}`}
+                className={`filter-header ${hasActiveFilters ? 'has-active-filters' : ''} w-full flex justify-between items-center py-3.5 max768:py-3 px-[2px] cursor-pointer text-sm font-medium tracking-[0.12em] uppercase text-ink text-left [transition:color_120ms_ease] hover:text-ink-2 [&.has-active-filters]:!text-ink`}
                 onClick={() => toggleSection(aggregation.attribute_code)}
                 aria-expanded={isExpanded}
               >
-                <span className="filter-title">
+                <span className="filter-title flex items-center gap-1.5">
                   {aggregation.label}
                   {hasActiveFilters && (
-                    <span className="active-count">
+                    <span className="active-count text-xs bg-ink text-bg py-[1px] px-1.5 rounded-pill font-medium tracking-normal normal-case">
                       ({getActiveFilterValues(aggregation.attribute_code).length})
                     </span>
                   )}
                 </span>
-                <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>
+                <span className={`expand-icon ${isExpanded ? 'expanded' : ''} [transition:transform_120ms_ease] text-2xs text-ink-2 [&.expanded]:rotate-180`}>
                   ▼
                 </span>
               </button>
 
               {isExpanded && (
-                <div className="filter-options">
+                <div className="filter-options pt-1 pb-3.5 max768:pb-3 flex flex-col gap-[2px]">
                   {aggregation.attribute_code === 'price' ? (
                     <PriceRangeSlider
                       min={priceRange.min}
@@ -308,7 +307,7 @@ const LayerNavigation = ({
                       return (
                         <label
                           key={option.value}
-                          className={`filter-option ${isActive ? 'active' : ''}`}
+                          className={`filter-option ${isActive ? 'active' : ''} flex items-center py-1.5 px-[2px] cursor-pointer text-13 gap-2.5 rounded [transition:color_120ms_ease] hover:text-ink [&_input]:w-3.5 [&_input]:h-3.5 [&_input]:accent-ink [&_input]:cursor-pointer`}
                         >
                           <input
                             type="checkbox"
@@ -319,7 +318,7 @@ const LayerNavigation = ({
                               e.target.checked
                             )}
                           />
-                          <span className="filter-option-label">{option.label}</span>
+                          <span className={`filter-option-label flex-1 text-ink ${isActive ? 'font-medium' : ''}`}>{option.label}</span>
                         </label>
                       );
                     })
@@ -332,7 +331,7 @@ const LayerNavigation = ({
       </div>
 
       {validAggregations.length === 0 && (
-        <div className="no-filters">
+        <div className="no-filters py-5 text-center text-ink-2 text-13 italic">
           No filters available for this selection.
         </div>
       )}

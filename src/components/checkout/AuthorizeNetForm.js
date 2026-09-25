@@ -1,5 +1,6 @@
 import React from 'react';
 import AcceptHostedIframe from './AcceptHostedIframe';
+import { CARD_FORM_TITLE_CLS } from './checkoutUi';
 
 const AuthorizeNetForm = ({
   tokenbaseConfig = null,
@@ -26,8 +27,8 @@ const AuthorizeNetForm = ({
   };
 
   return (
-    <div className="authorizenet-form">
-      <h4 className="card-form-title">Secure Credit Card Payment</h4>
+    <div className="authorizenet-form border border-line rounded p-[22px] mt-3.5 bg-bg">
+      <h4 className={CARD_FORM_TITLE_CLS}>Secure Credit Card Payment</h4>
 
       <AcceptHostedIframe
         tokenbaseConfig={tokenbaseConfig}

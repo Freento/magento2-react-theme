@@ -3,6 +3,17 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { getTileIcon } from './menuTileIcons';
 
+const SUBLIST_ITEM =
+  'flex items-center justify-between w-full py-4 bg-transparent border-0 border-b border-line text-md font-medium text-ink no-underline text-left cursor-pointer transition-colors duration-fast ease-[ease] hover:text-ink-2';
+
+const TILE_BASE =
+  'mobile-menu-tile flex flex-col items-center justify-center gap-2.5 py-5 px-3 border border-line rounded bg-bg text-ink text-[13px] font-medium tracking-normal normal-case no-underline transition-colors duration-fast ease-[ease] aspect-[5/4] text-center';
+
+const ACCOUNT_ITEM =
+  'block w-full py-3.5 bg-transparent border-0 cursor-pointer text-ink text-base text-left no-underline transition-colors duration-fast ease-[ease] hover:text-ink-2';
+
+const SKEL_PULSE = 'animate-skeleton-pulse';
+
 const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading }) => {
   const { isAuthenticated, openLoginModal, logout } = useAuth();
   const [submenuPath, setSubmenuPath] = useState([]);
@@ -28,18 +39,18 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
 
   return (
     <>
-      {isOpen && <div className="mobile-menu-scrim" onClick={closeAndReset} />}
+      {isOpen && <div className="mobile-menu-scrim fixed inset-0 bg-ink/40 z-[90] animate-scrim" onClick={closeAndReset} />}
       <aside
         ref={mobileMenuRef}
-        className={`mobile-menu ${isOpen ? 'is-open' : ''}`}
+        className={`mobile-menu fixed top-0 right-0 w-full max-w-[100vw] h-screen bg-bg z-[95] flex flex-col translate-x-full [transition:transform_240ms_ease] [&.is-open]:translate-x-0 ${isOpen ? 'is-open' : ''}`}
         aria-label="Menu"
       >
-        <div className="mobile-menu-head">
+        <div className="mobile-menu-head flex justify-between items-center py-4 px-5 border-b border-line">
           {inSubmenu ? (
             <button
               type="button"
               onClick={goBack}
-              className="mobile-menu-back"
+              className="mobile-menu-back inline-flex items-center gap-2 bg-transparent border-0 p-0 text-base font-medium text-ink cursor-pointer hover:text-ink-2"
               aria-label="Back"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -48,12 +59,12 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
               <span>{current.name}</span>
             </button>
           ) : (
-            <span className="mobile-menu-title">Menu</span>
+            <span className="mobile-menu-title font-sans text-base font-semibold tracking-[0.04em] uppercase text-ink">Menu</span>
           )}
           <button
             type="button"
             onClick={closeAndReset}
-            className="icon-btn"
+            className="icon-btn w-9 h-9 inline-flex items-center justify-center rounded-pill text-ink transition-colors duration-fast ease-[ease] hover:bg-surface [&_svg]:w-[18px] [&_svg]:h-[18px]"
             aria-label="Close menu"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -63,9 +74,9 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
           </button>
         </div>
 
-        <div className="mobile-menu-body">
+        <div className="mobile-menu-body flex-1 overflow-y-auto p-5">
           {inSubmenu ? (
-            <ul className="mobile-menu-sublist">
+            <ul className="mobile-menu-sublist list-none p-0 m-0 flex flex-col">
               <li>
                 <Link
                   to={`/${current.url_path}${current.url_suffix || ''}`}
@@ -77,7 +88,7 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                     path: `${current.url_path}${current.url_suffix || ''}`,
                   }}}
                   onClick={closeAndReset}
-                  className="mobile-menu-sublist-all"
+                  className="mobile-menu-sublist-all flex items-center justify-between w-full py-4 border-0 border-b border-line font-medium no-underline text-left cursor-pointer text-ink-2 tracking-[0.04em] uppercase text-sm"
                 >
                   View all {current.name}
                 </Link>
@@ -89,10 +100,11 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                     {hasKids ? (
                       <button
                         type="button"
+                        className={SUBLIST_ITEM}
                         onClick={() => setSubmenuPath((p) => [...p, child])}
                       >
                         <span>{child.name}</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <svg className="text-ink-2 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <polyline points="9 6 15 12 9 18" />
                         </svg>
                       </button>
@@ -107,9 +119,10 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                           path: `${child.url_path}${child.url_suffix || ''}`,
                         }}}
                         onClick={closeAndReset}
+                        className={SUBLIST_ITEM}
                       >
                         <span>{child.name}</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <svg className="text-ink-2 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <polyline points="9 6 15 12 9 18" />
                         </svg>
                       </Link>
@@ -120,11 +133,11 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
             </ul>
           ) : (
             <>
-              <div className="mobile-menu-tiles">
+              <div className="mobile-menu-tiles grid grid-cols-2 gap-2 mb-3">
                 {mobileTilesLoading && Array.from({ length: 6 }).map((_, i) => (
-                  <div key={`mm-sk-${i}`} className="mobile-menu-tile mobile-menu-tile--skel" aria-hidden="true">
-                    <span className="mobile-menu-tile-icon mm-skel-icon" />
-                    <span className="mobile-menu-tile-label mm-skel-label" />
+                  <div key={`mm-sk-${i}`} className={`${TILE_BASE} mobile-menu-tile--skel pointer-events-none cursor-default`} aria-hidden="true">
+                    <span className={`mobile-menu-tile-icon mm-skel-icon block w-7 h-7 rounded-full bg-line shrink-0 ${SKEL_PULSE}`} />
+                    <span className={`mobile-menu-tile-label mm-skel-label block w-[60%] h-3 rounded bg-line leading-[1.25] ${SKEL_PULSE}`} />
                   </div>
                 ))}
                 {!mobileTilesLoading && mainCategories.map((category) => {
@@ -136,11 +149,11 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                   return (
                     <TileEl
                       key={category.id}
-                      className="mobile-menu-tile"
+                      className={`${TILE_BASE} cursor-pointer hover:border-ink hover:bg-surface hover:text-ink`}
                       {...tileProps}
                     >
                       <svg
-                        className="mobile-menu-tile-icon"
+                        className="mobile-menu-tile-icon text-ink shrink-0 transition-colors duration-fast ease-[ease]"
                         width="28"
                         height="28"
                         viewBox="0 0 24 24"
@@ -153,28 +166,29 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                       >
                         {getTileIcon(category.name)}
                       </svg>
-                      <span className="mobile-menu-tile-label">{category.name}</span>
+                      <span className="mobile-menu-tile-label leading-[1.25]">{category.name}</span>
                     </TileEl>
                   );
                 })}
               </div>
 
-              <div className="mobile-menu-eyebrow mobile-menu-eyebrow-divider">Your account</div>
-              <ul className="mobile-menu-account">
+              <div className="mobile-menu-eyebrow mobile-menu-eyebrow-divider text-xs font-medium tracking-[0.12em] uppercase text-ink-2 mb-3 mt-8 pt-5 border-t border-line">Your account</div>
+              <ul className="mobile-menu-account list-none flex flex-col p-0">
                 {isAuthenticated ? (
                   <>
-                    <li>
-                      <Link to="/my-account" onClick={closeAndReset}>My account</Link>
+                    <li className="border-b border-line last:border-b-0">
+                      <Link className={ACCOUNT_ITEM} to="/my-account" onClick={closeAndReset}>My account</Link>
                     </li>
-                    <li>
-                      <Link to="/my-account/orders" onClick={closeAndReset}>Orders</Link>
+                    <li className="border-b border-line last:border-b-0">
+                      <Link className={ACCOUNT_ITEM} to="/my-account/orders" onClick={closeAndReset}>Orders</Link>
                     </li>
-                    <li>
-                      <Link to="/my-account?tab=wishlist" onClick={closeAndReset}>Wishlist</Link>
+                    <li className="border-b border-line last:border-b-0">
+                      <Link className={ACCOUNT_ITEM} to="/my-account?tab=wishlist" onClick={closeAndReset}>Wishlist</Link>
                     </li>
-                    <li>
+                    <li className="border-b border-line last:border-b-0">
                       <button
                         type="button"
+                        className={ACCOUNT_ITEM}
                         onClick={() => { logout && logout(); closeAndReset(); }}
                       >
                         Sign out
@@ -183,16 +197,17 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                   </>
                 ) : (
                   <>
-                    <li>
+                    <li className="border-b border-line last:border-b-0">
                       <button
                         type="button"
+                        className={ACCOUNT_ITEM}
                         onClick={() => { openLoginModal && openLoginModal(); closeAndReset(); }}
                       >
                         Sign in
                       </button>
                     </li>
-                    <li>
-                      <Link to="/my-account?tab=wishlist" onClick={closeAndReset}>Wishlist</Link>
+                    <li className="border-b border-line last:border-b-0">
+                      <Link className={ACCOUNT_ITEM} to="/my-account?tab=wishlist" onClick={closeAndReset}>Wishlist</Link>
                     </li>
                   </>
                 )}

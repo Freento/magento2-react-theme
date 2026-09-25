@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import BillingAddressForm from './BillingAddressForm';
+import CheckoutAddressCards from './CheckoutAddressCards';
+import ArrowLeftIcon from '../ui/icons/ArrowLeftIcon';
 import AddressFormFields from '../account/AddressFormFields';
 import useAddressValidation from '../../hooks/useAddressValidation';
 import { validateEmail } from './validation/addressValidation';
+import { FORM_SECTION_CLS, FORM_TITLE_CLS, CO_BTN_CLS, CO_SPINNER_CLS } from './checkoutUi';
 
 const ShippingAddressForm = ({
     shippingAddress,
     setShippingAddress,
     email,
     setEmail,
-    billingAddress,
-    setBillingAddress,
-    useSameAsShipping,
-    setUseSameAsShipping,
     errors,
     loading,
     handleAddressSubmit,
@@ -58,64 +56,25 @@ const ShippingAddressForm = ({
     };
 
     return (
-        <div className="form-section">
-            <h2 className="form-title">Shipping Address</h2>
+        <div className={FORM_SECTION_CLS}>
+            <h2 className={FORM_TITLE_CLS}>Shipping Address</h2>
 
             {/* Saved-address picker for logged-in customers. */}
             {isLoggedIn && showAddressSelector && !isEditingAddress && (
-                <div className="address-selector">
-                    <div className="saved-addresses-grid">
-                        {customerAddresses.map((address) => {
-                            const isSelected = selectedAddressId === address.id;
-                            return (
-                                <div
-                                    key={address.id}
-                                    role="radio"
-                                    aria-checked={isSelected}
-                                    tabIndex={0}
-                                    className={`co-address-card ${isSelected ? 'selected' : ''}`}
-                                    onClick={() => onAddressSelect(address)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            e.preventDefault();
-                                            onAddressSelect(address);
-                                        }
-                                    }}
-                                >
-                                    <div className="co-address-card-radio" aria-hidden="true" />
-                                    <div className="co-address-card-content">
-                                        <div className="address-card-head">
-                                            <strong>{address.firstname} {address.lastname}</strong>
-                                            {address.default_shipping && (
-                                                <span className="address-default-badge">Default</span>
-                                            )}
-                                        </div>
-                                        <div className="address-card-body">
-                                            <div>{address.street?.join(', ')}</div>
-                                            <div>{address.city}, {address.region?.region || ''} {address.postcode}</div>
-                                            <div>{address.country_code}</div>
-                                            {address.telephone && <div>Tel: {address.telephone}</div>}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                        <button
-                            type="button"
-                            className="co-address-card co-address-card--add"
-                            onClick={onNewAddress}
-                        >
-                            <span className="co-address-card-plus" aria-hidden="true">+</span>
-                            <span className="co-address-card-add-label">Add new address</span>
-                        </button>
-                    </div>
+                <div className="address-selector mb-[22px]">
+                    <CheckoutAddressCards
+                        addresses={customerAddresses}
+                        selectedId={selectedAddressId}
+                        onSelect={onAddressSelect}
+                        onNew={onNewAddress}
+                    />
                     <button
                         type="button"
-                        className="btn-primary"
+                        className={`btn-primary ${CO_BTN_CLS}`}
                         onClick={handleAddressSubmit}
                         disabled={loading || !selectedAddressId}
                     >
-                        {loading && <div className="loading-spinner" />}
+                        {loading && <div className={CO_SPINNER_CLS} />}
                         {loading ? 'Saving…' : 'Continue'}
                     </button>
                 </div>
@@ -126,10 +85,10 @@ const ShippingAddressForm = ({
                     {isLoggedIn && showAddressSelector && isEditingAddress && customerAddresses.length > 0 && (
                         <button
                             type="button"
-                            className="co-back-link"
+                            className="co-back-link inline-flex items-center gap-1 border-0 pb-3.5 text-ink-2 text-sm [transition:color_120ms_ease] hover:text-ink"
                             onClick={onBackToSelector}
                         >
-                            ← Use a saved address instead
+                            <ArrowLeftIcon /> Use a saved address instead
                         </button>
                     )}
                     <form onSubmit={handleAddressSubmit} className="form-grid">
@@ -168,32 +127,22 @@ const ShippingAddressForm = ({
                             idPrefix="shipping"
                         />
 
-                        <BillingAddressForm
-                            billingAddress={billingAddress}
-                            setBillingAddress={setBillingAddress}
-                            useSameAsShipping={useSameAsShipping}
-                            setUseSameAsShipping={setUseSameAsShipping}
-                            errors={errors}
-                            usStates={usStates}
-                            countries={countries}
-                            optionalZipCountries={optionalZipCountries}
-                        />
-
                         {/* Save-to-book opt-in. Only logged-in users have an
                             address book to save into; guests don't see this. */}
                         {isLoggedIn && (
-                            <label className="co-checkbox">
+                            <label className="co-checkbox inline-flex items-center gap-2.5 cursor-pointer select-none text-base text-ink">
                                 <input
                                     type="checkbox"
+                                    className="w-4 h-4 m-0 accent-ink cursor-pointer"
                                     checked={!!saveAddressToBook}
                                     onChange={(e) => setSaveAddressToBook(e.target.checked)}
                                 />
-                                <span>Save this address to my address book</span>
+                                <span className="leading-[1.4]">Save this address to my address book</span>
                             </label>
                         )}
 
-                        <button type="submit" disabled={loading} className="btn-primary">
-                            {loading && <div className="loading-spinner" />}
+                        <button type="submit" disabled={loading} className={`btn-primary ${CO_BTN_CLS}`}>
+                            {loading && <div className={CO_SPINNER_CLS} />}
                             {loading ? 'Processing…' : 'Continue'}
                         </button>
                     </form>

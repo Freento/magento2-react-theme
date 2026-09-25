@@ -24,6 +24,9 @@ export function renderBlock(rawBlock, index, parentId, options = {}) {
 
   const isEditing = !!options.onSelect;
   const isGrid = block.component === 'Grid';
+  // A container that lays its children out side by side wants the tail drop
+  // zone beside them, not under them.
+  const isRowParent = block.props?.direction === 'row';
   const gridLinear = isGrid && (block.props?.direction === 'column' || block.props?.direction === 'row');
   const gridCols = isGrid ? Math.max(1, Number(block.props?.columns) || 1) : null;
   const childOptions = {

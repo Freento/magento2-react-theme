@@ -34,6 +34,10 @@ const useFilters = (categoryId, enabledLayerNavigation = true) => {
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   }, [navigate, location.pathname, currentSort, categoryId, urlParams]);
 
+  const applyFilters = useCallback((newFilters) => {
+    updateFilters(newFilters);
+  }, [updateFilters]);
+
   const addFilter = useCallback((attribute, value) => {
     updateFilters(addFilterValue(activeFilters, attribute, value));
   }, [activeFilters, updateFilters]);
@@ -86,6 +90,7 @@ const useFilters = (categoryId, enabledLayerNavigation = true) => {
     enabledLayerNavigation,
     addFilter,
     removeFilter,
+    applyFilters,
     clearAllFilters,
     setSort,
     setPage,

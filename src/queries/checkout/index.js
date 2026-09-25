@@ -1,5 +1,4 @@
 export { APPLY_COUPON_TO_CART } from './applyCouponToCart';
-export { APPLY_GIFT_CARD_TO_CART } from './applyGiftCardToCart';
 export { CREATE_PAYPAL_EXPRESS_TOKEN } from './createPaypalExpressToken';
 export { GET_AUTHNET_HOSTED_PAYMENT_PARAMS } from './getAuthnetHostedPaymentParams';
 export { GET_AVAILABLE_PAYMENT_METHODS } from './getAvailablePaymentMethods';
@@ -8,7 +7,6 @@ export { GET_COUNTRIES } from './getCountries';
 export { GET_TOKENBASE_CHECKOUT_CONFIG } from './getTokenbaseCheckoutConfig';
 export { PLACE_ORDER } from './placeOrder';
 export { REMOVE_COUPON_FROM_CART } from './removeCouponFromCart';
-export { REMOVE_GIFT_CARD_FROM_CART } from './removeGiftCardFromCart';
 export { SET_BILLING_ADDRESS } from './setBillingAddress';
 export { SET_PAYMENT_METHOD } from './setPaymentMethod';
 export { SET_PAYMENT_METHOD_AND_PLACE_ORDER } from './setPaymentMethodAndPlaceOrder';

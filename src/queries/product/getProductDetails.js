@@ -72,6 +72,7 @@ export const GET_PRODUCT_DETAILS = gql`
                         use_default
                         attribute_code
                         values {
+                            uid
                             value_index
                             label
                             store_label
@@ -117,6 +118,10 @@ export const GET_PRODUCT_DETAILS = gql`
                     }
                 }
             }
+        }
+
+        storeConfig {
+            allow_guests_to_write_product_reviews
         }
     }
 `;

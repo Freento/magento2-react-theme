@@ -1,6 +1,10 @@
 import { gql } from '@apollo/client';
+import { CART_SHIPPING_ADDRESS_FIELDS } from '../cart/cartShippingAddressFields';
+import { CHECKOUT_CART_PRICES } from './cartPricesFragment';
 
 export const SET_SHIPPING_METHOD = gql`
+  ${CART_SHIPPING_ADDRESS_FIELDS}
+  ${CHECKOUT_CART_PRICES}
   mutation setShippingMethodOnCart($cartId: String!, $carrierCode: String!, $methodCode: String!) {
     setShippingMethodsOnCart(input: {
       cart_id: $cartId
@@ -12,26 +16,10 @@ export const SET_SHIPPING_METHOD = gql`
       cart {
         id
         shipping_addresses {
-          selected_shipping_method {
-            carrier_code
-            carrier_title
-            method_code
-            method_title
-            amount {
-              currency
-              value
-            }
-          }
+          ...CartShippingAddressFields
         }
         prices {
-          grand_total {
-            currency
-            value
-          }
-          subtotal_excluding_tax {
-            currency
-            value
-          }
+          ...CheckoutCartPrices
         }
       }
     }

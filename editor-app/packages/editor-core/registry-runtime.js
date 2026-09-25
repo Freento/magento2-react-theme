@@ -1,5 +1,6 @@
 const registryRuntime = {
   Grid: { acceptsChildren: true },
+  Box: { acceptsChildren: true },
   Heading: { acceptsChildren: false },
   Text: { acceptsChildren: false },
   Image: { acceptsChildren: false },
@@ -9,6 +10,7 @@ const registryRuntime = {
   ProductsCarousel: { acceptsChildren: false },
   HeroSlider: { acceptsChildren: false },
   Icon: { acceptsChildren: false },
+  ContactForm: { acceptsChildren: false },
 };
 
 export default registryRuntime;

@@ -1,0 +1,12 @@
+services:
+  react-app:
+    image: node:22-alpine
+    working_dir: /app
+    ports:
+      - "${HOST_PORT:-8250}:${CONTAINER_PORT:-3000}"
+    volumes:
+      - .:/app
+    command: sh -c "npm ci && npm run build && node ./server.prod.js "
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

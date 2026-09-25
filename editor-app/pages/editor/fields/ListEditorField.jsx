@@ -14,7 +14,7 @@ export function ListEditorField({
                                 }) {
     const key = propKey;
     return (
-        <div className="list-editor">
+        <div className="flex flex-col gap-1">
             {(selectedBlock.props[key] || []).map((item, itemIdx) => {
                 const accKey = `${key}-${itemIdx}`;
                 const isOpen = openAccordion === accKey;
@@ -25,7 +25,7 @@ export function ListEditorField({
                 return (
                     <div
                         key={itemIdx}
-                        className={`list-item${isOpen ? ' open' : ''}${isDragSource ? ' dragging' : ''}${isDragOver ? ' drag-over' : ''}`}
+                        className={`list-item bg-e-surface border border-e-border rounded-e transition-colors duration-100 [&.open]:border-e-primary-border [&.dragging]:opacity-40 [&.drag-over]:shadow-[inset_0_2px_0_0_#0F4C5C]${isOpen ? ' open' : ''}${isDragSource ? ' dragging' : ''}${isDragOver ? ' drag-over' : ''}`}
                         draggable
                         onDragStart={(e) => {
                             e.stopPropagation();
@@ -59,16 +59,16 @@ export function ListEditorField({
                         }}
                         onDragEnd={() => setListDrag({key: null, fromIdx: null, overIdx: null})}
                     >
-                        <div className="list-item-header"
+                        <div className="list-item-header flex justify-between items-center px-2.5 py-1.5 bg-e-surface-alt rounded-t-[4px] cursor-pointer select-none transition-colors duration-100 min-h-[32px] hover:bg-e-surface-hover"
                              onClick={() => setOpenAccordion(isOpen ? null : accKey)}>
-                            <div className="list-item-title">
-                                    <span className="list-item-grip">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                    <span className="list-item-grip inline-flex items-center justify-center text-e-text-soft shrink-0 cursor-grab transition-colors duration-100">
                                       <UI.GripVertical size={14} strokeWidth={1.75}/>
                                     </span>
-                                <span className="list-item-preview">{preview}</span>
+                                <span className="text-[12px] font-medium text-e-text truncate">{preview}</span>
                             </div>
-                            <div className="list-item-actions" onClick={(e) => e.stopPropagation()}>
-                                <button className="btn-icon danger" onClick={() => {
+                            <div className="flex gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                                <button className="btn-icon danger w-6 h-6 inline-flex items-center justify-center border-0 bg-transparent text-e-text-soft rounded-e-sm cursor-pointer transition-all duration-100 hover:bg-e-surface-hover hover:text-e-text [&.danger]:hover:bg-e-danger-soft [&.danger]:hover:text-e-danger" onClick={() => {
                                     const arr = selectedBlock.props[key].filter((_, i) => i !== itemIdx);
                                     updateBlockProp(selectedBlock.id, key, arr);
                                     if (isOpen) setOpenAccordion(null);
@@ -76,7 +76,7 @@ export function ListEditorField({
                             </div>
                         </div>
                         {isOpen && (
-                            <div className="list-item-body">
+                            <div className="p-2.5 flex flex-col gap-2.5 border-t border-e-border bg-e-surface rounded-b-[4px]">
                                 {Object.entries(schema.itemSchema).map(([field, fieldDef]) => {
                                     const fieldLabel = typeof fieldDef === 'object' ? fieldDef.label : field;
                                     const fieldType = typeof fieldDef === 'object' ? fieldDef.type : 'text';

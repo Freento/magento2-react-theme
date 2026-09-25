@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useBreadcrumb } from '../../context/BreadcrumbContext';
-import '../../styles/layout/Breadcrumbs.less';
 
 // Clear runs pre-paint on the client (no stale-crumb flash) but must not warn
 // during SSR, where layout effects don't run — fall back to useEffect there.
@@ -29,12 +28,12 @@ export default function Breadcrumbs() {
   if (!Array.isArray(breadcrumbs) || breadcrumbs.length === 0) return null;
 
   return (
-    <nav className="breadcrumbs" aria-label="Breadcrumb">
-      <ol className="breadcrumb-list">
+    <nav className="breadcrumbs py-4 max768:py-3 bg-transparent text-sm text-ink-2" aria-label="Breadcrumb">
+      <ol className="breadcrumb-list list-none flex flex-wrap items-center mx-auto px-gutter max-w-container gap-0">
         {breadcrumbs.map((crumb, i) => {
           const isLast = i === breadcrumbs.length - 1;
           return (
-            <li key={`${crumb.path || crumb.label}-${i}`} className="breadcrumb-item">
+            <li key={`${crumb.path || crumb.label}-${i}`} className="breadcrumb-item flex items-center text-sm">
               {crumb.path && !isLast ? (
                 // In node URL-resolve mode the client can't resolve a catalog URL
                 // on its own — it needs the entity handed to it via router state,
@@ -42,6 +41,7 @@ export default function Breadcrumbs() {
                 // renders NotFound (only a reload, resolved server-side, works).
                 <Link
                   to={crumb.path}
+                  className="text-ink-2 no-underline transition-colors duration-fast ease-[ease] hover:text-ink"
                   state={crumb.categoryId != null
                     ? { resolved: { type: 'category', id: Number(crumb.categoryId), path: crumb.path.replace(/^\/+/, '') } }
                     : undefined}
@@ -49,11 +49,11 @@ export default function Breadcrumbs() {
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="breadcrumb-current" aria-current={isLast ? 'page' : undefined}>
+                <span className="breadcrumb-current text-ink font-medium" aria-current={isLast ? 'page' : undefined}>
                   {crumb.label}
                 </span>
               )}
-              {!isLast && <span className="breadcrumb-separator" aria-hidden="true">/</span>}
+              {!isLast && <span className="breadcrumb-separator mx-2 max768:mx-1.5 text-ink-2 select-none" aria-hidden="true">/</span>}
             </li>
           );
         })}
