@@ -14,15 +14,24 @@ export default function useAddToCart(product, isConfigurable, selectedVariant, s
     const qty = Number(editContext?.quantity);
     return qty > 0 ? Math.min(qty, 9999) : 1;
   });
-  const [addToCartError, setAddToCartError] = useState('');
+  const [quantityInput, setQuantityInput] = useState(() => String(quantity));
+  const setBoth = (n) => { setQuantity(n); setQuantityInput(String(n)); };
   const [cartUpdating, setCartUpdating] = useState(false);
 
   const handleQuantityChange = (value) => {
-    const numValue = parseInt(value);
-    if (numValue > 0 && numValue <= 9999) setQuantity(numValue);
+    if (value === '') { setQuantityInput(''); return; }
+    if (!/^\d+$/.test(value)) return;
+    const numValue = parseInt(value, 10);
+    if (numValue > 9999) return;
+    setQuantityInput(value);
+    if (numValue > 0) setQuantity(numValue);
   };
-  const incrementQuantity = () => { if (quantity < 9999) setQuantity(quantity + 1); };
-  const decrementQuantity = () => { if (quantity > 1) setQuantity(quantity - 1); };
+  const commitQuantity = () => {
+    const numValue = parseInt(quantityInput, 10);
+    setBoth(Number.isFinite(numValue) && numValue > 0 ? Math.min(numValue, 9999) : 1);
+  };
+  const incrementQuantity = () => { if (quantity < 9999) setBoth(quantity + 1); };
+  const decrementQuantity = () => { if (quantity > 1) setBoth(quantity - 1); };
 
   const canAddToCart = () => {
     if (!isConfigurable) return true;
@@ -37,16 +46,11 @@ export default function useAddToCart(product, isConfigurable, selectedVariant, s
   // Adds the current configuration to the cart. Returns true on success.
   const addCurrentToCart = async ({ openMiniCart = true } = {}) => {
     if (!canAddToCart()) return false;
-    setAddToCartError('');
-    if (isConfigurable && !selectedVariant) {
-      setAddToCartError('That combination is not available — try a different colour or size.');
-      return false;
-    }
+    if (isConfigurable && !selectedVariant) return false;
     try {
       await addToCart(product.sku, quantity, currentOptionUids(), { openMiniCart });
       return true;
-    } catch (err) {
-      setAddToCartError(err?.message || 'Could not add to bag — please try again.');
+    } catch {
       return false;
     }
   };
@@ -60,14 +64,11 @@ export default function useAddToCart(product, isConfigurable, selectedVariant, s
   // line, because updateCartItems cannot change a configurable's options.
   const handleUpdateCart = async () => {
     if (!editContext || !canAddToCart()) return false;
-    setAddToCartError('');
     setCartUpdating(true);
     try {
       if (sameUidSet(currentOptionUids(), editContext.valueUids || [])) {
         if (quantity === editContext.quantity) return true;
-        const ok = await updateQuantity(editContext.itemId, quantity);
-        if (!ok) setAddToCartError('Could not update the cart — please try again.');
-        return ok;
+        return updateQuantity(editContext.itemId, quantity);
       }
       if (!await addCurrentToCart({ openMiniCart: false })) return false;
       await removeItem(editContext.itemId, { silent: true });
@@ -80,6 +81,8 @@ export default function useAddToCart(product, isConfigurable, selectedVariant, s
 
   return {
     quantity,
+    quantityInput,
+    commitQuantity,
     handleQuantityChange,
     incrementQuantity,
     decrementQuantity,
@@ -89,6 +92,5 @@ export default function useAddToCart(product, isConfigurable, selectedVariant, s
     handleUpdateCart,
     cartUpdating,
     cartLoading,
-    addToCartError,
   };
 }

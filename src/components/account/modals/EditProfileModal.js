@@ -1,4 +1,5 @@
 import React from 'react';
+import useBackToClose from '../../../hooks/useBackToClose';
 
 const EditProfileModal = ({
   open,
@@ -9,6 +10,7 @@ const EditProfileModal = ({
   onToggleEmailEditable,
   onSave,
 }) => {
+  useBackToClose('profileModal', open, onCancel);
   if (!open) return null;
 
   return (

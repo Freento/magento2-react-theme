@@ -9,81 +9,101 @@
   "areas": {
     "category-top": [
       {
-        "id": "promo-gear-main",
-        "component": "Box",
+        "id": "promo-gear-main-grid",
+        "component": "Grid",
         "props": {
-          "direction": "column",
-          "gap": 8,
-          "alignX": "stretch",
-          "alignY": "end"
+          "columns": 1,
+          "rows": 1,
+          "rowGap": 0,
+          "columnGap": 0,
+          "customCss": "",
+          "backgroundImage": ""
         },
         "style": {
-          "padding": "32px",
-          "borderRadius": "8px",
-          "height": "420px",
-          "backgroundImage": "/uploads/promo-gear-main.avif",
-          "backgroundSize": "cover",
-          "backgroundPosition": "center center",
-          "backgroundOverlay": 0.35,
-          "link": "/gear.html",
           "marginBottom": 16
         },
         "children": [
           {
-            "id": "promo-gear-main-title",
-            "component": "Heading",
+            "id": "promo-gear-main",
+            "component": "Column",
             "props": {
-              "text": "Sprite Yoga Companion Kit",
-              "level": 2,
-              "color": "#ffffff",
-              "fontSize": "26px",
-              "fontWeight": "bold"
-            }
-          },
-          {
-            "id": "promo-gear-main-subtitle",
-            "component": "Text",
-            "props": {
-              "text": "Save up to 20% on a bundle!",
-              "fontSize": 15,
-              "lineHeight": 1.4,
-              "color": "#f0f0f0"
-            }
-          },
-          {
-            "id": "promo-gear-main-cta",
-            "component": "Text",
-            "props": {
-              "text": "Shop Yoga Kit",
-              "fontSize": 14,
-              "fontWeight": 500,
-              "color": "#1a1a1a",
-              "textAlign": "center"
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end",
+              "flex": 1
             },
             "style": {
-              "backgroundColor": "#ffffff",
-              "padding": "10px 22px",
-              "borderRadius": "4px",
-              "width": "fit-content",
-              "marginTop": "8px"
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "420px",
+              "backgroundImage": "/uploads/promo-gear-main.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "/gear.html",
+              "colStart": 1,
+              "rowStart": 1
+            },
+            "children": [
+              {
+                "id": "promo-gear-main-title",
+                "component": "Text",
+                "props": {
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold",
+                  "html": "Sprite Yoga Companion Kit"
+                }
+              },
+              {
+                "id": "promo-gear-main-subtitle",
+                "component": "Text",
+                "props": {
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0",
+                  "html": "Save up to 20% on a bundle!",
+                  "level": "p"
+                }
+              },
+              {
+                "id": "promo-gear-main-cta",
+                "component": "Text",
+                "props": {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "color": "#1a1a1a",
+                  "textAlign": "center",
+                  "html": "Shop Yoga Kit",
+                  "level": "p"
+                },
+                "style": {
+                  "backgroundColor": "#ffffff",
+                  "padding": "10px 22px",
+                  "borderRadius": "4px",
+                  "width": "fit-content",
+                  "marginTop": "8px"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "300px"
+                }
+              }
             }
           }
-        ],
-        "responsive": {
-          "mobile": {
-            "style": {
-              "height": "300px"
-            }
-          }
-        }
+        ]
       },
       {
         "id": "promo-row-1",
         "component": "Grid",
         "props": {
-          "direction": "grid",
           "columns": 2,
-          "rows": 0,
+          "rows": 1,
           "rowGap": 16,
           "columnGap": 16,
           "alignItems": "stretch",
@@ -92,7 +112,8 @@
         "responsive": {
           "mobile": {
             "props": {
-              "columns": 1
+              "columns": 1,
+              "rows": 2
             }
           }
         },
@@ -102,12 +123,13 @@
         "children": [
           {
             "id": "promo-gear-fitnes",
-            "component": "Box",
+            "component": "Column",
             "props": {
               "direction": "column",
               "gap": 8,
               "alignX": "stretch",
-              "alignY": "end"
+              "alignY": "end",
+              "flex": 1
             },
             "style": {
               "padding": "32px",
@@ -122,34 +144,36 @@
             "children": [
               {
                 "id": "promo-gear-fitnes-title",
-                "component": "Heading",
+                "component": "Text",
                 "props": {
-                  "text": "Loosen Up",
                   "level": 2,
                   "color": "#ffffff",
                   "fontSize": "26px",
-                  "fontWeight": "bold"
+                  "fontWeight": "bold",
+                  "html": "Loosen Up"
                 }
               },
               {
                 "id": "promo-gear-fitnes-subtitle",
                 "component": "Text",
                 "props": {
-                  "text": "Extend your training with yoga straps, tone bands, and jump ropes",
                   "fontSize": 15,
                   "lineHeight": 1.4,
-                  "color": "#f0f0f0"
+                  "color": "#f0f0f0",
+                  "html": "Extend your training with yoga straps, tone bands, and jump ropes",
+                  "level": "p"
                 }
               },
               {
                 "id": "promo-gear-fitnes-cta",
                 "component": "Text",
                 "props": {
-                  "text": "Shop Fitness",
                   "fontSize": 14,
                   "fontWeight": 500,
                   "color": "#1a1a1a",
-                  "textAlign": "center"
+                  "textAlign": "center",
+                  "html": "Shop Fitness",
+                  "level": "p"
                 },
                 "style": {
                   "backgroundColor": "#ffffff",
@@ -170,12 +194,13 @@
           },
           {
             "id": "promo-gear-equipment",
-            "component": "Box",
+            "component": "Column",
             "props": {
               "direction": "column",
               "gap": 8,
               "alignX": "stretch",
-              "alignY": "end"
+              "alignY": "end",
+              "flex": 1
             },
             "style": {
               "padding": "32px",
@@ -190,23 +215,24 @@
             "children": [
               {
                 "id": "promo-gear-equipment-title",
-                "component": "Heading",
+                "component": "Text",
                 "props": {
-                  "text": "Here’s to you!",
                   "level": 2,
                   "color": "#ffffff",
                   "fontSize": "26px",
-                  "fontWeight": "bold"
+                  "fontWeight": "bold",
+                  "html": "Here’s to you!"
                 }
               },
               {
                 "id": "promo-gear-equipment-subtitle",
                 "component": "Text",
                 "props": {
-                  "text": "$4 Luma water bottle (save 70%)",
                   "fontSize": 15,
                   "lineHeight": 1.4,
-                  "color": "#f0f0f0"
+                  "color": "#f0f0f0",
+                  "html": "$4 Luma water bottle (save 70%)",
+                  "level": "p"
                 }
               }
             ],
@@ -224,9 +250,8 @@
         "id": "promo-row-2",
         "component": "Grid",
         "props": {
-          "direction": "grid",
           "columns": 3,
-          "rows": 0,
+          "rows": 1,
           "rowGap": 16,
           "columnGap": 16,
           "alignItems": "stretch",
@@ -235,7 +260,8 @@
         "responsive": {
           "mobile": {
             "props": {
-              "columns": 1
+              "columns": 1,
+              "rows": 3
             }
           }
         },
@@ -245,12 +271,13 @@
         "children": [
           {
             "id": "promo-gear-category-bags",
-            "component": "Box",
+            "component": "Column",
             "props": {
               "direction": "column",
               "gap": 10,
               "alignX": "stretch",
-              "alignY": "start"
+              "alignY": "start",
+              "flex": 1
             },
             "style": {
               "backgroundColor": "#f2f0ed",
@@ -281,34 +308,36 @@
               },
               {
                 "id": "promo-gear-category-bags-title",
-                "component": "Heading",
+                "component": "Text",
                 "props": {
-                  "text": "Tote, cart or carry",
                   "level": 3,
                   "color": "#1a1a1a",
                   "fontSize": "20px",
-                  "fontWeight": "bold"
+                  "fontWeight": "bold",
+                  "html": "Tote, cart or carry"
                 }
               },
               {
                 "id": "promo-gear-category-bags-subtitle",
                 "component": "Text",
                 "props": {
-                  "text": "Luma bags go the distance",
                   "fontSize": 15,
                   "lineHeight": 1.4,
-                  "color": "#4a4a4a"
+                  "color": "#4a4a4a",
+                  "html": "Luma bags go the distance",
+                  "level": "p"
                 }
               },
               {
                 "id": "promo-gear-category-bags-cta",
                 "component": "Text",
                 "props": {
-                  "text": "Shop Bags",
                   "fontSize": 14,
                   "fontWeight": 500,
                   "color": "#ffffff",
-                  "textAlign": "center"
+                  "textAlign": "center",
+                  "html": "Shop Bags",
+                  "level": "p"
                 },
                 "style": {
                   "backgroundColor": "#1a1a1a",
@@ -322,12 +351,13 @@
           },
           {
             "id": "promo-gear-category-equipment",
-            "component": "Box",
+            "component": "Column",
             "props": {
               "direction": "column",
               "gap": 10,
               "alignX": "stretch",
-              "alignY": "start"
+              "alignY": "start",
+              "flex": 1
             },
             "style": {
               "backgroundColor": "#f2f0ed",
@@ -358,34 +388,36 @@
               },
               {
                 "id": "promo-gear-category-equipment-title",
-                "component": "Heading",
+                "component": "Text",
                 "props": {
-                  "text": "Let’s get after it!",
                   "level": 3,
                   "color": "#1a1a1a",
                   "fontSize": "20px",
-                  "fontWeight": "bold"
+                  "fontWeight": "bold",
+                  "html": "Let’s get after it!"
                 }
               },
               {
                 "id": "promo-gear-category-equipment-subtitle",
                 "component": "Text",
                 "props": {
-                  "text": "Luma gym equipment fits your goals and style",
                   "fontSize": 15,
                   "lineHeight": 1.4,
-                  "color": "#4a4a4a"
+                  "color": "#4a4a4a",
+                  "html": "Luma gym equipment fits your goals and style",
+                  "level": "p"
                 }
               },
               {
                 "id": "promo-gear-category-equipment-cta",
                 "component": "Text",
                 "props": {
-                  "text": "Shop Equipment",
                   "fontSize": 14,
                   "fontWeight": 500,
                   "color": "#ffffff",
-                  "textAlign": "center"
+                  "textAlign": "center",
+                  "html": "Shop Equipment",
+                  "level": "p"
                 },
                 "style": {
                   "backgroundColor": "#1a1a1a",
@@ -399,12 +431,13 @@
           },
           {
             "id": "promo-gear-category-watches",
-            "component": "Box",
+            "component": "Column",
             "props": {
               "direction": "column",
               "gap": 10,
               "alignX": "stretch",
-              "alignY": "start"
+              "alignY": "start",
+              "flex": 1
             },
             "style": {
               "backgroundColor": "#f2f0ed",
@@ -435,34 +468,36 @@
               },
               {
                 "id": "promo-gear-category-watches-title",
-                "component": "Heading",
+                "component": "Text",
                 "props": {
-                  "text": "Luma watches",
                   "level": 3,
                   "color": "#1a1a1a",
                   "fontSize": "20px",
-                  "fontWeight": "bold"
+                  "fontWeight": "bold",
+                  "html": "Luma watches"
                 }
               },
               {
                 "id": "promo-gear-category-watches-subtitle",
                 "component": "Text",
                 "props": {
-                  "text": "Keeping pace has never been more stylish",
                   "fontSize": 15,
                   "lineHeight": 1.4,
-                  "color": "#4a4a4a"
+                  "color": "#4a4a4a",
+                  "html": "Keeping pace has never been more stylish",
+                  "level": "p"
                 }
               },
               {
                 "id": "promo-gear-category-watches-cta",
                 "component": "Text",
                 "props": {
-                  "text": "Shop Watches",
                   "fontSize": 14,
                   "fontWeight": 500,
                   "color": "#ffffff",
-                  "textAlign": "center"
+                  "textAlign": "center",
+                  "html": "Shop Watches",
+                  "level": "p"
                 },
                 "style": {
                   "backgroundColor": "#1a1a1a",
@@ -478,11 +513,12 @@
       },
       {
         "id": "gear-products",
-        "component": "ProductsCarousel",
+        "component": "ProductsList",
         "props": {
           "title": "Hot Sellers",
-          "eyebrow": "",
-          "skus": [
+          "dataSource": "products",
+          "categoryId": "",
+          "products": [
             {
               "sku": "24-MB02"
             },
@@ -496,9 +532,10 @@
               "sku": "24-WG080"
             }
           ],
-          "pageSize": 4,
-          "itemsPerSlide": 4,
-          "source": "skus"
+          "randomize": false,
+          "appearance": "carousel",
+          "productsCount": 4,
+          "columns": 4
         },
         "style": {
           "width": "100%",

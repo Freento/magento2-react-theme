@@ -6,11 +6,18 @@
   "exports": {
     "./renderer": "./renderer.jsx",
     "./registry": "./registry.js",
-    "./routes": "./routes.js",
     "./blocks": "./blocks/index.jsx",
     "./blocks/*": "./blocks/*",
     "./inline-edit-style": "./inline-edit-style.js",
-    "./link-context": "./link-context.js"
+    "./link-context": "./link-context.js",
+    "./routes": "./routes.js",
+    "./content-url": "./lib/contentUrl.js",
+    "./lib/richText": "./lib/richText.js",
+    "./lib/safeHtml": "./lib/safeHtml.js",
+    "./lib/linkTargets": "./lib/linkTargets.js",
+    "./components/LinkSuggest": "./components/LinkSuggest.jsx",
+    "./lib/customCss": "./lib/customCss.js",
+    "./lib/blockClipboard": "./lib/blockClipboard.js"
   },
   "peerDependencies": {
     "react": "^18.2.0"

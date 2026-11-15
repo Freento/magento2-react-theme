@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import ProductCard from './ProductCard';
+import { ProductCardSkeleton } from './CategorySkeleton';
 import Pagination from '../ui/Pagination';
 import LayerNavigation from './LayerNavigation';
 import { GET_AGGREGATIONS } from '../../queries/category';
 import { addFilterValue, removeFilterValue, countFilterValues, clearFilterValues } from '../../hooks/filters/filterUrl';
+import useBackToClose from '../../hooks/useBackToClose';
 const FilterIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <line x1="4" y1="6" x2="20" y2="6" />
@@ -68,6 +70,7 @@ const ProductList = ({
   onSetPriceRange,
   categoryId,
   searchTerm = null,
+  productsPending = false,
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hasOpenedDrawer, setHasOpenedDrawer] = useState(false);
@@ -85,9 +88,10 @@ const ProductList = ({
   const pendingPrice = (from, to) => setPendingFilters((f) => ({ ...f, price: { from, to } }));
   const pendingClear = () => setPendingFilters((f) => clearFilterValues(f));
   const hasPendingFilters = countFilterValues(pendingFilters) > 0;
+  const closeDrawerThen = useBackToClose('filters', drawerOpen, () => setDrawerOpen(false), () => setDrawerOpen(true));
   const applyPending = () => {
-    if (onApplyFilters) onApplyFilters(pendingFilters);
-    setDrawerOpen(false);
+    const filters = pendingFilters;
+    closeDrawerThen(() => { if (onApplyFilters) onApplyFilters(filters); });
   };
   const plpDrawerRef = useRef(null);
   const aggVariables = useMemo(() => {
@@ -200,9 +204,11 @@ const ProductList = ({
       </div>
 
       <div className="product-grid grid grid-cols-4 max900:grid-cols-2 gap-y-[clamp(16px,2vw,32px)] gap-x-[clamp(12px,1.6vw,24px)] mt-[clamp(20px,3vw,32px)]">
-        {products.map((product, index) => (
-          <ProductCard key={product.id} product={product} priority={index < 4} />
-        ))}
+        {productsPending
+          ? Array.from({ length: products.length || pageInfo?.page_size || 12 }).map((_, i) => <ProductCardSkeleton key={i} />)
+          : products.map((product, index) => (
+            <ProductCard key={product.id} product={product} priority={index < 4} highPriority={index === 0} deferSrc={index > 0} titleTag="h2" />
+          ))}
       </div>
 
       {totalCount === 0 && (

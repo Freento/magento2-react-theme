@@ -17,17 +17,18 @@ export const useBreadcrumb = () => {
 // Breadcrumbs component on route change, so the bar "waits for data" and never
 // flashes the previous page's crumbs.
 export const useSyncBreadcrumbs = (crumbs) => {
-  const { updateBreadcrumbs } = useBreadcrumb();
+  const { updateBreadcrumbs, ssrStore } = useBreadcrumb();
   const hasCrumbs = Array.isArray(crumbs) && crumbs.length > 0;
   // Re-run on content change, not identity (call sites build a fresh array each render).
   const key = hasCrumbs ? JSON.stringify(crumbs) : null;
+  if (ssrStore && key) ssrStore.crumbs = JSON.parse(key);
   useEffect(() => {
     if (key) updateBreadcrumbs(JSON.parse(key));
   }, [key, updateBreadcrumbs]);
 };
 
-export const BreadcrumbProvider = ({ children }) => {
-  const [breadcrumbs, setBreadcrumbs] = useState([]);
+export const BreadcrumbProvider = ({ children, initialBreadcrumbs = [], ssrStore = null }) => {
+  const [breadcrumbs, setBreadcrumbs] = useState(initialBreadcrumbs);
 
   const updateBreadcrumbs = useCallback((crumbs) => {
     setBreadcrumbs((prev) => {
@@ -41,7 +42,7 @@ export const BreadcrumbProvider = ({ children }) => {
   }, []);
 
   return (
-    <BreadcrumbContext.Provider value={{ breadcrumbs, updateBreadcrumbs }}>
+    <BreadcrumbContext.Provider value={{ breadcrumbs: ssrStore?.crumbs || breadcrumbs, updateBreadcrumbs, ssrStore }}>
       {children}
     </BreadcrumbContext.Provider>
   );

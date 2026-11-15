@@ -20,6 +20,28 @@ const buildHostedFieldStyles = () => ({
   '.valid':   { color: readVar('--ink', '#111111') },
 });
 
+// braintree-web's framebus teardown() flags the bus destroyed before calling off(),
+// which then returns early, so every listener stays in framebus' global table and
+// keeps the bus, and the field iframes it targets, alive: four leaked iframes each
+// time the card form was shown. Unsubscribe them while off() still works. These
+// are private fields of the SDK; if they change this does nothing and the leak is
+// back, nothing breaks.
+const releaseBus = (hostedFields) => {
+  const bus = hostedFields?._bus;
+  if (!bus || bus.isDestroyed || !Array.isArray(bus.listeners)) return;
+  // listeners keep the channel-prefixed name and off() prefixes it again.
+  const prefix = bus.channel ? `${bus.channel}:` : '';
+  bus.listeners.slice().forEach((l) => {
+    const name = l.eventName.startsWith(prefix) ? l.eventName.slice(prefix.length) : l.eventName;
+    bus.off(name, bus.verifyDomain ? l.originalHandler : l.handler);
+  });
+};
+
+const teardownHostedFields = (hostedFields) => {
+  try { releaseBus(hostedFields); } catch {}
+  try { hostedFields.teardown(); } catch {}
+};
+
 export default function BraintreeHostedFields({ onReady, onError }) {
   const createClientToken = useBraintreeClientToken();
   const [phase, setPhase] = useState('init');
@@ -67,7 +89,7 @@ export default function BraintreeHostedFields({ onReady, onError }) {
         if (cancelled) {
           // Race: parent already unmounted. Tear down immediately so the
           // iframe doesn't linger as a detached DOM node.
-          try { hostedFields.teardown(); } catch {}
+          teardownHostedFields(hostedFields);
           return;
         }
 
@@ -94,9 +116,7 @@ export default function BraintreeHostedFields({ onReady, onError }) {
     return () => {
       cancelled = true;
       if (onReady) onReady(null);
-      if (createdInstance) {
-        try { createdInstance.teardown(); } catch {}
-      }
+      if (createdInstance) teardownHostedFields(createdInstance);
       instanceRef.current = null;
     };
   }, []);

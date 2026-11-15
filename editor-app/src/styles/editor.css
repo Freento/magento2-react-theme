@@ -1,0 +1,291 @@
+/*
+ * Editor chrome — the plain-CSS remainder.
+ * Everything expressible as utilities moved into component classNames; this
+ * file keeps only what utilities can't carry:
+ *  - the .editor-root base (element-level box-sizing / button font reset),
+ *  - rules that target markup the editor doesn't render itself
+ *    (.editor-grid-ghost comes from packages/editor-core, [data-tooltip] is
+ *    also used by editor-core's overlay buttons),
+ *  - vendor pseudo-elements (range thumbs, spinners, scrollbars),
+ *  - the [data-tooltip] ::before/::after tooltip system,
+ *  - keyframes.
+ * Colors are the ed-* tokens from editor-app/tailwind.config.js, inlined.
+ */
+
+.editor-root {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink);
+    background: var(--surface);
+}
+
+.editor-root *,
+.editor-root *::before,
+.editor-root *::after {
+    box-sizing: border-box;
+}
+
+.editor-root button {
+    font-family: inherit;
+}
+
+/* Native select arrow (data-URI background can't ride in a utility cleanly). */
+.editor-root select.field-input {
+    padding-right: 24px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    cursor: pointer;
+}
+
+/* The boolean-field toggle switch (appearance-none checkbox + ::after knob). */
+.editor-root .field-checkbox > input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 28px;
+    height: 16px;
+    margin: 0;
+    border-radius: 999px;
+    background: #B9B9B4;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    flex-shrink: 0;
+}
+
+.editor-root .field-checkbox > input[type="checkbox"]::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform 0.15s;
+}
+
+.editor-root .field-checkbox > input[type="checkbox"]:checked {
+    background: #0f4c5c;
+}
+
+.editor-root .field-checkbox > input[type="checkbox"]:checked::after {
+    transform: translateX(12px);
+}
+
+.editor-root .field-checkbox:hover > input[type="checkbox"]:not(:checked) {
+    background: #9E9E99;
+}
+
+/* Themed range input (vendor thumb pseudo-elements). */
+.editor-root .slider-field input[type="range"] {
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+}
+
+.editor-root .slider-field input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #0f4c5c;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.editor-root .slider-field input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.editor-root .slider-field input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #0f4c5c;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+}
+
+/* Number inputs without native spinners (hook class added in JSX). */
+.editor-root .ed-no-spin::-webkit-outer-spin-button,
+.editor-root .ed-no-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Attribute-driven tooltips — also used by editor-core's overlay buttons. */
+.editor-root [data-tooltip] {
+    position: relative;
+}
+
+.editor-root [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%) translateY(2px);
+    padding: 4px 8px;
+    background: #111111;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.12s 0.2s, transform 0.12s 0.2s;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.editor-root [data-tooltip]::before {
+    content: "";
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #111111;
+    pointer-events: none;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.12s 0.2s;
+    z-index: 1000;
+}
+
+/* The panel's content has a fixed width, so a scrollbar appearing takes room
+   from the right padding rather than from the fields: nothing moves. The
+   scrollbar is thin enough to sit inside that padding. */
+.editor-root .tab-content {
+    scrollbar-width: thin;
+    scrollbar-color: #B9B9B4 transparent;
+}
+.editor-root .tab-content::-webkit-scrollbar {
+    width: 6px;
+}
+.editor-root .tab-content::-webkit-scrollbar-thumb {
+    background: #B9B9B4;
+    border-radius: 3px;
+}
+.editor-root .tab-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* The storefront stylesheet is loaded in this document too (the canvas is not
+   an iframe) and paints a green :focus-visible outline; the editor's own
+   controls use the accent colour, and fields with their own focus ring need
+   no outline on top. */
+.editor-root :focus-visible {
+    outline-color: #0F4C5C;
+}
+.editor-root input:focus-visible,
+.editor-root textarea:focus-visible,
+.editor-root select:focus-visible,
+.editor-root .accordion-trigger:focus:not(:focus-visible) {
+    outline: none;
+}
+.editor-root .accordion-trigger:focus-visible {
+    outline-offset: -2px;
+    border-radius: 4px;
+}
+
+.editor-root [data-tooltip]:hover::after,
+.editor-root [data-tooltip]:focus-visible::after {
+    display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.editor-root [data-tooltip]:hover::before,
+.editor-root [data-tooltip]:focus-visible::before {
+    display: block;
+    opacity: 1;
+}
+
+@starting-style {
+    .editor-root [data-tooltip]:hover::after,
+    .editor-root [data-tooltip]:focus-visible::after {
+        opacity: 0;
+        transform: translateX(-50%) translateY(2px);
+    }
+
+    .editor-root [data-tooltip]:hover::before,
+    .editor-root [data-tooltip]:focus-visible::before {
+        opacity: 0;
+    }
+}
+
+/* Sidebar scrollbars. */
+.editor-root .tab-content::-webkit-scrollbar,
+.editor-root .page-select-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.editor-root .tab-content::-webkit-scrollbar-thumb,
+.editor-root .page-select-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+}
+
+.editor-root .tab-content::-webkit-scrollbar-thumb:hover,
+.editor-root .page-select-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.18);
+    background-clip: padding-box;
+    border: 3px solid transparent;
+}
+
+/* Grid drop ghosts are rendered by editor-core (GridGhosts.jsx) with inline
+   styles for border/background/color/layout; only these bits still come from
+   CSS. (The old hover recolor was dead — inline styles always won.) */
+.editor-root .editor-grid-ghost {
+    font-weight: 300;
+    user-select: none;
+    transition: all 0.12s;
+}
+
+@keyframes editor-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.editor-root .custom-css-shake {
+    animation: custom-css-shake 0.35s ease;
+}
+@keyframes custom-css-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+}
+
+/* Hints are drawn by TooltipLayer, positioned against the viewport so they are
+   never clipped by the panel; the pseudo-element tooltips stay off. */
+.editor-root [data-tooltip]::after,
+.editor-root [data-tooltip]::before {
+    display: none !important;
+}

@@ -17,6 +17,7 @@ export default function NewsletterForm({
     >
       <input
         type="email"
+        name="email"
         placeholder={placeholder}
         disabled
         style={{

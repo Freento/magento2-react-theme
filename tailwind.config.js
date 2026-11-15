@@ -44,8 +44,8 @@ export default {
         warning: '#b45309',
       },
       fontFamily: {
-        sans: ['Inter', 'Inter Fallback', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['Lora', 'Lora Fallback', 'Georgia', 'serif'],
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Lora', 'serif'],
       },
       fontSize: {
         '2xs': 'var(--fs-2xs)',
@@ -122,6 +122,22 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.55' },
         },
+        'slide-from-right': {
+          from: { transform: 'translateX(100%)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'slide-from-left': {
+          from: { transform: 'translateX(-100%)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'slide-to-left': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-100%)' },
+        },
+        'slide-to-right': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(100%)' },
+        },
       },
       animation: {
         spin: 'spin 0.7s linear infinite',
@@ -136,6 +152,10 @@ export default {
         'scrim-quick': 'fade-in 160ms ease',
         'skeleton-pulse': 'pulse-soft 1.4s ease-in-out infinite',
         'search-pulse': 'pulse-soft 1.2s ease-in-out infinite',
+        'gallery-in-next': 'slide-from-right 450ms ease',
+        'gallery-in-prev': 'slide-from-left 450ms ease',
+        'gallery-out-next': 'slide-to-left 450ms ease forwards',
+        'gallery-out-prev': 'slide-to-right 450ms ease forwards',
       },
     },
     /* Descending max-widths: narrower variants are emitted later in the

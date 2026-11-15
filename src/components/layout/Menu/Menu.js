@@ -3,11 +3,13 @@ import MobileMenuDrawer from './MobileMenuDrawer';
 import DesktopMenu from './DesktopMenu';
 import MenuSkeleton from './MenuSkeleton';
 import useMenuData from './hooks/useMenuData';
+import { manualToCategories } from './menuItems';
 
-const Menu = ({ isMobile = false, isOpen = false, onClose = () => {} }) => {
-  const { menuData, loading, error } = useMenuData({ isMobile, isOpen });
+const Menu = ({ isMobile = false, isOpen = false, onClose = () => {}, items = null }) => {
+  const manual = Array.isArray(items) && items.length > 0;
+  const { menuData, loading, error } = useMenuData({ isMobile, isOpen, disabled: manual });
 
-  const mainCategories = (menuData?.categoryList || [])
+  const mainCategories = manual ? manualToCategories(items) : (menuData?.categoryList || [])
     .flatMap((root) => root.children || [])
     .filter((cat) => cat.include_in_menu)
     .sort((a, b) => (a.position || 0) - (b.position || 0));
@@ -23,6 +25,7 @@ const Menu = ({ isMobile = false, isOpen = false, onClose = () => {} }) => {
     );
   }
 
+  if (manual) return <DesktopMenu mainCategories={mainCategories} />;
   if (loading && !menuData) return <MenuSkeleton />;
   if (error || !menuData?.categoryList) return null;
 

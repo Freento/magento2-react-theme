@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLazyQuery } from '@apollo/client';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useCompare } from '../../context/CompareContext';
 import { useAuth } from '../../context/AuthContext';
 import { src } from '../../lib/productImage';
+import { whenFirstImageReady } from '../../lib/firstImageGate';
 import { formatMoney } from '../../lib/money';
 import { findMatchingVariant, isSwatchable } from './ProductDetail/helpers/productVariants';
 import { selectedOptionUids } from '../../lib/configurableOptions';
 import CompareIcon from '../ui/icons/CompareIcon';
+import { GET_CARD_VARIANTS } from '../../queries/catalog/configurableCardFields';
 
-const ProductCard = ({ product, onRemove, priority = false }) => {
+const ProductCard = ({ product, onRemove, priority = false, highPriority = false, deferSrc = false, titleTag: TitleTag = 'h3' }) => {
+  const [imageReleased, setImageReleased] = useState(!deferSrc);
+  useEffect(() => {
+    if (imageReleased) return undefined;
+    let active = true;
+    whenFirstImageReady().then(() => { if (active) setImageReleased(true); });
+    return () => { active = false; };
+  }, [imageReleased]);
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isInWishlist, addToWishlist, removeFromWishlist, getWishlistItemId } = useWishlist();
@@ -20,6 +30,9 @@ const ProductCard = ({ product, onRemove, priority = false }) => {
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
   const [isTogglingCompare, setIsTogglingCompare] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState({});
+  const [loadVariants, { data: variantsData }] = useLazyQuery(GET_CARD_VARIANTS, {
+    fetchPolicy: 'cache-first',
+  });
 
   const ratingSummary = product.rating_summary || 0;
   const reviewCount = product.review_count || 0;
@@ -35,19 +48,24 @@ const ProductCard = ({ product, onRemove, priority = false }) => {
   }};
 
   const configOptions = (isConfigurable && product.configurable_options) || [];
-  const hasOptions = configOptions.length > 0 && (product.variants?.length || 0) > 0;
+  const variants = product.variants || variantsData?.products?.items?.[0]?.variants || [];
+  const variantsLoaded = variants.length > 0;
+  const ensureVariants = () => {
+    if (isConfigurable && !variantsLoaded) loadVariants({ variables: { sku: product.sku } });
+  };
+  const hasOptions = configOptions.length > 0;
   const allSelected = hasOptions && configOptions.every(
     (option) => selectedOptions[option.attribute_code] !== undefined
   );
   const selectedVariant = allSelected
-    ? findMatchingVariant(product.variants, selectedOptions)
+    ? findMatchingVariant(variants, selectedOptions)
     : null;
   const previewVariant = (() => {
     if (!hasOptions) return null;
     if (selectedVariant) return selectedVariant;
     const picked = Object.keys(selectedOptions);
     if (!picked.length) return null;
-    return product.variants.find((variant) =>
+    return variants.find((variant) =>
       variant.attributes
         .filter((attr) => picked.includes(attr.code))
         .every((attr) => Number(attr.value_index) === Number(selectedOptions[attr.code]))
@@ -55,7 +73,7 @@ const ProductCard = ({ product, onRemove, priority = false }) => {
   })();
   const variantOutOfStock = selectedVariant
     ? selectedVariant.product.stock_status !== 'IN_STOCK'
-    : allSelected;
+    : allSelected && variantsLoaded;
   const displayImage = previewVariant?.product?.small_image?.w450
     ? previewVariant.product.small_image
     : product.small_image;
@@ -66,6 +84,7 @@ const ProductCard = ({ product, onRemove, priority = false }) => {
   const displayCurrency = displayPriceObj?.currency;
 
   const toggleOption = (attributeCode, valueIndex) => {
+    ensureVariants();
     setSelectedOptions((prev) => {
       if (Number(prev[attributeCode]) === Number(valueIndex)) {
         const { [attributeCode]: _removed, ...rest } = prev;
@@ -82,7 +101,12 @@ const ProductCard = ({ product, onRemove, priority = false }) => {
       navigate(pdpHref, { state: resolvedState });
       return;
     }
-    if (isConfigurable && (!selectedVariant || variantOutOfStock)) return;
+    let variant = selectedVariant;
+    if (isConfigurable && !variantsLoaded) {
+      const { data } = await loadVariants({ variables: { sku: product.sku } });
+      variant = findMatchingVariant(data?.products?.items?.[0]?.variants || [], selectedOptions);
+    }
+    if (isConfigurable && (!variant || variant.product.stock_status !== 'IN_STOCK')) return;
     setIsAddingToCart(true);
     try {
       await addToCart(
@@ -204,15 +228,18 @@ const ProductCard = ({ product, onRemove, priority = false }) => {
         state={resolvedState}
       >
         <img
-          src={src(displayImage)}
+          src={imageReleased ? src(displayImage) : undefined}
+          data-deferred-src={imageReleased ? undefined : src(displayImage)}
+          data-first-image={highPriority ? '' : undefined}
+          suppressHydrationWarning
           alt={product.name}
           className="product-image w-full h-auto aspect-[4/5] object-cover bg-surface rounded mb-3.5 [transition:transform_200ms_ease] group-hover:scale-[1.04]"
           loading={priority ? 'eager' : 'lazy'}
-          fetchpriority={priority ? 'high' : undefined}
+          fetchpriority={highPriority ? 'high' : undefined}
           decoding="async"
         />
         <div className="product-info">
-          <h3 className="product-title text-base font-medium text-ink mb-[2px] tracking-normal leading-[1.35]">{product.name}</h3>
+          <TitleTag className="product-title text-base font-medium text-ink mb-[2px] tracking-normal leading-[1.35]">{product.name}</TitleTag>
 
           {reviewCount > 0 && (
             <div className="product-rating hidden">
@@ -236,7 +263,7 @@ const ProductCard = ({ product, onRemove, priority = false }) => {
         </div>
       </Link>
       {hasOptions && (
-        <div className="card-options flex flex-col gap-2 mt-2.5">
+        <div className="card-options flex flex-col gap-2 mt-2.5" onPointerEnter={ensureVariants} onFocus={ensureVariants}>
           {configOptions.filter((o) => !isSwatchable(o)).map((option) => (
             <div key={option.id} className="card-sizes flex flex-wrap gap-1.5" role="radiogroup" aria-label={option.label}>
               {option.values.map((v) => (

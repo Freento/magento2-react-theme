@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { src } from '../../../lib/productImage';
+import { MAX_QTY_DIGITS } from '../../../lib/catalog';
+import { customOptionLines } from '../../../lib/cartItemOptions';
+import { productPrefetchAttrs } from '../../../lib/productLink';
 
 const MC_ITEM_LINKISH =
   'bg-transparent border-0 cursor-pointer p-0 text-xs tracking-[0.04em] text-ink-2 underline underline-offset-2 hover:text-ink';
@@ -9,8 +12,8 @@ const MiniCartItem = ({ item, isPending, onUpdateQuantity, onRemove, onNavigate,
   const [qtyDraft, setQtyDraft] = useState(String(item.quantity));
 
   useEffect(() => {
-    setQtyDraft(String(item.quantity));
-  }, [item.quantity]);
+    if (!isPending) setQtyDraft(String(item.quantity));
+  }, [isPending, item.quantity]);
 
   const commitQty = () => {
     const parsed = parseInt(qtyDraft, 10);
@@ -18,12 +21,12 @@ const MiniCartItem = ({ item, isPending, onUpdateQuantity, onRemove, onNavigate,
       setQtyDraft(String(item.quantity));
       return;
     }
-    const next = Math.min(parsed, 9999);
-    setQtyDraft(String(next));
-    if (next !== item.quantity) onUpdateQuantity(item.id, next);
+    setQtyDraft(String(parsed));
+    if (parsed !== item.quantity) onUpdateQuantity(item.id, parsed);
   };
 
   const href = `/${item.product.url_key}${item.product.url_suffix || ''}`;
+  const prefetch = productPrefetchAttrs(item.product);
   const linkState = item.product?.id ? { resolved: {
     type: 'product',
     id: Number(item.product.id),
@@ -48,6 +51,7 @@ const MiniCartItem = ({ item, isPending, onUpdateQuantity, onRemove, onNavigate,
         to={href}
         state={linkState}
         onClick={onNavigate}
+        {...prefetch}
         className="mc-item-img block shrink-0 w-[72px] h-[88px] rounded overflow-hidden bg-surface leading-[0]"
         aria-label={`Open ${item.product.name}`}
       >
@@ -59,13 +63,18 @@ const MiniCartItem = ({ item, isPending, onUpdateQuantity, onRemove, onNavigate,
       </Link>
 
       <div className="mc-item-main flex-1 min-w-0 flex flex-col gap-1">
-        <Link to={href} state={linkState} onClick={onNavigate} className="mc-item-name text-base font-medium text-ink leading-snug no-underline hover:text-ink-2">
+        <Link to={href} state={linkState} onClick={onNavigate} {...prefetch} className="mc-item-name text-base font-medium text-ink leading-snug no-underline hover:text-ink-2">
           {item.product.name}
         </Link>
         <div className="mc-item-sku text-xs tracking-[0.08em] uppercase text-ink-2">SKU {item.configured_variant?.sku || item.product.sku}</div>
         {(item.configurable_options || []).map((opt) => (
           <div key={opt.option_label} className="mc-item-option mt-[2px] text-2xs text-ink-2">
             {opt.option_label}: {opt.value_label}
+          </div>
+        ))}
+        {customOptionLines(item).map((opt) => (
+          <div key={opt.uid} className="mc-item-option mt-[2px] text-2xs text-ink-2 break-words">
+            {opt.label}: {opt.value}
           </div>
         ))}
 
@@ -80,12 +89,14 @@ const MiniCartItem = ({ item, isPending, onUpdateQuantity, onRemove, onNavigate,
             >−</button>
             <input
               type="number"
-              className="w-[34px] h-full border-0 p-0 text-center font-sans text-13 leading-base text-ink bg-transparent [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 focus:outline-none focus:bg-surface disabled:text-ink-2"
+              name={`qty-${item.id}`}
+              autoComplete="off"
+              inputMode="numeric"
+              className="w-11 h-full border-0 p-0 text-center font-sans text-13 leading-base text-ink bg-transparent [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 focus:outline-none focus:bg-surface disabled:text-ink-2"
               value={qtyDraft}
               min="1"
-              max="9999"
               disabled={isPending}
-              onChange={(e) => setQtyDraft(e.target.value)}
+              onChange={(e) => { if (e.target.value.length <= MAX_QTY_DIGITS) setQtyDraft(e.target.value); }}
               onBlur={commitQty}
               onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
               aria-label="Quantity"
@@ -106,6 +117,7 @@ const MiniCartItem = ({ item, isPending, onUpdateQuantity, onRemove, onNavigate,
                 to={href}
                 state={editState}
                 onClick={onNavigate}
+                {...prefetch}
                 className={`mc-edit ${MC_ITEM_LINKISH}`}
                 aria-label={`Edit ${item.product.name}`}
               >

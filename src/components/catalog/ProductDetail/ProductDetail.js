@@ -6,9 +6,12 @@ import ReviewModal from './ReviewModal';
 import ProductGallery from './ProductGallery';
 import ProductOptions from './ProductOptions';
 import ProductReviews from './ProductReviews';
+import RelatedProducts from './RelatedProducts';
 import useProductDetail from './hooks/useProductDetail';
+import { findMatchingVariant } from './helpers/productVariants';
 import { formatMoney } from '../../../lib/money';
 import CompareIcon from '../../ui/icons/CompareIcon';
+import useBackToClose from '../../../hooks/useBackToClose';
 
 const ProductDetail = ({ urlKey: urlKeyProp }) => {
   const location = useLocation();
@@ -20,6 +23,7 @@ const ProductDetail = ({ urlKey: urlKeyProp }) => {
   const { loading, error, product } = pdp;
   const { isInCompare, toggleCompare } = useCompare();
   const [compareBusy, setCompareBusy] = useState(false);
+  useBackToClose('review', pdp.showReviewModal, () => pdp.setShowReviewModal(false), () => pdp.setShowReviewModal(true));
 
   const editStateCleared = useRef(false);
   useEffect(() => {
@@ -50,15 +54,17 @@ const ProductDetail = ({ urlKey: urlKeyProp }) => {
   const {
     eyebrowText, price, regularPrice, discount, inStock,
     isConfigurable, configOptions,
-    swatchOptions, buttonOptions, selectedOptions, handleOptionChange,
+    swatchOptions, buttonOptions, selectedOptions, handleOptionChange, isOptionValueInStock,
     gallery, mainImg, activeImageIdx, setActiveImageIdx, mainImgLoading, setMainImgLoading,
-    quantity, handleQuantityChange, incrementQuantity, decrementQuantity,
-    handleAddToCart, canAddToCart, cartLoading, addToCartError,
+    quantity, quantityInput, commitQuantity, handleQuantityChange, incrementQuantity, decrementQuantity,
+    handleAddToCart, canAddToCart, cartLoading,
     isEdit, handleUpdateCart, cartUpdating,
     handleAddToWishlist, wishlistLoading, wishlistMessage,
     reviews, reviewCount, ratingSummary, showReviewModal, setShowReviewModal, handleWriteReviewClick,
     isAuthenticated, guestReviewsAllowed, openLoginModal, refetch,
   } = pdp;
+
+  const comboUnavailable = isConfigurable && canAddToCart() && !findMatchingVariant(product.variants, selectedOptions);
 
   // In edit mode "Update Cart" replaces the line and returns to the cart.
   const updateCartAndGo = async () => {
@@ -92,6 +98,7 @@ const ProductDetail = ({ urlKey: urlKeyProp }) => {
             buttonOptions={buttonOptions}
             selectedOptions={selectedOptions}
             onOptionChange={handleOptionChange}
+            isValueInStock={isOptionValueInStock}
           />
 
           {wishlistMessage && (
@@ -107,31 +114,36 @@ const ProductDetail = ({ urlKey: urlKeyProp }) => {
             </div>
           )}
 
-          <div className="qty-row flex gap-2.5 items-stretch mt-6 mb-3.5">
+          <div className="qty-row flex flex-wrap gap-2.5 items-stretch mt-6 mb-3.5">
             <div className="qty inline-flex items-center border border-line rounded overflow-hidden h-12 bg-bg">
               <button type="button" aria-label="Decrease" className="w-10 h-full text-[16px] text-ink cursor-pointer [transition:background-color_120ms_ease] hover:enabled:bg-surface disabled:text-ink-2 disabled:cursor-not-allowed" onClick={decrementQuantity} disabled={quantity <= 1}>−</button>
               <input
                 type="number"
-                value={quantity}
+                name="qty"
+                autoComplete="off"
+                inputMode="numeric"
+                value={quantityInput}
                 min="1"
                 max="9999"
                 onChange={(e) => handleQuantityChange(e.target.value)}
+                onBlur={commitQuantity}
                 className="qty-input w-10 text-center border-none [font-family:inherit] text-base bg-transparent text-ink [appearance:textfield] [-moz-appearance:textfield] leading-[normal] focus:outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0"
                 aria-label="Quantity"
               />
               <button type="button" aria-label="Increase" className="w-10 h-full text-[16px] text-ink cursor-pointer [transition:background-color_120ms_ease] hover:enabled:bg-surface disabled:text-ink-2 disabled:cursor-not-allowed" onClick={incrementQuantity} disabled={quantity >= 9999}>+</button>
             </div>
-            <div className="cta-row pdp-col-fill flex gap-2 flex-1">
+            <div className="cta-row pdp-col-fill flex gap-2 flex-1 min-w-[280px]">
               <button
                 type="button"
                 onClick={isEdit ? updateCartAndGo : handleAddToCart}
-                disabled={cartLoading || cartUpdating || !inStock || !canAddToCart()}
-                className="pdp-add-btn flex-1 h-12 inline-flex items-center justify-center min-h-[48px] py-3.5 px-[22px] rounded text-base font-medium tracking-[0.02em] cursor-pointer bg-ink text-bg border border-ink [transition:background-color_200ms_ease,color_200ms_ease,border-color_200ms_ease] hover:enabled:bg-black disabled:bg-surface disabled:text-ink-2 disabled:border-line disabled:cursor-not-allowed"
+                disabled={cartLoading || cartUpdating || !inStock || !canAddToCart() || comboUnavailable}
+                className="pdp-add-btn flex-1 min-w-0 h-12 inline-flex items-center justify-center whitespace-nowrap overflow-hidden text-ellipsis min-h-[48px] py-3.5 px-[22px] rounded text-base font-medium tracking-[0.02em] cursor-pointer bg-ink text-bg border border-ink [transition:background-color_200ms_ease,color_200ms_ease,border-color_200ms_ease] hover:enabled:bg-black disabled:bg-surface disabled:text-ink-2 disabled:border-line disabled:cursor-not-allowed"
               >
                 {cartUpdating ? 'Updating…'
                   : cartLoading ? 'Adding…'
                   : !inStock ? 'Out of stock'
                   : !canAddToCart() ? 'Please select options'
+                  : comboUnavailable ? 'Unavailable'
                   : isEdit ? 'Update Cart'
                   : `Add to bag — ${formatMoney(price?.value, price?.currency)}`}
               </button>
@@ -158,11 +170,6 @@ const ProductDetail = ({ urlKey: urlKeyProp }) => {
               </button>
             </div>
           </div>
-          {addToCartError && (
-            <div className="pdp-flash py-2.5 px-3.5 rounded mb-3.5 text-13 border border-line [&.is-success]:bg-surface [&.is-success]:text-ink [&.is-success]:border-ink [&.is-error]:bg-danger-bg [&.is-error]:text-sale [&.is-error]:border-sale is-error" role="alert">
-              {addToCartError}
-            </div>
-          )}
 
           <div className="pdp__meta flex gap-4 mt-[18px] text-sm text-ink-2">
             <span>
@@ -175,7 +182,7 @@ const ProductDetail = ({ urlKey: urlKeyProp }) => {
 
           {product.description?.html && (
             <div className="pdp__desc mt-9 pt-7 border-t border-line text-md text-ink">
-              <h3 className="text-13 tracking-[0.12em] uppercase font-medium text-ink mb-3">The story</h3>
+              <h2 className="text-13 tracking-[0.12em] uppercase font-medium text-ink mb-3">The story</h2>
               <div dangerouslySetInnerHTML={{ __html: product.description.html }} />
             </div>
           )}
@@ -195,6 +202,8 @@ const ProductDetail = ({ urlKey: urlKeyProp }) => {
           </dl>
         </div>
       </div>
+
+      <RelatedProducts urlKey={product.url_key} ready={!loading} />
 
       <ProductReviews
         reviews={reviews}

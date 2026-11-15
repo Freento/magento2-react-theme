@@ -33,15 +33,17 @@ export function makeHostBlock(loader, fallbackTitle) {
     };
 }
 
-const HostProductsCarousel = makeHostBlock(() => import('@host/components/catalog/ProductsCarousel'), 'Products Carousel');
+const HostProductsList = makeHostBlock(() => import('@host/components/catalog/ProductsList'), 'Products List');
 const HostNewsletterForm = makeHostBlock(() => import('@host/components/layout/NewsletterForm'), 'Newsletter Form');
 const HostContactForm = makeHostBlock(() => import('@host/components/contact/ContactForm'), 'Contact Form');
+const HostMenu = makeHostBlock(() => import('@host/components/layout/MenuBar'), 'Menu');
 
 export const allBlocks = {
     ...defaultBlocks,
-    ProductsCarousel: HostProductsCarousel,
+    ProductsList: HostProductsList,
     NewsletterForm: HostNewsletterForm,
     ContactForm: HostContactForm,
+    Menu: HostMenu,
 };
 
 export const DEVICE_WIDTHS = {desktop: null, tablet: 1024, mobile: 375};

@@ -30,32 +30,26 @@ export default function useCheckoutPaymentHandlers({
   const handlePayPalCancel = () =>
     actions.setErrors({ payment: 'PayPal payment was cancelled. Please try again or select a different payment method.' });
 
-  const handleAcceptJsToken = (token) => {
-    actions.setAcceptJsToken(token);
-    if (state.errors.payment) actions.setErrors({ ...state.errors, payment: '' });
-  };
-
   const handleAuthorizeNetTransactionComplete = useCallback(async (result) => {
     try {
       actions.setPaymentLoading(true);
       let paymentMethodInput = { code: 'authnetcim' };
+      if (result.transactionId) {
+        paymentMethodInput = {
+          code: 'authnetcim',
+          tokenbase_data: { transaction_id: result.transactionId, save: !!result.saveCard },
+        };
+      }
 
       if (result.iframeSessionId) {
         try {
-          const syncResult = await mutations.syncHostedForm({
+          await mutations.syncHostedForm({
             variables: {
               cartId,
               iframeSessionId: result.iframeSessionId,
               guestEmail: user?.email || state.email || null,
             },
           });
-          const cardData = syncResult.data?.authnetcimSyncHostedForm?.card;
-          if (cardData) {
-            paymentMethodInput = {
-              code: 'authnetcim',
-              tokenbase_data: { id: cardData.id, type: cardData.type, label: cardData.label, selected: true },
-            };
-          }
         } catch (syncError) {
           if (isCartAuthError(syncError)) {
             navigate('/', { replace: true });
@@ -63,11 +57,6 @@ export default function useCheckoutPaymentHandlers({
           }
           // Fall through with bare code — backend can still resolve from session.
         }
-      } else if (result.transactionId) {
-        paymentMethodInput = {
-          code: 'authnetcim',
-          tokenbase_data: { transaction_id: result.transactionId },
-        };
       }
 
       await mutations.setPaymentMethod({ variables: { cartId, paymentMethod: paymentMethodInput } });
@@ -97,16 +86,16 @@ export default function useCheckoutPaymentHandlers({
     actions.setPaymentLoading(false);
   };
 
-  const googlePayPlaceOrder = useCallback(async (nonce) => {
-    if (!nonce) throw new Error('Google Pay returned no nonce');
+  const walletPlaceOrder = useCallback(async ({ code, inputKey, label, nonce, saveForLater }) => {
+    if (!nonce) throw new Error(`${label} returned no nonce`);
     const setRes = await mutations.setPaymentMethod({
       variables: {
         cartId,
         paymentMethod: {
-          code: 'braintree_googlepay',
-          braintree: {
+          code,
+          [inputKey]: {
             payment_method_nonce: nonce,
-            is_active_payment_token_enabler: false,
+            is_active_payment_token_enabler: !!saveForLater,
           },
         },
       },
@@ -122,6 +111,20 @@ export default function useCheckoutPaymentHandlers({
     navigate('/checkout/success', { state: { orderNumber }, replace: true });
   }, [cartId, mutations, clearCart, navigate]);
 
+  const googlePayPlaceOrder = useCallback(
+    (nonce, saveForLater) => walletPlaceOrder({
+      code: 'braintree_googlepay', inputKey: 'braintree', label: 'Google Pay', nonce, saveForLater,
+    }),
+    [walletPlaceOrder],
+  );
+
+  const paypalPlaceOrder = useCallback(
+    (nonce, saveForLater) => walletPlaceOrder({
+      code: 'braintree_paypal', inputKey: 'braintree_paypal', label: 'PayPal', nonce, saveForLater,
+    }),
+    [walletPlaceOrder],
+  );
+
   const dismissErrorKey = useCallback((key) => {
     const next = { ...state.errors };
     delete next[key];
@@ -133,10 +136,10 @@ export default function useCheckoutPaymentHandlers({
     handlePayPalSuccess,
     handlePayPalError,
     handlePayPalCancel,
-    handleAcceptJsToken,
     handleAuthorizeNetTransactionComplete,
     handleAuthorizeNetTransactionError,
     googlePayPlaceOrder,
+    paypalPlaceOrder,
     dismissErrorKey,
   };
 }

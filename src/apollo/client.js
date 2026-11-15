@@ -3,6 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { stripIgnoredCharacters } from 'graphql';
 import { readCustomerToken, clearCustomerToken } from '../lib/customerToken';
+import { mediaLink } from './mediaLink';
 
 const isServer = typeof window === 'undefined';
 
@@ -96,11 +97,24 @@ export const possibleTypes = {
   ],
 };
 
-export function makeApolloClient({ ssr = false, initialCache = null } = {}) {
-  const cache = new InMemoryCache({
+/**
+ * The one cache configuration, shared by the browser client and the SSR render in
+ * entry-server.jsx. The two must agree: without the `Query.customer` merge the
+ * server lets each customer query replace the others' fields, so it refetches
+ * `getCustomer` on every render pass and ships a cache the browser then has to
+ * fill in again.
+ */
+export function makeApolloCache() {
+  return new InMemoryCache({
     possibleTypes,
     typePolicies: {
-      Customer: { keyFields: false },
+      // The signed-in customer is one per session (signing out reloads the page),
+      // so every Customer object is the same cache entry, whatever fields its
+      // query asked for. Without a key it was stored inline under
+      // Query.customer, and a refetch of any customer query — which overwrites
+      // rather than merges — dropped the fields the other queries had loaded.
+      Customer: { keyFields: [] },
+      StoreConfig: { keyFields: [] },
       CompareList: { keyFields: ['uid'] },
       Query: {
         fields: {
@@ -143,10 +157,14 @@ export function makeApolloClient({ ssr = false, initialCache = null } = {}) {
       },
     },
   });
+}
+
+export function makeApolloClient({ ssr = false, initialCache = null } = {}) {
+  const cache = makeApolloCache();
   if (initialCache) cache.restore(initialCache);
   return new ApolloClient({
     ssrMode: ssr,
-    link: errorLink.concat(authLink).concat(createHttpLinkForEnv()),
+    link: errorLink.concat(authLink).concat(mediaLink).concat(createHttpLinkForEnv()),
     cache,
     defaultOptions: {
       watchQuery: { fetchPolicy: 'cache-and-network' }

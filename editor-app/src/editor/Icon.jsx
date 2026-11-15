@@ -13,6 +13,7 @@ import {
   PanelLeftOpen,
   Link as LinkIcon,
   Link2Off,
+  Info,
   Layers,
   Settings,
   Eye,
@@ -42,6 +43,13 @@ import {
   AlignVerticalJustifyStart,
   AlignVerticalJustifyCenter,
   AlignVerticalJustifyEnd,
+  AlignHorizontalJustifyStart,
+  AlignHorizontalJustifyCenter,
+  AlignHorizontalJustifyEnd,
+  AlignHorizontalSpaceBetween,
+  AlignVerticalSpaceBetween,
+  StretchHorizontal,
+  StretchVertical,
   BoxSelect,
   PanelTop,
   PanelBottom,
@@ -69,6 +77,17 @@ import {
   Search,
   User,
   MessageSquare,
+  TriangleAlert,
+  MoreHorizontal,
+  Pencil,
+  LockOpen,
+  LogOut,
+  LocateFixed,
+  CircleHelp,
+  ArrowUpDown,
+  ExternalLink,
+  Clipboard,
+  Scissors,
 } from 'lucide-react';
 
 const BLOCK_ICON_MAP = {
@@ -215,6 +234,7 @@ function CornerRadius({ size = 14, strokeWidth = 1.75, ...rest }) {
 
 export const UI = {
   Save,
+  LogOut,
   Trash: Trash2,
   Close: X,
   Plus,
@@ -229,6 +249,10 @@ export const UI = {
   PanelOpen: PanelLeftOpen,
   Link: LinkIcon,
   Unlink: Link2Off,
+  LockOpen,
+  Locate: LocateFixed,
+  Help: CircleHelp,
+  Info,
   Layers,
   Settings,
   Eye,
@@ -243,6 +267,13 @@ export const UI = {
   AlignTop: AlignVerticalJustifyStart,
   AlignMiddle: AlignVerticalJustifyCenter,
   AlignBottom: AlignVerticalJustifyEnd,
+  HAlignStart: AlignHorizontalJustifyStart,
+  HAlignCenter: AlignHorizontalJustifyCenter,
+  HAlignEnd: AlignHorizontalJustifyEnd,
+  HSpread: AlignHorizontalSpaceBetween,
+  VSpread: AlignVerticalSpaceBetween,
+  StretchH: StretchHorizontal,
+  StretchV: StretchVertical,
   BorderAll: BoxSelect,
   BorderTop: PanelTop,
   BorderBottom: PanelBottom,
@@ -290,10 +321,16 @@ export const UI = {
   Heart,
   Search,
   User,
+  Warning: TriangleAlert,
+  More: MoreHorizontal,
+  Sort: ArrowUpDown,
+  ExternalLink,
+  Clipboard,
+  Scissors,
+  Edit: Pencil,
 };
 
 export function BlockIcon({ name, size = 16 }) {
-  const Cmp = BLOCK_ICON_MAP[name];
-  if (!Cmp) return <span style={{ fontSize: size - 2 }}>{name}</span>;
+  const Cmp = BLOCK_ICON_MAP[name] || Square;
   return <Cmp size={size} strokeWidth={1.75} />;
 }

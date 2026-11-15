@@ -9,22 +9,26 @@ export function groupFields(entries, getGroup) {
 }
 
 export const FIELD_SUBGROUP = {
-    href: 'Link', linkTarget: 'Link',
+    href: 'Link', linkTarget: 'Link', newTab: 'Link',
     fontFamily: 'Typography', fontSize: 'Typography', fontWeight: 'Typography',
     fontStyle: 'Typography', textDecoration: 'Typography',
     letterSpacing: 'Typography', lineHeight: 'Typography',
-    color: 'Color', backgroundColor: 'Color', textColor: 'Color',
+    color: 'Color', backgroundColor: 'Color', backgroundImage: 'Color', textColor: 'Color',
     borderRadius: 'Border', borderWidth: 'Border', borderStyle: 'Border',
     borderColor: 'Border', borderSides: 'Border',
     width: 'Size', height: 'Size', objectFit: 'Size',
-    colSpan: 'Size', rowSpan: 'Size', fullWidth: 'Size',
-    padding: 'Spacing', margin: 'Spacing',
+    fullWidth: 'Size',
+    hidden: 'Visibility',
+    customCss: 'TextOptions',
+    padding: 'Spacing', margin: 'Spacing', rowGap: 'Spacing',
     textAlign: 'TextOptions', textTransform: 'TextOptions',
 };
-export const SUBGROUP_ORDER = ['', 'Link', 'Typography', 'Color', 'Border', 'Size', 'Spacing', 'TextOptions'];
-const subGroupOf = (key) => FIELD_SUBGROUP[key] || '';
-export const sortBySubGroup = (a, b) => {
-    const sa = SUBGROUP_ORDER.indexOf(subGroupOf(a.key));
-    const sb = SUBGROUP_ORDER.indexOf(subGroupOf(b.key));
+export const SUBGROUP_ORDER = ['', 'Visibility', 'Link', 'Typography', 'Color', 'Border', 'Size', 'Spacing', 'TextOptions'];
+const STYLE_FIELD_SUBGROUP = {textAlign: 'Typography'};
+const subGroupOf = (entry, overrides) =>
+    overrides?.[entry.key] || (entry.source === 'style' && STYLE_FIELD_SUBGROUP[entry.key]) || FIELD_SUBGROUP[entry.key] || '';
+export const sortBySubGroup = (a, b, overrides) => {
+    const sa = SUBGROUP_ORDER.indexOf(subGroupOf(a, overrides));
+    const sb = SUBGROUP_ORDER.indexOf(subGroupOf(b, overrides));
     return sa - sb;
 };

@@ -1,10 +1,13 @@
+const fileName = (url) => (url || '').split('?')[0].split('/').pop() || '';
+
 export default {
     label: 'Slider',
     category: 'domain',
     icon: '⧫',
     acceptsChildren: false,
-    allowedIn: ['page', 'Grid', 'Box'],
-    hideStyleFields: ['color', 'backgroundColor', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundOverlay', 'borderSides', 'borderStyle', 'borderColor', 'link'],
+    allowedIn: ['page', 'Grid', 'Column'],
+    hideStyleFields: ['fontFamily', 'textAlign', 'color', 'backgroundColor', 'borderSides', 'borderStyle', 'borderColor'],
+    spacingSideBySide: true,
     defaultProps: {
       slides: [
         { title: 'Shinglas shingles from 10.80 BYN', subtitle: 'Best prices on roofing materials', buttonText: 'Learn more', buttonHref: '/catalog', image: 'https://placehold.co/1200x400/c52327/fff?text=Slide+1' },
@@ -19,14 +22,23 @@ export default {
     propsSchema: {
       slides: {
         label: 'Slides',
+        emptyText: 'Add slides to show in the slider.',
+        addLabel: 'Add slide',
         type: 'list',
         group: 'Slider',
+        itemPreview: (item) => item.title || fileName(item.image),
         itemSchema: {
-          buttonHref: { label: 'Button link', type: 'text' },
           image: { label: 'Image', type: 'image' },
-          buttonColor: { label: 'Button color', type: 'color' },
+          backgroundColor: { label: 'Background color', type: 'color', showIf: (item) => !item.image },
           textColor: { label: 'Text color', type: 'color' },
-          backgroundColor: { label: 'Background color', type: 'color' },
+          title: { label: 'Title', type: 'text' },
+          titleMargin: { label: 'Title margin', type: 'spacing' },
+          subtitle: { label: 'Subtitle', type: 'text' },
+          subtitleMargin: { label: 'Subtitle margin', type: 'spacing' },
+          buttonText: { label: 'Button text', type: 'text' },
+          buttonHref: { label: 'Button link', type: 'link' },
+          buttonColor: { label: 'Button background color', type: 'color' },
+          buttonMargin: { label: 'Button margin', type: 'spacing' },
         },
       },
       autoplay: {

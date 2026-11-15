@@ -49,33 +49,28 @@ export const loadBraintreeHostedFields = () => {
   return braintreeHostedFieldsLoader;
 };
 
-export const tokenizeBraintreeCard = async ({ cardData, clientToken }) => {
-  if (!clientToken) throw new Error('Braintree client token missing');
-  if (!cardData?.number) throw new Error('Card number missing');
+const BRAINTREE_PAYPAL_CHECKOUT_SDK = 'https://js.braintreegateway.com/web/3.97.4/js/paypal-checkout.min.js';
 
-  const braintreeClient = await loadBraintreeClient();
-  const client = await braintreeClient.create({ authorization: clientToken });
-
-  const mm = String(cardData.expiryMonth).padStart(2, '0');
-  const yy = String(cardData.expiryYear).length === 2
-    ? `20${cardData.expiryYear}`
-    : String(cardData.expiryYear);
-
-  const response = await client.request({
-    endpoint: 'payment_methods/credit_cards',
-    method: 'post',
-    data: {
-      creditCard: {
-        number: String(cardData.number).replace(/\s+/g, ''),
-        expirationDate: `${mm}/${yy}`,
-        cvv: String(cardData.cvv || ''),
-        cardholderName: cardData.holderName || '',
-      },
-    },
+let braintreePayPalCheckoutLoader = null;
+export const loadBraintreePayPalCheckout = () => {
+  if (typeof window === 'undefined') return Promise.reject(new Error('no window'));
+  if (window.braintree?.paypalCheckout) return Promise.resolve(window.braintree.paypalCheckout);
+  if (braintreePayPalCheckoutLoader) return braintreePayPalCheckoutLoader;
+  braintreePayPalCheckoutLoader = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = BRAINTREE_PAYPAL_CHECKOUT_SDK;
+    s.async = true;
+    s.onload = () => {
+      if (window.braintree?.paypalCheckout) resolve(window.braintree.paypalCheckout);
+      else reject(new Error('paypal-checkout SDK loaded but window.braintree.paypalCheckout is missing'));
+    };
+    s.onerror = () => {
+      braintreePayPalCheckoutLoader = null;
+      reject(new Error('Failed to load Braintree PayPal Checkout SDK'));
+    };
+    document.head.appendChild(s);
   });
-  const nonce = response?.creditCards?.[0]?.nonce;
-  if (!nonce) throw new Error('Braintree response missing nonce');
-  return nonce;
+  return braintreePayPalCheckoutLoader;
 };
 
 export const CREATE_BRAINTREE_CLIENT_TOKEN = gql`

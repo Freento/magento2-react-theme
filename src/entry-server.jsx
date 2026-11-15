@@ -5,7 +5,6 @@ import {
   ApolloClient,
   ApolloProvider,
   HttpLink,
-  InMemoryCache,
 } from '@apollo/client';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 import { onError } from '@apollo/client/link/error';
@@ -15,7 +14,8 @@ import { WishlistProvider } from './context/WishlistContext';
 import { CompareProvider } from './context/CompareContext';
 import { BreadcrumbProvider } from './context/BreadcrumbContext';
 import App from './App.jsx';
-import { minifyPrint, possibleTypes } from './apollo/client';
+import { minifyPrint, makeApolloCache } from './apollo/client';
+import { mediaLink } from './apollo/mediaLink';
 
 function quiet(fn) {
   const orig = console.error;
@@ -130,8 +130,8 @@ export async function renderApp(url, initialData = {}, options = {}) {
   });
 
   const apollo = new ApolloClient({
-    link: authWatchLink.concat(httpLink),
-    cache: new InMemoryCache({ possibleTypes }),
+    link: authWatchLink.concat(mediaLink).concat(httpLink),
+    cache: makeApolloCache(),
     ssrMode: true,
   });
 
@@ -140,14 +140,16 @@ export async function renderApp(url, initialData = {}, options = {}) {
     ? { pathname: parsedUrl.pathname, search: parsedUrl.search, hash: '', state: initialData.routeHint ? { resolved: initialData.routeHint } : null }
     : url;
 
+  const breadcrumbStore = { crumbs: null };
+
   const tree = (
     <ApolloProvider client={apollo}>
-      <AuthProvider>
+      <AuthProvider initialToken={customerToken || null}>
         <CartProvider>
           <WishlistProvider>
             <CompareProvider>
-            <BreadcrumbProvider>
-              <StaticRouter location={location}>
+            <BreadcrumbProvider ssrStore={breadcrumbStore}>
+              <StaticRouter location={location} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <App initialData={initialData} />
               </StaticRouter>
             </BreadcrumbProvider>
@@ -178,5 +180,5 @@ export async function renderApp(url, initialData = {}, options = {}) {
   const apolloState = apollo.extract();
   // `personalized` tells the client this cache already holds the customer's prices,
   // so it can trust it instead of re-fetching the catalog.
-  return { html, apolloState, personalized: Boolean(customerToken) && !authRejected, authRejected, stats };
+  return { html, apolloState, breadcrumbs: breadcrumbStore.crumbs || [], personalized: Boolean(customerToken) && !authRejected, authRejected, stats };
 }

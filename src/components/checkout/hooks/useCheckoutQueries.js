@@ -5,6 +5,8 @@ import {
   GET_AVAILABLE_PAYMENT_METHODS,
   GET_COUNTRIES,
   GET_TOKENBASE_CHECKOUT_CONFIG,
+  GET_BRAINTREE_CHECKOUT_CONFIG,
+  GET_PAYPAL_BILLING_AGREEMENT_SIGNUP,
   SET_SHIPPING_ADDRESS_AND_EMAIL,
   SET_SHIPPING_ADDRESS_FOR_CUSTOMER,
   SET_BILLING_ADDRESS,
@@ -30,8 +32,12 @@ export default function useCheckoutQueries({ cartId, currentStep, user }) {
     notifyOnNetworkStatusChange: false,
   });
 
+  // Not during SSR: checkout is built from the cart in localStorage, which the
+  // server cannot see, so the server would only hold the first byte for a list
+  // the browser fetches in parallel with everything else anyway.
   const countries = useQuery(GET_COUNTRIES, {
     fetchPolicy: 'cache-first',
+    ssr: false,
   });
 
   const customer = useQuery(GET_CUSTOMER_DATA, {
@@ -45,6 +51,22 @@ export default function useCheckoutQueries({ cartId, currentStep, user }) {
       (m) => m.code === 'authnetcim',
     ),
     fetchPolicy: 'cache-first',
+  });
+
+  const braintree = useQuery(GET_BRAINTREE_CHECKOUT_CONFIG, {
+    skip: !paymentMethods.data?.cart?.available_payment_methods?.some(
+      (m) => m.code.startsWith('braintree'),
+    ),
+    fetchPolicy: 'cache-first',
+  });
+  const braintreeStore = braintree.data?.storeConfig;
+
+  const agreementSignup = useQuery(GET_PAYPAL_BILLING_AGREEMENT_SIGNUP, {
+    skip: !user || !paymentMethods.data?.cart?.available_payment_methods?.some(
+      (m) => m.code === 'paypal_express',
+    ),
+    fetchPolicy: 'cache-first',
+    errorPolicy: 'ignore',
   });
 
   const [setShippingAddressAndEmail]    = useMutation(SET_SHIPPING_ADDRESS_AND_EMAIL);
@@ -63,6 +85,7 @@ export default function useCheckoutQueries({ cartId, currentStep, user }) {
       countries,
       customer,
       tokenbase,
+      braintree,
     },
     mutations: {
       setShippingAddressAndEmail,
@@ -80,6 +103,16 @@ export default function useCheckoutQueries({ cartId, currentStep, user }) {
       paymentMethods: paymentMethods.data?.cart?.available_payment_methods || [],
       shippingAddresses: shippingMethods.data?.cart?.shipping_addresses || [],
       tokenbaseConfig: tokenbase.data?.tokenBaseCheckoutConfig || null,
+      braintreeConfig: braintreeStore ? {
+        environment: braintreeStore.braintree_environment || null,
+        paypalMerchantCountry: braintreeStore.braintree_paypal_merchant_country || null,
+        paypalButtonStyle: {
+          label: braintreeStore.braintree_paypal_button_location_checkout_type_paypal_label,
+          color: braintreeStore.braintree_paypal_button_location_checkout_type_paypal_color,
+          shape: braintreeStore.braintree_paypal_button_location_checkout_type_paypal_shape,
+        },
+      } : null,
+      billingAgreementSignup: agreementSignup.data?.storeConfig?.paypal_express_billing_agreement_signup || 'never',
     },
     loading: {
       shippingMethods: shippingMethods.loading,

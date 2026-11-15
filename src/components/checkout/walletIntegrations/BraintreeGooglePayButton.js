@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { loadBraintreeClient, useBraintreeClientToken } from '../lib/braintree';
+import GoogleGIcon from '../../ui/icons/GoogleGIcon';
+import SaveForLaterCheckbox from '../SaveForLaterCheckbox';
 
 const GOOGLE_PAY_API_SDK = 'https://pay.google.com/gp/p/js/pay.js';
 const BRAINTREE_GOOGLE_PAY_SDK = 'https://js.braintreegateway.com/web/3.97.4/js/google-payment.min.js';
@@ -56,17 +58,20 @@ export default function BraintreeGooglePayButton({
   currencyCode = 'USD',
   totalAmount,
   disabled = false,
+  showSaveForLater = false,
 }) {
   const createClientToken = useBraintreeClientToken();
 
   const [phase, setPhase] = useState('init');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [saveForLater, setSaveForLater] = useState(false);
   const paymentsClientRef = useRef(null);
   const googlePayInstanceRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
+    let createdInstance = null;
     (async () => {
       try {
         const [_, braintreeGooglePay, clientToken, braintreeClient] = await Promise.all([
@@ -83,7 +88,11 @@ export default function BraintreeGooglePayButton({
           googlePayVersion: 2,
           ...(googleMerchantId ? { googleMerchantId } : {}),
         });
-        if (cancelled) return;
+        if (cancelled) {
+          try { googlePayInstance.teardown(); } catch {}
+          return;
+        }
+        createdInstance = googlePayInstance;
         googlePayInstanceRef.current = googlePayInstance;
         const paymentsClient = new window.google.payments.api.PaymentsClient({ environment });
         paymentsClientRef.current = paymentsClient;
@@ -102,7 +111,14 @@ export default function BraintreeGooglePayButton({
         }
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      if (createdInstance) {
+        try { createdInstance.teardown(); } catch {}
+      }
+      googlePayInstanceRef.current = null;
+      paymentsClientRef.current = null;
+    };
   }, [loadBraintreeClient, createClientToken, environment, googleMerchantId]);
 
   const handleClick = useCallback(async () => {
@@ -125,7 +141,7 @@ export default function BraintreeGooglePayButton({
       const result = await googlePayInstance.parseResponse(paymentData);
       const nonce = result?.nonce;
       if (!nonce) throw new Error('Google Pay returned no nonce');
-      await setPaymentAndPlaceOrder(nonce);
+      await setPaymentAndPlaceOrder(nonce, showSaveForLater && saveForLater);
     } catch (err) {
       if (err?.statusCode === 'CANCELED') {
         setBusy(false);
@@ -136,13 +152,23 @@ export default function BraintreeGooglePayButton({
     } finally {
       setBusy(false);
     }
-  }, [busy, disabled, currencyCode, countryCode, totalAmount, setPaymentAndPlaceOrder]);
+  }, [busy, disabled, currencyCode, countryCode, totalAmount, setPaymentAndPlaceOrder, showSaveForLater, saveForLater]);
 
   const errorCls = 'gpay-error mt-2 text-sale text-13';
+
+  const saveToggle = showSaveForLater && (
+    <SaveForLaterCheckbox
+      className="mb-3"
+      checked={saveForLater}
+      onChange={setSaveForLater}
+      disabled={busy || disabled}
+    />
+  );
 
   if (phase === 'init') {
     return (
       <div className="gpay-wrap mt-4" aria-busy="true" aria-live="polite">
+        {saveToggle}
         <div className="gpay-skeleton w-full min-h-12 rounded-[8px] bg-[linear-gradient(90deg,rgba(0,0,0,0.06)_0%,rgba(0,0,0,0.12)_50%,rgba(0,0,0,0.06)_100%)] [background-size:200%_100%] [animation:shimmer_1.2s_linear_infinite]" aria-hidden="true" />
       </div>
     );
@@ -160,6 +186,7 @@ export default function BraintreeGooglePayButton({
 
   return (
     <div className="gpay-wrap mt-4">
+      {saveToggle}
       <button
         type="button"
         className={`gpay-button inline-flex items-center justify-center w-full min-h-12 px-[22px] py-0 bg-black text-bg border-0 rounded-[8px] text-[16px] font-medium tracking-[0.02em] [transition:background_120ms_ease,opacity_120ms_ease] enabled:hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed${busy ? ' !cursor-progress' : ''}`}
@@ -168,9 +195,7 @@ export default function BraintreeGooglePayButton({
         aria-label="Pay with Google Pay"
       >
         <span aria-hidden="true" className="gpay-button-label inline-flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-            <path fill="#4285F4" d="M44.5 20H24v8.5h11.7c-1.1 5.3-5.6 8.7-11.7 8.7-7 0-12.6-5.7-12.6-12.7S17 11.8 24 11.8c3.2 0 6.1 1.2 8.3 3.1l6.1-6.1C34.7 5.4 29.7 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c11.5 0 20.7-8.4 20.7-21 0-1.4-.2-2.7-.2-4z"/>
-          </svg>
+          <GoogleGIcon />
           <span>{busy ? 'Processing…' : 'Pay'}</span>
         </span>
       </button>

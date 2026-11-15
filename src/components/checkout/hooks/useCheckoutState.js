@@ -49,7 +49,6 @@ const initialStateFactory = (initialStep) => ({
   cardData: { ...EMPTY_CARD },
   selectedVaultHash: '',
   saveCard: true,
-  acceptJsToken: null,
   paymentLoading: false,
   orderLoading: false,
 
@@ -138,8 +137,6 @@ function reducer(state, action) {
       return { ...state, selectedVaultHash: action.value };
     case 'SET_SAVE_CARD':
       return { ...state, saveCard: action.value };
-    case 'SET_ACCEPT_JS_TOKEN':
-      return { ...state, acceptJsToken: action.value };
     case 'SET_PAYMENT_LOADING':
       return { ...state, paymentLoading: action.value };
     case 'SET_ORDER_LOADING':
@@ -198,7 +195,6 @@ export default function useCheckoutState(initialStep = 1) {
     setCardData: (value) => dispatch({ type: 'SET_CARD_DATA', value }),
     setVaultHash: (value) => dispatch({ type: 'SET_VAULT_HASH', value }),
     setSaveCard: (value) => dispatch({ type: 'SET_SAVE_CARD', value }),
-    setAcceptJsToken: (value) => dispatch({ type: 'SET_ACCEPT_JS_TOKEN', value }),
     setPaymentLoading: (value) => dispatch({ type: 'SET_PAYMENT_LOADING', value }),
     setOrderLoading: (value) => dispatch({ type: 'SET_ORDER_LOADING', value }),
 

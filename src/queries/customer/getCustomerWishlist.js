@@ -6,14 +6,10 @@ export const GET_CUSTOMER_WISHLIST = gql`
       wishlists {
         id
         items_count
-        sharing_code
         updated_at
         items_v2(currentPage: $currentPage, pageSize: $pageSize) {
           items {
             id
-            quantity
-            description
-            added_at
             product {
               __typename
               id

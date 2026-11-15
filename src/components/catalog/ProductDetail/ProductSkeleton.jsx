@@ -5,9 +5,14 @@ export default function ProductSkeleton() {
     <div className="product-detail-content grid grid-cols-2 gap-8 py-6 max900:grid-cols-1 max900:gap-5">
       <div className="flex flex-col gap-3">
         <div className="sk-img aspect-square w-full max900:aspect-[4/5]" />
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2 max900:hidden">
           {Array.from({ length: 4 }).map((_, i) => (
             <div className="sk-img aspect-square" key={i} />
+          ))}
+        </div>
+        <div className="hidden max900:flex justify-center gap-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div className="sk-img w-2.5 h-2.5 rounded-pill" key={i} />
           ))}
         </div>
       </div>

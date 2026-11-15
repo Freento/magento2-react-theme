@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_CUSTOMER_WISHLIST, ADD_PRODUCTS_TO_WISHLIST, REMOVE_PRODUCTS_FROM_WISHLIST } from '../queries/customer';
+import { GET_WISHLIST_SKUS, REFETCH_WISHLIST, ADD_PRODUCTS_TO_WISHLIST, REMOVE_PRODUCTS_FROM_WISHLIST } from '../queries/customer';
 import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext();
@@ -16,18 +16,16 @@ export const useWishlist = () => {
 export const WishlistProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
-  const { data, loading, refetch } = useQuery(GET_CUSTOMER_WISHLIST, {
+  const { data, loading, refetch } = useQuery(GET_WISHLIST_SKUS, {
     skip: !isAuthenticated,
     fetchPolicy: 'cache-and-network'
   });
 
   const [addProductsToWishlistMutation] = useMutation(ADD_PRODUCTS_TO_WISHLIST, {
-    refetchQueries: ['getCustomerWishlist'],
-    awaitRefetchQueries: true,
+    ...REFETCH_WISHLIST,
   });
   const [removeProductsFromWishlistMutation] = useMutation(REMOVE_PRODUCTS_FROM_WISHLIST, {
-    refetchQueries: ['getCustomerWishlist'],
-    awaitRefetchQueries: true,
+    ...REFETCH_WISHLIST,
     update(cache, _result, { variables }) {
       if (!variables?.wishlistId) return;
       const removedIds = new Set((variables.wishlistItemsIds || []).map(String));
@@ -87,7 +85,6 @@ export const WishlistProvider = ({ children }) => {
         at: Date.now(),
       });
 
-      await refetch();
     } catch (error) {
       console.error('Error adding to wishlist:', error);
       throw error;
@@ -107,7 +104,6 @@ export const WishlistProvider = ({ children }) => {
         }
       });
 
-      await refetch();
     } catch (error) {
       console.error('Error removing from wishlist:', error);
       throw error;
@@ -131,7 +127,8 @@ export const WishlistProvider = ({ children }) => {
     lastAdded,
     clearLastAdded,
     // Stable count used by the mobile bottom-nav badge.
-    wishlistCount: wishlistItems.length,
+    // The server's count: the loaded list stops at the query's page size.
+    wishlistCount: wishlist?.items_count ?? wishlistItems.length,
   };
 
   return (

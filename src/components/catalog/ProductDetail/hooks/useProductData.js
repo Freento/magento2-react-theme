@@ -4,6 +4,7 @@ import { useSyncBreadcrumbs } from '../../../../context/BreadcrumbContext';
 import { GET_PRODUCT_DETAILS } from '../../../../queries/product';
 import { useAuth } from '../../../../context/AuthContext';
 import { isSsrPersonalized } from '../../../../lib/ssrPersonalized';
+import { isPrefetchedForCustomer } from '../../../../lib/prefetch';
 
 export default function useProductData(urlKeyProp) {
   const { urlKey: urlKeyParam } = useParams();
@@ -13,8 +14,12 @@ export default function useProductData(urlKeyProp) {
   const { loading, error, data, refetch } = useQuery(GET_PRODUCT_DETAILS, {
     variables: { urlKey },
     // Guests read the SSR/prefetch-populated cache; a customer only when the server
-    // rendered this document as them, otherwise it holds guest prices.
-    fetchPolicy: isAuthenticated && !isSsrPersonalized() ? 'cache-and-network' : 'cache-first',
+    // rendered this document as them, otherwise it holds guest prices. A hover
+    // prefetch that fetched this product with their token counts the same way.
+    fetchPolicy: isAuthenticated && !isSsrPersonalized()
+      && !isPrefetchedForCustomer({ query: GET_PRODUCT_DETAILS, variables: { urlKey } })
+      ? 'cache-and-network'
+      : 'cache-first',
   });
 
   // Magento's url_key `eq` filter can return related products too (e.g. a bundle

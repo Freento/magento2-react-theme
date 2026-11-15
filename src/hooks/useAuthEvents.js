@@ -23,17 +23,3 @@ export const useAuthEvents = (eventHandlers = {}) => {
     };
   }, [eventHandlers]);
 };
-
-export const useAuthEvent = (eventType, handler) => {
-  useEffect(() => {
-    if (handler && typeof handler === 'function') {
-      const handleEvent = (event) => handler(event.detail);
-
-      window.addEventListener(eventType, handleEvent);
-
-      return () => {
-        window.removeEventListener(eventType, handleEvent);
-      };
-    }
-  }, [eventType, handler]);
-};

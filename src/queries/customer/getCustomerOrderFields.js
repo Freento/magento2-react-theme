@@ -8,5 +8,8 @@ export const GET_CUSTOMER_ORDER_FIELDS = gql`
         name
       }
     }
+    orderSortInput: __type(name: "CustomerOrderSortInput") {
+      name
+    }
   }
 `;

@@ -1,0 +1,107 @@
+.ec-text-toolbar {
+  position: fixed;
+  z-index: 2147483646;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: #ffffff;
+  border: 1px solid #b9b9b4;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+  font-family: "Inter", sans-serif;
+}
+.ec-text-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #111111;
+  font-size: 13px;
+  cursor: pointer;
+}
+.ec-text-toolbar button:hover {
+  background: #ecece8;
+}
+.ec-text-toolbar button[aria-pressed="true"] {
+  background: #0f4c5c;
+  color: #ffffff;
+}
+.ec-text-toolbar--link {
+  flex-wrap: wrap;
+  width: 300px;
+  gap: 4px;
+  padding: 4px;
+}
+.ec-text-link-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #b9b9b4;
+  border-radius: 4px;
+  color: #424242;
+  cursor: text;
+}
+.ec-text-link-field:focus-within {
+  border-color: #0f4c5c;
+  box-shadow: 0 0 0 2px rgba(15, 76, 92, 0.18);
+}
+.ec-text-link-field svg {
+  flex: none;
+}
+.ec-text-link-field input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: #111111;
+}
+.ec-text-link-field input::placeholder {
+  color: #6b6b6b;
+}
+.ec-text-toolbar .ec-text-link-apply {
+  height: 30px;
+  padding: 0 12px;
+  background: #0f4c5c;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ec-text-toolbar .ec-text-link-apply:hover {
+  background: #0b3a46;
+}
+.ec-text-toolbar .ec-text-toolbar-error {
+  flex-basis: 100%;
+  padding: 0 2px 2px;
+  font-size: 11px;
+  color: #b91c1c;
+}
+::highlight(ec-text-kept-selection) {
+  background-color: #b4d5fe;
+}
+.ec-text-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 3px;
+  background: #d8d8d4;
+}
+.ec-text-toolbar button:disabled {
+  color: #b9b9b4;
+  cursor: default;
+  background: transparent;
+}

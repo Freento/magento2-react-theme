@@ -29,7 +29,7 @@ export default function Breadcrumbs() {
 
   return (
     <nav className="breadcrumbs py-4 max768:py-3 bg-transparent text-sm text-ink-2" aria-label="Breadcrumb">
-      <ol className="breadcrumb-list list-none flex flex-wrap items-center mx-auto px-gutter max-w-container gap-0">
+      <ol className="breadcrumb-list list-none flex flex-wrap items-center gap-0">
         {breadcrumbs.map((crumb, i) => {
           const isLast = i === breadcrumbs.length - 1;
           return (

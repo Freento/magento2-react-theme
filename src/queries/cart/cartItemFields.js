@@ -24,6 +24,10 @@ export const CART_ITEM_FIELDS = gql`
       stock_status
     }
     quantity
+    errors {
+      code
+      message
+    }
     prices {
       price {
         currency
@@ -38,7 +42,38 @@ export const CART_ITEM_FIELDS = gql`
         value
       }
     }
+    ... on SimpleCartItem {
+      customizable_options {
+        customizable_option_uid
+        label
+        values {
+          customizable_option_value_uid
+          label
+          value
+        }
+      }
+    }
+    ... on VirtualCartItem {
+      customizable_options {
+        customizable_option_uid
+        label
+        values {
+          customizable_option_value_uid
+          label
+          value
+        }
+      }
+    }
     ... on ConfigurableCartItem {
+      customizable_options {
+        customizable_option_uid
+        label
+        values {
+          customizable_option_value_uid
+          label
+          value
+        }
+      }
       configurable_options {
         option_label
         value_label

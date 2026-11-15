@@ -11,7 +11,7 @@ export default function useProductDetail(urlKeyProp, editContext) {
   const { product, isConfigurable } = data;
 
   const variant = useVariantSelection(product, isConfigurable, editContext?.valueUids);
-  const gallery = useProductGallery(product, variant.previewVariant, variant.selectedVariant);
+  const gallery = useProductGallery(product, variant.previewVariant);
   const cart = useAddToCart(product, isConfigurable, variant.selectedVariant, variant.selectedOptions, editContext);
   const wishlist = useWishlistAction(product);
 

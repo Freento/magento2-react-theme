@@ -1,30 +1,39 @@
-import {useState, useCallback, useEffect} from 'react';
+import {useState, useCallback, useEffect, useRef} from 'react';
+import {AREAS, PAGE_AREA} from '../lib/areas.js';
+import {pendingBlobUrls, uploadPending, withUploadedUrls} from '../lib/pendingUploads.js';
+import {docEndpoint, isRouteId} from '../lib/docView.js';
 
-const FOOTER_PAGE_ID = '__footer__';
-
-/**
- * @param {object} mainDoc  What Save writes for the document being edited:
- *   `{ endpoint, id, path, body }`. A page and a route document differ only in
- *   the endpoint and in the body being the stored document rather than the
- *   editing view.
- */
 export function useSavePush({
-                                mainDoc,
-                                footerData,
-                                mainDirty,
-                                footerDirty,
-                                setSavedPageJson,
-                                setSavedFooterJson,
+                                currentPageId,
+                                areas,
+                                dirty,
+                                markSaved,
                                 showToast,
                             }) {
-    const [isPushing, setIsPushing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveRun, setSaveRun] = useState(null);
     const [canPush, setCanPush] = useState(false);
+    const [pushPreview, setPushPreview] = useState({commits: [], error: null});
+    const [saveLock, setSaveLock] = useState({disabled: false, tooltip: null});
+    useEffect(() => {
+        fetch('/api/editor/config', {cache: 'no-store'})
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data) => {
+                if (data?.save) setSaveLock({disabled: !!data.save.disabled, tooltip: data.save.tooltip || null});
+            })
+            .catch(() => {});
+    }, []);
+    const refreshSeqRef = useRef(0);
     const refreshPushStatus = useCallback(async () => {
+        const seq = ++refreshSeqRef.current;
         try {
             const res = await fetch('/api/editor/push/status', {cache: 'no-store'});
-            if (!res.ok) return;
+            if (!res.ok || seq !== refreshSeqRef.current) return;
             const data = await res.json();
+            if (seq !== refreshSeqRef.current) return;
             setCanPush(!!data.canPush);
+            const next = {commits: data.commits || [], error: data.error || null};
+            setPushPreview((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
         } catch {
         }
     }, []);
@@ -34,7 +43,47 @@ export function useSavePush({
         return () => clearInterval(t);
     }, [refreshPushStatus]);
 
+    const publish = useCallback(async () => {
+        const res = await fetch('/api/editor/push', {method: 'POST'});
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+            const detail = (data.steps || [])
+                .filter((s) => s.code !== 0 || s.stderr)
+                .map((s) => `[${s.step}] ${s.stderr || s.error || `exit ${s.code}`}`)
+                .join('\n');
+            throw new Error(detail || data.error || 'unknown error');
+        }
+    }, []);
+
+    const pendingLabels = AREAS.filter((a) => dirty[a.key]).map((a) => (a.key === PAGE_AREA && isRouteId(currentPageId) ? 'Storefront page blocks' : a.label));
+
+    // One pass over the region list: every dirty area is written to its own
+    // page file, the page area to whichever page is currently open. The commit
+    // each write leaves behind is then published, so Save is the only step.
     const save = useCallback(async () => {
+        if (isSaving || saveLock.disabled) return;
+        const targets = AREAS
+            .filter((area) => dirty[area.key])
+            .map((area) => ({area, id: area.key === PAGE_AREA ? currentPageId : area.pageId, value: areas[area.key]}))
+            .filter((t) => t.id);
+        const blobs = pendingBlobUrls(targets.map((t) => t.value));
+        const steps = [
+            ...(blobs.length ? [{key: 'upload', label: 'Uploading images', done: 0, total: blobs.length}] : []),
+            {key: 'save', label: targets.length ? `Saving & committing ${targets.map((t) => `"${t.area.label}"`).join(', ')}` : 'Saving & committing'},
+            {key: 'publish', label: 'Publishing'},
+        ].map((step) => ({...step, status: 'pending', error: ''}));
+        const update = (key, patch) => setSaveRun((run) => run && {
+            ...run,
+            steps: run.steps.map((step) => (step.key === key ? {...step, ...patch} : step)),
+        });
+        const fail = (key, message) => {
+            update(key, {status: 'error', error: message});
+            setSaveRun((run) => run && {...run, status: 'error'});
+            showToast(message, 'error', 7000);
+        };
+
+        setIsSaving(true);
+        setSaveRun({status: 'running', steps});
         const broadcast = (() => {
             try {
                 return new BroadcastChannel('editor:pages');
@@ -43,52 +92,58 @@ export function useSavePush({
             }
         })();
         try {
-            if (mainDirty && mainDoc?.endpoint) {
-                await fetch(mainDoc.endpoint, {
+            if (blobs.length) {
+                update('upload', {status: 'active'});
+                try {
+                    for (let i = 0; i < blobs.length; i++) {
+                        await uploadPending(blobs[i]);
+                        update('upload', {done: i + 1});
+                    }
+                } catch (err) {
+                    fail('upload', `Images were not uploaded: ${err.message}`);
+                    return;
+                }
+                update('upload', {status: 'done'});
+            }
+
+            update('save', {status: 'active'});
+            const refused = [];
+            for (const {area, id, value} of targets) {
+                const body = withUploadedUrls(value);
+                const res = await fetch(docEndpoint(id), {
                     method: 'PUT',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(mainDoc.body),
-                });
-                setSavedPageJson(JSON.stringify(mainDoc.body));
-                broadcast?.postMessage({type: 'saved', id: mainDoc.id, path: mainDoc.path, kind: mainDoc.kind});
+                    body: JSON.stringify(body),
+                }).catch((err) => ({ok: false, json: async () => ({error: err.message})}));
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    refused.push(`"${area.label}" was not saved: ${data.error || `request failed (${res.status})`}`);
+                    continue;
+                }
+                markSaved(area.key, JSON.stringify(value));
+                broadcast?.postMessage({type: 'saved', id, path: body?.path});
             }
-            if (footerDirty) {
-                await fetch(`/api/editor/pages/${FOOTER_PAGE_ID}`, {
-                    method: 'PUT',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(footerData),
-                });
-                setSavedFooterJson(JSON.stringify(footerData));
-                broadcast?.postMessage({type: 'saved', id: FOOTER_PAGE_ID, path: footerData?.path});
+            if (refused.length) fail('save', refused.join('\n'));
+            else update('save', {status: 'done'});
+
+            update('publish', {status: 'active'});
+            try {
+                await publish();
+            } catch (err) {
+                fail('publish', `Saved locally — publish failed: ${err.message}`);
+                return;
             }
+            update('publish', {status: 'done'});
+            if (!refused.length) setSaveRun((run) => run && {...run, status: 'done'});
         } finally {
             broadcast?.close?.();
+            setIsSaving(false);
             refreshPushStatus();
         }
-    }, [mainDoc, footerData, mainDirty, footerDirty, refreshPushStatus]);
+    }, [currentPageId, areas, dirty, isSaving, saveLock.disabled, markSaved, publish, refreshPushStatus, showToast]);
 
-    const push = useCallback(async () => {
-        if (isPushing) return;
-        setIsPushing(true);
-        try {
-            const res = await fetch('/api/editor/push', {method: 'POST'});
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok || !data.ok) {
-                const detail = (data.steps || [])
-                    .filter((s) => s.code !== 0 || s.stderr)
-                    .map((s) => `[${s.step}] ${s.stderr || s.error || `exit ${s.code}`}`)
-                    .join('\n');
-                showToast(`Push failed — ${detail || data.error || 'unknown error'}`, 'error', 7000);
-            } else {
-                showToast('Pushed to remote', 'success');
-            }
-        } catch (err) {
-            showToast(`Push failed — ${err.message}`, 'error', 7000);
-        } finally {
-            setIsPushing(false);
-            refreshPushStatus();
-        }
-    }, [isPushing, refreshPushStatus, showToast]);
-
-    return {isPushing, canPush, save, push, refreshPushStatus};
+    return {
+        isSaving, saveRun, canPush, pushPreview, pendingLabels, save, refreshPushStatus,
+        saveDisabled: saveLock.disabled, saveTooltip: saveLock.tooltip,
+    };
 }

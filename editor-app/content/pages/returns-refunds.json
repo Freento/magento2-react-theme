@@ -4,21 +4,250 @@
   "blocks": [
     {
       "id": "rr-title",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "Returns & Refunds",
         "level": 1,
-        "textAlign": "left"
+        "textAlign": "left",
+        "fontSize": 44,
+        "letterSpacing": "-0.02em",
+        "html": "Returns &amp; Refunds"
       },
-      "style": {}
+      "style": {
+        "marginTop": 40,
+        "marginBottom": 32
+      }
     },
     {
-      "id": "rr-body",
-      "component": "Html",
+      "id": "rr-policy-h",
+      "component": "Text",
       "props": {
-        "html": "<h2>Return Policy</h2>\n<p>We want you to be completely satisfied with your purchase. If you're not happy with your order, we're here to help.</p>\n\n<h3>Return Window</h3>\n<p>You have 30 days from the date of delivery to return most items for a full refund or exchange.</p>\n\n<h3>Return Conditions</h3>\n<p>To be eligible for a return, items must be:</p>\n<ul>\n  <li>In their original condition</li>\n  <li>Unworn and unused</li>\n  <li>In the original packaging</li>\n  <li>With all tags attached</li>\n</ul>\n\n<h3>How to Return an Item</h3>\n<ol>\n  <li>Contact our customer service team at support@example.com to initiate a return</li>\n  <li>Receive your return authorization and shipping label</li>\n  <li>Pack the item securely in its original packaging</li>\n  <li>Ship the item using the provided label</li>\n</ol>\n\n<h3>Refunds</h3>\n<p>Once we receive and inspect your return, we will process your refund within 5-7 business days. Refunds will be issued to the original payment method.</p>\n\n<h3>Exchanges</h3>\n<p>If you need a different size or color, we're happy to exchange your item. Contact us to arrange an exchange.</p>\n\n<h3>Non-Returnable Items</h3>\n<p>The following items cannot be returned:</p>\n<ul>\n  <li>Personalized or custom-made products</li>\n  <li>Perishable goods</li>\n  <li>Intimate or sanitary products</li>\n  <li>Sale or clearance items (unless defective)</li>\n</ul>"
+        "level": 2,
+        "textAlign": "left",
+        "fontSize": 26,
+        "html": "Return Policy"
       },
-      "style": {}
+      "style": {
+        "marginBottom": 12
+      }
+    },
+    {
+      "id": "rr-policy-lead",
+      "component": "Text",
+      "props": {
+        "fontSize": 18,
+        "lineHeight": 1.6,
+        "color": "#6B6B6B",
+        "html": "We want you to be completely satisfied with your purchase. If you're not happy with your order, we're here to help.",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 16,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-window-h",
+      "component": "Text",
+      "props": {
+        "level": 3,
+        "textAlign": "left",
+        "fontSize": 20,
+        "html": "Return Window"
+      },
+      "style": {
+        "marginTop": 28,
+        "marginBottom": 8
+      }
+    },
+    {
+      "id": "rr-window-body",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "You have 30 days from the date of delivery to return most items for a full refund or exchange.",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 12,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-conditions-h",
+      "component": "Text",
+      "props": {
+        "level": 3,
+        "textAlign": "left",
+        "fontSize": 20,
+        "html": "Return Conditions"
+      },
+      "style": {
+        "marginTop": 28,
+        "marginBottom": 8
+      }
+    },
+    {
+      "id": "rr-conditions-intro",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "To be eligible for a return, items must be:",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 8,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-conditions-list",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "<ul><li>In their original condition</li><li>Unworn and unused</li><li>In the original packaging</li><li>With all tags attached</li></ul>",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 12,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-how-h",
+      "component": "Text",
+      "props": {
+        "level": 3,
+        "textAlign": "left",
+        "fontSize": 20,
+        "html": "How to Return an Item"
+      },
+      "style": {
+        "marginTop": 28,
+        "marginBottom": 8
+      }
+    },
+    {
+      "id": "rr-how-list",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "<ol><li>Contact our customer service team at <a class=\"plain\" href=\"mailto:support@example.com\">support@example.com</a> to initiate a return</li><li>Receive your return authorization and shipping label</li><li>Pack the item securely in its original packaging</li><li>Ship the item using the provided label</li></ol>",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 12,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-refunds-h",
+      "component": "Text",
+      "props": {
+        "level": 3,
+        "textAlign": "left",
+        "fontSize": 20,
+        "html": "Refunds"
+      },
+      "style": {
+        "marginTop": 28,
+        "marginBottom": 8
+      }
+    },
+    {
+      "id": "rr-refunds-body",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "Once we receive and inspect your return, we will process your refund within 5-7 business days. Refunds will be issued to the original payment method.",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 12,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-exchanges-h",
+      "component": "Text",
+      "props": {
+        "level": 3,
+        "textAlign": "left",
+        "fontSize": 20,
+        "html": "Exchanges"
+      },
+      "style": {
+        "marginTop": 28,
+        "marginBottom": 8
+      }
+    },
+    {
+      "id": "rr-exchanges-body",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "If you need a different size or color, we're happy to exchange your item. Contact us to arrange an exchange.",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 12,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-nonreturn-h",
+      "component": "Text",
+      "props": {
+        "level": 3,
+        "textAlign": "left",
+        "fontSize": 20,
+        "html": "Non-Returnable Items"
+      },
+      "style": {
+        "marginTop": 28,
+        "marginBottom": 8
+      }
+    },
+    {
+      "id": "rr-nonreturn-intro",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "The following items cannot be returned:",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 8,
+        "maxWidth": 720
+      }
+    },
+    {
+      "id": "rr-nonreturn-list",
+      "component": "Text",
+      "props": {
+        "fontSize": 15,
+        "lineHeight": 1.65,
+        "color": "#333",
+        "html": "<ul><li>Personalized or custom-made products</li><li>Perishable goods</li><li>Intimate or sanitary products</li><li>Sale or clearance items (unless defective)</li></ul>",
+        "level": "p"
+      },
+      "style": {
+        "marginBottom": 64,
+        "maxWidth": 720
+      }
     }
   ]
 }

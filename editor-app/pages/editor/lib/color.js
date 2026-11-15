@@ -47,7 +47,7 @@ export async function pickColorFromPage() {
       display: flex; align-items: center; gap: 8px;
       padding: 6px 10px 6px 6px;
       background: #fff;
-      border: 1px solid #d1d5db;
+      border: 1px solid #B9B9B4;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       font: 500 12px -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
@@ -55,7 +55,7 @@ export async function pickColorFromPage() {
       transform: translate(16px, 16px);
     `;
         const swatch = document.createElement('div');
-        swatch.style.cssText = `width: 32px; height: 32px; border-radius: 6px; border: 1px solid #d1d5db;`;
+        swatch.style.cssText = `width: 32px; height: 32px; border-radius: 6px; border: 1px solid #B9B9B4;`;
         const label = document.createElement('span');
         label.style.cssText = `font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px;`;
         preview.append(swatch, label);
@@ -106,14 +106,66 @@ export async function pickColorFromPage() {
     });
 }
 
+const NAMED = {
+    black: '000000', white: 'FFFFFF', red: 'FF0000', green: '008000', blue: '0000FF', yellow: 'FFFF00',
+    orange: 'FFA500', purple: '800080', pink: 'FFC0CB', gray: '808080', grey: '808080', silver: 'C0C0C0',
+    brown: 'A52A2A', navy: '000080', teal: '008080', lime: '00FF00', cyan: '00FFFF', aqua: '00FFFF',
+    magenta: 'FF00FF', fuchsia: 'FF00FF', maroon: '800000', olive: '808000', gold: 'FFD700',
+    beige: 'F5F5DC', ivory: 'FFFFF0', coral: 'FF7F50', salmon: 'FA8072', tomato: 'FF6347', crimson: 'DC143C',
+    indigo: '4B0082', violet: 'EE82EE', khaki: 'F0E68C', tan: 'D2B48C', chocolate: 'D2691E',
+    turquoise: '40E0D0', skyblue: '87CEEB', lightblue: 'ADD8E6', lightgray: 'D3D3D3', lightgrey: 'D3D3D3',
+    darkgray: 'A9A9A9', darkgrey: 'A9A9A9', darkblue: '00008B', darkgreen: '006400', darkred: '8B0000',
+};
+
+const channel = (raw, max) => {
+    const s = String(raw).trim();
+    if (s.endsWith('%')) return Math.round(parseFloat(s) / 100 * max);
+    return Number(s);
+};
+
+const hslToRgb = (h, s, l) => {
+    const sat = s / 100, light = l / 100;
+    const c = (1 - Math.abs(2 * light - 1)) * sat;
+    const hp = ((h % 360) + 360) % 360 / 60;
+    const x = c * (1 - Math.abs(hp % 2 - 1));
+    const [r, g, b] = hp < 1 ? [c, x, 0] : hp < 2 ? [x, c, 0] : hp < 3 ? [0, c, x] : hp < 4 ? [0, x, c] : hp < 5 ? [x, 0, c] : [c, 0, x];
+    const m = light - c / 2;
+    return [r + m, g + m, b + m].map((v) => Math.round(v * 255));
+};
+
+const toHex6 = (r, g, b) => [r, g, b]
+    .map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0'))
+    .join('').toUpperCase();
+
 export function parseColor(v) {
-    if (!v) return {hex6: '', alpha: 1};
-    const m = String(v).trim().match(/^#([0-9a-f]{6})([0-9a-f]{2})?$/i);
-    if (!m) return {hex6: '', alpha: 1};
-    return {
-        hex6: m[1].toUpperCase(),
-        alpha: m[2] ? parseInt(m[2], 16) / 255 : 1,
-    };
+    const none = {hex6: '', alpha: 1};
+    if (!v) return none;
+    const s = String(v).trim();
+    const low = s.toLowerCase();
+    if (low === 'transparent') return {hex6: '000000', alpha: 0};
+    if (NAMED[low]) return {hex6: NAMED[low], alpha: 1};
+    let m = s.match(/^#([0-9a-f]{6})([0-9a-f]{2})?$/i);
+    if (m) return {hex6: m[1].toUpperCase(), alpha: m[2] ? parseInt(m[2], 16) / 255 : 1};
+    m = s.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])?$/i);
+    if (m) {
+        const [, r, g, b, a] = m;
+        return {hex6: (r + r + g + g + b + b).toUpperCase(), alpha: a ? parseInt(a + a, 16) / 255 : 1};
+    }
+    m = low.match(/^rgba?\(\s*([^,\s/]+)[\s,]+([^,\s/]+)[\s,]+([^,\s/]+)(?:[\s,/]+([^\s)]+))?\s*\)$/);
+    if (m) {
+        const [r, g, b] = [m[1], m[2], m[3]].map((c) => channel(c, 255));
+        if ([r, g, b].some((n) => Number.isNaN(n))) return none;
+        const a = m[4] === undefined ? 1 : (m[4].endsWith('%') ? parseFloat(m[4]) / 100 : Number(m[4]));
+        return {hex6: toHex6(r, g, b), alpha: Number.isNaN(a) ? 1 : Math.max(0, Math.min(1, a))};
+    }
+    m = low.match(/^hsla?\(\s*([^,\s/]+)[\s,]+([^,\s/]+)[\s,]+([^,\s/]+)(?:[\s,/]+([^\s)]+))?\s*\)$/);
+    if (m) {
+        const h = parseFloat(m[1]), sa = parseFloat(m[2]), li = parseFloat(m[3]);
+        if ([h, sa, li].some((n) => Number.isNaN(n))) return none;
+        const a = m[4] === undefined ? 1 : (m[4].endsWith('%') ? parseFloat(m[4]) / 100 : Number(m[4]));
+        return {hex6: toHex6(...hslToRgb(h, sa, li)), alpha: Number.isNaN(a) ? 1 : Math.max(0, Math.min(1, a))};
+    }
+    return none;
 }
 
 export function combineColor(hex6, alpha) {

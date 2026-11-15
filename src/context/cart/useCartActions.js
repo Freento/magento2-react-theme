@@ -121,12 +121,16 @@ export const useCartActions = (state, dispatch) => {
 
   useAuthEvents({
     [AUTH_EVENTS.LOGOUT]: () => { initializeCart(true); },
-    [AUTH_EVENTS.TOKEN_VALIDATED]: () => { initializeCart(true); },
+    // Fires on every page load for a signed-in customer, not just on sign-in. A
+    // cart id already in the browser is the customer's (useCartAuthSync merged
+    // any guest cart into it), so there is nothing to ask for; only a browser
+    // without one needs Magento to hand over the customer's cart.
+    [AUTH_EVENTS.TOKEN_VALIDATED]: () => { if (!localStorage.getItem('cartId')) initializeCart(true); },
     [AUTH_EVENTS.TOKEN_INVALID]: () => { initializeCart(true); },
   });
 
-  const addToCart = async (sku, quantity = 1, selectedOptions = [], { openMiniCart: openAfterAdd = true } = {}) => {
-    let cartId = state.cartId;
+  const addToCart = async (sku, quantity = 1, selectedOptions = [], { openMiniCart: openAfterAdd = true, retryCartId = null } = {}) => {
+    let cartId = retryCartId || state.cartId;
     if (!cartId) {
       try {
         const result = await createEmptyCart();
@@ -166,7 +170,10 @@ export const useCartActions = (state, dispatch) => {
       setCartRequested(true);
       if (openAfterAdd) dispatch({ type: 'SET_IS_MINI_CART_OPEN', payload: true });
     } catch (error) {
-      if (isDeadCartError(error)) { await recoverCart(); }
+      if (isDeadCartError(error) && !retryCartId) {
+        const newCartId = await recoverCart();
+        if (newCartId) return addToCart(sku, quantity, selectedOptions, { openMiniCart: openAfterAdd, retryCartId: newCartId });
+      }
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
     } finally {
@@ -178,27 +185,54 @@ export const useCartActions = (state, dispatch) => {
   // callers that need to act on the outcome (cart item editing) can branch.
   const updateQuantity = async (cartItemId, quantity) => {
     if (!state.cartId) return false;
-    dispatch({ type: 'ADD_PENDING_ITEM', payload: cartItemId });
-    try {
+    const previousQty = state.cartData?.items?.find((it) => String(it.id) === String(cartItemId))?.quantity;
+    const sendQty = async (qty) => {
       const result = await updateCartItems({
         variables: {
           cartId: state.cartId,
-          cartItems: [{ cart_item_id: cartItemId, quantity }],
+          cartItems: [{ cart_item_id: cartItemId, quantity: qty }],
         },
+        fetchPolicy: 'no-cache',
       });
-
-      if (result.data?.updateCartItems?.cart) {
-        dispatch({ type: 'SET_CART_DATA', payload: result.data.updateCartItems.cart });
+      return result.data?.updateCartItems?.cart || null;
+    };
+    const commitCart = (cart) => {
+      if (!cart) return;
+      try {
+        const variables = { cartId: state.cartId };
+        const existing = apolloClient.readQuery({ query: GET_CART_DETAILS, variables });
+        const merged = existing?.cart ? { ...existing.cart, ...cart } : cart;
+        apolloClient.writeQuery({ query: GET_CART_DETAILS, variables, data: { cart: merged } });
+        writeCartCache(state.cartId, merged);
+        dispatch({ type: 'SET_CART_DATA', payload: merged });
+      } catch (err) {
+        dispatch({ type: 'SET_CART_DATA', payload: cart });
       }
+    };
+    dispatch({ type: 'ADD_PENDING_ITEM', payload: cartItemId });
+    try {
+      const cart = await sendQty(quantity);
+      const line = cart?.items?.find((it) => String(it.id) === String(cartItemId));
+      const rejection = line?.errors?.find((e) => e?.message)?.message;
+
+      if (rejection && previousQty != null && previousQty !== quantity) {
+        commitCart((await sendQty(previousQty)) || cart);
+        dispatch({ type: 'SET_ATTENTION', payload: rejection });
+        return false;
+      }
+
+      commitCart(cart);
       return true;
     } catch (error) {
       if (isDeadCartError(error)) { await recoverCart(); }
-      else dispatch({ type: 'SET_ERROR', payload: error.message });
+      else dispatch({ type: 'SET_ATTENTION', payload: error.message });
       return false;
     } finally {
       dispatch({ type: 'REMOVE_PENDING_ITEM', payload: cartItemId });
     }
   };
+
+  const clearAttention = () => dispatch({ type: 'SET_ATTENTION', payload: null });
 
   const removeItem = async (cartItemId, { silent = false } = {}) => {
     if (!state.cartId) return false;
@@ -286,5 +320,6 @@ export const useCartActions = (state, dispatch) => {
     refetchCart,
     loadCart,
     clearError,
+    clearAttention,
   };
 };

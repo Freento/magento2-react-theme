@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCompare } from '../../context/CompareContext';
-import { productHref, productResolvedState } from '../../lib/productLink';
+import { productHref, productResolvedState, productPrefetchAttrs } from '../../lib/productLink';
 import { useCart } from '../../context/CartContext';
 import { src } from '../../lib/productImage';
 import PrintIcon from '../ui/icons/PrintIcon';
@@ -69,7 +69,7 @@ const ComparePage = () => {
                   >
                     <CloseIcon />
                   </button>
-                  <Link to={productHref(product)} state={productResolvedState(product)} className="compare-product-link block text-inherit hover:text-inherit">
+                  <Link to={productHref(product)} state={productResolvedState(product)} {...productPrefetchAttrs(product)} className="compare-product-link block text-inherit hover:text-inherit">
                     <img src={src(product.small_image)} alt={product.name} loading="lazy" className="w-[120px] h-[150px] object-cover rounded bg-surface mb-2.5" />
                     <span className="compare-product-name block text-base font-medium text-ink">{product.name}</span>
                   </Link>
@@ -80,6 +80,7 @@ const ComparePage = () => {
                     <button
                       type="button"
                       className="btn-primary compare-cart-btn inline-flex items-center justify-center w-auto m-0 py-[9px] px-4 text-13 no-underline print:!hidden"
+                      {...productPrefetchAttrs(product)}
                       onClick={() => {
                         notice('You need to choose options for your item.');
                         navigate(productHref(product), { state: productResolvedState(product) });

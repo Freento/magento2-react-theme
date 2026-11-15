@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { GET_CUSTOMER_DATA, GET_CUSTOMER_ORDERS, GET_CUSTOMER_ORDERS_WITH_COUPONS, GET_CUSTOMER_ORDER_FIELDS, CREATE_CUSTOMER_ADDRESS, UPDATE_CUSTOMER_ADDRESS, DELETE_CUSTOMER_ADDRESS, GET_CUSTOMER_WISHLIST, REMOVE_PRODUCTS_FROM_WISHLIST, REORDER_ITEMS } from '../../queries/customer';
+import { GET_CUSTOMER_DATA, getCustomerOrdersQuery, GET_CUSTOMER_ORDER_FIELDS, CREATE_CUSTOMER_ADDRESS, UPDATE_CUSTOMER_ADDRESS, DELETE_CUSTOMER_ADDRESS, GET_CUSTOMER_WISHLIST, REFETCH_WISHLIST, GET_CUSTOMER_PAYMENT_TOKENS, GET_TOKENBASE_CARDS, GET_PAYPAL_BILLING_AGREEMENTS, REMOVE_PRODUCTS_FROM_WISHLIST, REORDER_ITEMS } from '../../queries/customer';
 import { GET_COUNTRIES } from '../../queries/checkout';
 import useAddressValidation from '../../hooks/useAddressValidation';
 import useProfileForm from './hooks/useProfileForm';
@@ -22,7 +22,11 @@ import CompareSidebarBlock from './CompareSidebarBlock';
 import '../../styles/account/MyAccount.css';
 
 const MyAccount = () => {
-  const { user, logout, initialLoading, openLoginModal } = useAuth();
+  const { user, token, logout, initialLoading, openLoginModal } = useAuth();
+  // Every query below is the customer's own. Without a token Magento can only
+  // refuse them, and a refusal cached for a guest would still be on screen after
+  // they sign in — the variables do not change, so nothing would refetch.
+  const guest = !token;
   const location = useLocation();
   const navigate = useNavigate();
   const { refetchCart, openMiniCart } = useCart();
@@ -30,7 +34,12 @@ const MyAccount = () => {
   const [reorderError, setReorderError] = useState('');
   const [reorderItems] = useMutation(REORDER_ITEMS);
   const viewingOrderNumber = new URLSearchParams(location.search || '').get('order');
-  const [activeTab, setActiveTab] = useState('profile');
+  // From the URL on the first render, not after an effect: the queries below are
+  // chosen by tab, and a first render that always thinks "profile" would fetch
+  // the profile's data on every tab.
+  const [activeTab, setActiveTab] = useState(
+    () => location.state?.activeTab || new URLSearchParams(location.search || '').get('tab') || 'profile',
+  );
   // Address management state
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [addressEditMode, setAddressEditMode] = useState('add'); // 'add' or 'edit'
@@ -60,22 +69,43 @@ const MyAccount = () => {
   const [wishlistPage, setWishlistPage] = useState(1);
   const [wishlistPageSize] = useState(12);
 
-  const { data: customerData, loading: customerLoading, error: customerError, refetch: refetchCustomerData } = useQuery(GET_CUSTOMER_DATA);
+  // None of this is fetched during SSR (`ssr: false`): the server renders this page
+  // as a skeleton — auth is still initialising there — so the data would only delay
+  // the first byte while the browser fetches it anyway once it has a user.
+  // Beyond the profile, each tab asks only for what it shows; the profile tab
+  // shows both counts, so it takes orders and wishlist too. A tab's query stays on
+  // once the tab has been opened: switching it off again would restart it on the
+  // way back, and the `cache-and-network` default would refetch every time.
+  const [visitedTabs, setVisitedTabs] = useState(() => new Set([activeTab]));
+  useEffect(() => {
+    setVisitedTabs((prev) => (prev.has(activeTab) ? prev : new Set(prev).add(activeTab)));
+  }, [activeTab]);
+  const opened = (tab) => tab === activeTab || visitedTabs.has(tab);
+  const needsOrders = opened('orders') || opened('profile');
+  const needsWishlist = opened('wishlist') || opened('profile');
+  const { data: customerData, loading: customerLoading, error: customerError, refetch: refetchCustomerData } = useQuery(GET_CUSTOMER_DATA, { skip: guest, ssr: false });
   const [ordersPage, setOrdersPage] = useState(1);
   const ordersPageSize = 10;
-  const { data: orderFieldsData, loading: orderFieldsLoading } = useQuery(GET_CUSTOMER_ORDER_FIELDS, { fetchPolicy: 'cache-first' });
+  const { data: orderFieldsData, loading: orderFieldsLoading } = useQuery(GET_CUSTOMER_ORDER_FIELDS, { skip: guest || !needsOrders, ssr: false, fetchPolicy: 'cache-first' });
   const ordersSupportCoupons = (orderFieldsData?.__type?.fields || []).some((f) => f.name === 'applied_coupons');
+  const ordersSupportSort = Boolean(orderFieldsData?.orderSortInput);
   const { data: ordersData, loading: ordersQueryLoading, error: ordersError } = useQuery(
-    ordersSupportCoupons ? GET_CUSTOMER_ORDERS_WITH_COUPONS : GET_CUSTOMER_ORDERS,
-    { variables: { pageSize: ordersPageSize, currentPage: ordersPage }, skip: orderFieldsLoading }
+    getCustomerOrdersQuery({ withCoupons: ordersSupportCoupons, withSort: ordersSupportSort }),
+    { variables: { pageSize: ordersPageSize, currentPage: ordersPage }, skip: guest || !needsOrders || orderFieldsLoading, ssr: false }
   );
   const ordersLoading = orderFieldsLoading || ordersQueryLoading;
-  const { data: wishlistData, loading: wishlistLoading, error: wishlistError, refetch: refetchWishlist } = useQuery(GET_CUSTOMER_WISHLIST, {
+  const { data: wishlistData, loading: wishlistLoading, error: wishlistError } = useQuery(GET_CUSTOMER_WISHLIST, {
     variables: { currentPage: wishlistPage, pageSize: wishlistPageSize },
+    skip: guest || !needsWishlist,
+    ssr: false,
     notifyOnNetworkStatusChange: true,
   });
 
-  const { data: countriesData } = useQuery(GET_COUNTRIES, { fetchPolicy: 'cache-first' });
+  const paymentTokensQuery = useQuery(GET_CUSTOMER_PAYMENT_TOKENS, { skip: guest || !opened('payments'), ssr: false, errorPolicy: 'all' });
+  const tokenbaseCardsQuery = useQuery(GET_TOKENBASE_CARDS, { skip: guest || !opened('payments'), ssr: false, errorPolicy: 'ignore' });
+  const billingAgreementsQuery = useQuery(GET_PAYPAL_BILLING_AGREEMENTS, { skip: guest || !opened('payments'), ssr: false, errorPolicy: 'ignore' });
+
+  const { data: countriesData } = useQuery(GET_COUNTRIES, { skip: guest || !isAddressModalOpen, ssr: false, fetchPolicy: 'cache-first' });
   const optionalZipCountries = [];
 
   const availableRegions =
@@ -171,8 +201,7 @@ const MyAccount = () => {
     },
   });
   const [removeProductsFromWishlist] = useMutation(REMOVE_PRODUCTS_FROM_WISHLIST, {
-    refetchQueries: ['getCustomerWishlist'],
-    awaitRefetchQueries: true,
+    ...REFETCH_WISHLIST,
     update(cache, _result, { variables }) {
       if (!variables?.wishlistId) return;
       const removedIds = new Set((variables.wishlistItemsIds || []).map(String));
@@ -213,29 +242,39 @@ const MyAccount = () => {
       new URLSearchParams(location.search || '').get('tab') ||
       'profile';
 
+    const cardCls = 'bg-bg border border-line rounded';
     const profileSkel = (
-      <div className="flex flex-col gap-[18px]">
-        <div className="grid grid-cols-2 gap-[18px] max640:grid-cols-1">
-          <div className="flex flex-col gap-1.5">
-            <span className="skeleton w-[30%] h-[11px]" />
-            <span className="skeleton w-full h-11" />
+      <div className="account-section">
+        <div className={`${cardCls} px-6 py-[22px] mb-3.5 grid grid-cols-[auto_1fr_auto] gap-5 items-center max720:grid-cols-[auto_1fr]`}>
+          <span className="skeleton w-16 h-16 rounded-full" />
+          <div className="min-w-0">
+            <div className="h-8 mb-1.5 flex items-center"><span className="skeleton w-[180px] h-7" /></div>
+            <div className="h-[18px] flex items-center"><span className="skeleton w-[260px] max-w-full h-3.5" /></div>
           </div>
-          <div className="flex flex-col gap-1.5">
-            <span className="skeleton w-[30%] h-[11px]" />
-            <span className="skeleton w-full h-11" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-[18px] max640:grid-cols-1">
-          <div className="flex flex-col gap-1.5">
-            <span className="skeleton w-[30%] h-[11px]" />
-            <span className="skeleton w-full h-11" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <span className="skeleton w-[30%] h-[11px]" />
-            <span className="skeleton w-full h-11" />
+          <div className="flex flex-col gap-2 shrink-0 max720:col-span-full max720:flex-row">
+            <span className="skeleton w-[150px] h-11 max720:flex-1" />
+            <span className="skeleton w-[150px] h-11 max720:flex-1" />
           </div>
         </div>
-        <span className="skeleton w-[140px] h-10 mt-1" />
+        <div className="grid grid-cols-3 gap-2.5 mb-3.5 max480:grid-cols-1">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={`stat-${i}`} className={`${cardCls} flex flex-col items-start gap-1 px-5 py-[18px]`}>
+              <div className="h-7 flex items-center"><span className="skeleton w-8 h-6" /></div>
+              <div className="h-[15px] flex items-center"><span className="skeleton w-20 h-2.5" /></div>
+            </div>
+          ))}
+        </div>
+        <div className={`${cardCls} px-6 py-[22px] mb-3.5`}>
+          <div className="h-[21px] mb-3.5 flex items-center"><span className="skeleton w-40 h-4" /></div>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 max480:grid-cols-1">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={`detail-${i}`}>
+                <div className="h-4 mb-1 flex items-center"><span className="skeleton w-16 h-2.5" /></div>
+                <div className="h-5 flex items-center"><span className="skeleton w-32 h-3.5" /></div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
 
@@ -280,33 +319,64 @@ const MyAccount = () => {
       </div>
     );
 
-    let mainSkel = profileSkel;
-    if (pendingTab === 'addresses') mainSkel = addressesSkel;
+
+    const newsletterSkel = (
+      <div className="account-section">
+        <div className="flex items-center gap-2 h-[19.5px]">
+          <span className="skeleton w-4 h-4 rounded-sm" />
+          <span className="skeleton w-[130px] h-3" />
+        </div>
+        <span className="skeleton w-[76px] h-11 mt-5" />
+      </div>
+    );
+
+    const tabSkels = {
+      addresses: (
+        <div className="account-section">
+          <span className="skeleton w-[180px] h-[22px] mb-6" />
+          {addressesSkel}
+        </div>
+      ),
+      orders: <OrdersTab ordersLoading viewingOrderNumber={viewingOrderNumber} />,
+      wishlist: <WishlistTab wishlistLoading />,
+      payments: <StoredPaymentsTab tokensQuery={{ loading: true }} />,
+      newsletter: newsletterSkel,
+    };
 
     return (
       <div className="max-w-[1280px] mx-auto pt-8 px-6 pb-20 max768:pt-5 max768:px-0 max768:pb-0 pointer-events-none" aria-busy="true" aria-live="polite">
         <div className="flex justify-between items-center gap-4 pb-7 mb-8 border-b border-line max768:gap-3 max768:pb-5 max768:mb-6">
-          <div>
-            <span className="skeleton w-[220px] h-8 mb-2" />
-            <span className="skeleton w-[280px] h-3.5" />
+          <div className="min-w-0">
+            <div className="mb-1.5 text-3xl max768:text-[24px] leading-tight"><span className="skeleton inline-block align-middle w-[180px] h-8 max768:h-6" /></div>
+            <div className="text-base max768:text-13"><span className="skeleton inline-block align-middle w-[150px] h-3.5" /></div>
           </div>
-          <span className="skeleton w-[88px] h-10 self-end" />
+          <span className="skeleton w-[100px] h-10 shrink-0" />
         </div>
         <div className="grid grid-cols-[240px_1fr] gap-10 items-start max1024:grid-cols-[200px_1fr] max1024:gap-8 max768:grid-cols-1 max768:gap-5">
           <nav className="sticky top-6 max768:static max768:min-w-0">
             <ul className="list-none p-0 m-0 flex flex-col gap-0.5 max768:flex-row max768:gap-0 max768:overflow-x-auto max768:[-webkit-overflow-scrolling:touch] max768:[scrollbar-width:none] max768:[&::-webkit-scrollbar]:hidden max768:border-b max768:border-line max768:-mx-4 max768:px-4 max768:max-w-full max768:flex-nowrap">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <li key={`tab-${i}`}>
-                  <span className="skeleton w-4/5 h-9 my-0.5" />
+              {[
+                ['profile', 'w-[136px]'],
+                ['addresses', 'w-[100px]'],
+                ['orders', 'w-[96px]'],
+                ['wishlist', 'w-[84px]'],
+                ['payments', 'w-[170px]'],
+                ['newsletter', 'w-[160px]'],
+              ].map(([id, w], i, all) => (
+                <li key={`tab-${id}`}>
+                  <span className={`block w-full py-3 pl-3.5 border-l-2 text-base max768:border-l-0 max768:border-b-2 max768:px-3.5 max768:text-13 max768:whitespace-nowrap max480:py-[11px] max480:px-3 max480:text-sm ${id === pendingTab || (i === 0 && !all.some(([t]) => t === pendingTab)) ? 'border-ink' : 'border-transparent'}`}>
+                    <span className={`skeleton inline-block align-middle h-3.5 ${w}`} />
+                  </span>
                 </li>
               ))}
             </ul>
+            <div className="mt-7 pt-5 pl-4 border-t border-line max768:hidden">
+              <div className="h-[11.5px] flex items-center"><span className="skeleton w-[130px] h-2.5" /></div>
+              <div className="h-[18px] mt-2.5 flex items-center"><span className="skeleton w-[170px] h-3" /></div>
+            </div>
           </nav>
           <main className="w-full min-w-0">
-            <div className="account-section">
-              <span className="skeleton w-[180px] h-[22px] mb-6" />
-              {mainSkel}
-            </div>
+            {tabSkels[pendingTab] || profileSkel}
           </main>
         </div>
       </div>
@@ -514,7 +584,6 @@ const MyAccount = () => {
         }
       });
 
-      await refetchWishlist();
       setWishlistActionSuccess('Item removed from wishlist!');
       setTimeout(() => setWishlistActionSuccess(''), 3000);
     } catch (error) {
@@ -619,6 +688,9 @@ const MyAccount = () => {
       case 'payments':
         return (
           <StoredPaymentsTab
+            tokensQuery={paymentTokensQuery}
+            cimQuery={tokenbaseCardsQuery}
+            agreementsQuery={billingAgreementsQuery}
             onSuccess={(msg) => {
               setAddressSuccess(msg);
               setTimeout(() => setAddressSuccess(''), 3000);

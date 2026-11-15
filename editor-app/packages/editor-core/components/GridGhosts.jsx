@@ -1,15 +1,10 @@
-import { computeGridEmpties, computeGridTailRow } from '../lib/grid.js';
+import { computeGridEmpties } from '../lib/grid.js';
 
-export function GridGhosts({ block, dropTarget, onDropTargetChange, isDragging }) {
-  const direction = block.props?.direction || 'grid';
-  if (direction === 'column' || direction === 'row') return null;
-  const empty = computeGridEmpties(block);
-  const tail = isDragging ? computeGridTailRow(block) : [];
-  const allGhosts = [...empty, ...tail];
-  if (allGhosts.length === 0) return null;
+export function GridGhosts({ block, dropTarget, onDropTargetChange, isDragging, devices }) {
+  const empty = computeGridEmpties(block, devices);
+  if (empty.length === 0) return null;
   const childrenCount = (block.children || []).length;
-  const tailRow = tail.length ? tail[0].r : null;
-  return allGhosts.map(({ r, c }) => {
+  return empty.map(({ r, c }) => {
     const isActive =
       dropTarget?.parentId === block.id &&
       dropTarget?.cell?.r === r &&
@@ -17,12 +12,12 @@ export function GridGhosts({ block, dropTarget, onDropTargetChange, isDragging }
     return (
       <div
         key={`ghost-${r}-${c}`}
-        className="editor-grid-ghost flex items-center justify-center text-e-text-soft text-[20px] font-light select-none transition-all duration-[120ms] hover:text-e-primary"
+        className="editor-grid-ghost flex items-center justify-center text-ed-text-soft text-[20px] font-light select-none [transition:all_0.12s] hover:text-ed-primary"
         style={{
           gridColumn: `${c}`,
           gridRow: `${r}`,
           minHeight: 80,
-          border: isActive ? '2px solid #0F4C5C' : '1.5px dashed #9A9A95',
+          border: isActive ? '2px solid #0F4C5C' : '1.5px dashed #9E9E99',
           borderRadius: 6,
           backgroundColor: isActive ? 'rgba(15, 76, 92, 0.08)' : 'rgba(15, 76, 92, 0.025)',
           backgroundImage: isActive
@@ -31,7 +26,7 @@ export function GridGhosts({ block, dropTarget, onDropTargetChange, isDragging }
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: isActive ? '#0F4C5C' : '#9A9A95',
+          color: isActive ? '#0F4C5C' : '#6F6F6B',
           fontSize: 20,
           pointerEvents: 'auto',
         }}

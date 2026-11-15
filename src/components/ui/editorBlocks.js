@@ -1,5 +1,5 @@
 import * as defaultBlocks from 'editor-core/blocks';
-import HostProductsCarousel from '../catalog/ProductsCarousel';
+import HostProductsList from '../catalog/ProductsList';
 import HostNewsletterForm from '../layout/NewsletterForm';
 import HostContactForm from '../contact/ContactForm';
 
@@ -11,7 +11,7 @@ import HostContactForm from '../contact/ContactForm';
  */
 export const storefrontBlocks = {
   ...defaultBlocks,
-  ProductsCarousel: HostProductsCarousel,
+  ProductsList: HostProductsList,
   NewsletterForm: HostNewsletterForm,
   ContactForm: HostContactForm,
 };

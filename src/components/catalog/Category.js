@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery, useApolloClient } from '@apollo/client';
 import { useLocation, Navigate } from 'react-router-dom';
 import { useSyncBreadcrumbs } from '../../context/BreadcrumbContext';
 import useFilters from '../../hooks/useFilters';
 import { useResolvedUrl } from '../../hooks/useResolvedUrl';
-import useMenuData from '../layout/Menu/hooks/useMenuData';
 import ProductDetail from './ProductDetail';
 import ProductList from './ProductList';
 import CategorySkeleton from './CategorySkeleton';
 import NotFound from '../ui/NotFound';
 import EditorArea from '../ui/EditorArea';
 import { GET_CATEGORY_PRODUCTS, GET_CATEGORY_META } from '../../queries/category';
+import { GET_CATEGORIES } from '../../queries/menu';
 import { categoryProductsVariables } from '../../lib/catalog';
 import { getCategoryUid } from '../../hooks/filters/filterUrl';
 import { useRouteArea } from '../../hooks/useRouteArea';
@@ -19,6 +19,7 @@ import {
 } from 'editor-core/routes';
 import { useAuth } from '../../context/AuthContext';
 import { isSsrPersonalized } from '../../lib/ssrPersonalized';
+import { isPrefetchedForCustomer } from '../../lib/prefetch';
 
 const findCategoryNameById = (menuData, id) => {
   if (id == null) return null;
@@ -58,7 +59,7 @@ const Category = ({
   const location = useLocation();
   const urlPath = location.pathname;
 
-  const resolvedFromUrl = useResolvedUrl(urlPath);
+  const { data: resolvedFromUrl, loading: resolvePending } = useResolvedUrl(urlPath);
   const routeData = resolved || resolvedFromUrl;
   const { isAuthenticated } = useAuth();
 
@@ -75,8 +76,13 @@ const Category = ({
   const showBlocks = showsBlocks(displayMode) && !!areaContent;
   const showProducts = showsRouteContent(displayMode);
 
-  const { menuData } = useMenuData({ isOpen: true });
-  const categoryName = findCategoryNameById(menuData, categoryId) || 'Category';
+  // Only a fallback for the title, so whatever the menu already put in the
+  // cache is enough. A plain read, not a useQuery: on the server that would
+  // share the menu's SSR registration and stop the menu from being fetched.
+  const client = useApolloClient();
+  let menuData = null;
+  try { menuData = client.readQuery({ query: GET_CATEGORIES }); } catch { /* not cached yet */ }
+  const categoryName = findCategoryNameById(menuData, categoryId) || location.state?.resolved?.name || 'Category';
 
   // Use filters hook for filtering functionality
   const {
@@ -99,6 +105,11 @@ const Category = ({
     graphqlSort
   } = useFilters(categoryId, enabledLayerNavigation);
 
+  const handlePageChange = (page) => {
+    setPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Prepare variables for GraphQL query
   const queryVariables = useMemo(
     () => categoryProductsVariables(categoryId, {
@@ -117,9 +128,13 @@ const Category = ({
   const { loading: productsLoading, error: productsError, data, previousData } = useQuery(GET_CATEGORY_PRODUCTS, {
     variables: queryVariables,
     skip: !isCategory || !showProducts || areaPending,
-    // Personalized SSR already put the customer's prices in the cache; otherwise
+    // Personalized SSR already put the customer's prices in the cache, and so did a
+    // hover prefetch that fetched this very listing with their token; otherwise
     // (prerender, rejected token, blocked cookie) they have to be fetched.
-    fetchPolicy: isAuthenticated && !isSsrPersonalized() ? 'cache-and-network' : 'cache-first',
+    fetchPolicy: isAuthenticated && !isSsrPersonalized()
+      && !isPrefetchedForCustomer({ query: GET_CATEGORY_PRODUCTS, variables: queryVariables })
+      ? 'cache-and-network'
+      : 'cache-first',
   });
 
   // The name and breadcrumbs ride along with the products; when the list is
@@ -129,7 +144,10 @@ const Category = ({
     skip: !isCategory || showProducts || areaPending,
   });
 
-  const productsData = data ?? previousData;
+  const sameCategoryPrevious = previousData?.categoryList?.[0]?.uid === queryVariables.categoryUid
+    ? previousData
+    : undefined;
+  const productsData = data ?? sameCategoryPrevious;
 
   // Breadcrumb trail from the categoryList metadata returned by the same query
   // (ancestors root-first by level; the current category is the last, unlinked
@@ -173,13 +191,17 @@ const Category = ({
     return <NotFound />;
   }
 
+  // A plain link (editor content) gave no route state; Magento is being asked
+  // what this URL is. Not knowing yet is not the same as "not found".
+  if (!routeData && resolvePending) return <CategorySkeleton />;
+
   if (!routeData || routeData.type !== 'category') {
     return <NotFound />;
   }
 
   // "Hide everything" keeps the header, breadcrumbs and footer — the heading
   // alone over an empty page is worse than no page content at all.
-  if (displayMode === 'none') return <div className="category-page pt-10 max768:pt-4" />;
+  if (displayMode === 'none') return <div className="category-page" />;
 
   const listPending = showProducts && !productsData && (areaPending || productsLoading || !!productsError);
 
@@ -193,6 +215,7 @@ const Category = ({
   const products = productsData?.products?.items || [];
   const totalCount = productsData?.products?.total_count || 0;
   const pageInfo = productsData?.products?.page_info;
+  const pagePending = productsLoading && !!pageInfo && pageInfo.current_page !== currentPage;
 
   // A category holding no products of its own is a landing page, whatever its
   // display mode says. Next to editor blocks an empty toolbar over "No products
@@ -204,7 +227,7 @@ const Category = ({
   const showList = showProducts && !listPending && !(emptyCategory && showBlocks);
 
   return (
-    <div className="category-page pt-10 max768:pt-4">
+    <div className="category-page">
       <h1 className="page-title text-hero text-ink mb-1.5 tracking-[-0.02em] max768:text-2xl max768:leading-[1.2]">{categoryMeta?.name || categoryName}</h1>
       {showProducts && totalCount > 0 && (
         <div className="page-count-mobile hidden max768:block mt-1 mb-3.5 font-serif italic text-ink-2 text-md">
@@ -223,7 +246,8 @@ const Category = ({
           totalCount={totalCount}
           pageInfo={pageInfo}
           currentPage={currentPage}
-          onPageChange={setPage}
+          onPageChange={handlePageChange}
+          productsPending={pagePending}
           currentSort={currentSort}
           onSortChange={setSort}
           enabledLayerNavigation={isEnabled}

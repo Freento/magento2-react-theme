@@ -4,13 +4,13 @@
   "blocks": [
     {
       "id": "about-title",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "About Us",
         "level": 1,
         "textAlign": "left",
         "fontSize": 44,
-        "letterSpacing": "-0.02em"
+        "letterSpacing": "-0.02em",
+        "html": "About Us"
       },
       "style": {
         "marginTop": 40,
@@ -21,10 +21,11 @@
       "id": "about-lead",
       "component": "Text",
       "props": {
-        "text": "We're a small team building a thoughtful shopping experience — carefully curated products, transparent pricing, and a checkout that doesn't get in your way.",
         "fontSize": 18,
         "lineHeight": 1.6,
-        "color": "#6B6B6B"
+        "color": "#6B6B6B",
+        "html": "We're a small team building a thoughtful shopping experience — carefully curated products, transparent pricing, and a checkout that doesn't get in your way.",
+        "level": "p"
       },
       "style": {
         "marginBottom": 48,
@@ -33,12 +34,12 @@
     },
     {
       "id": "about-mission-h",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "Our Mission",
         "level": 2,
         "textAlign": "left",
-        "fontSize": 26
+        "fontSize": 26,
+        "html": "Our Mission"
       },
       "style": {
         "marginBottom": 12
@@ -48,10 +49,11 @@
       "id": "about-mission-body",
       "component": "Text",
       "props": {
-        "text": "To deliver the best possible shopping experience by offering a focused selection of high-quality products at fair prices, backed by support that actually solves problems.",
         "fontSize": 15,
         "lineHeight": 1.65,
-        "color": "#333"
+        "color": "#333",
+        "html": "To deliver the best possible shopping experience by offering a focused selection of high-quality products at fair prices, backed by support that actually solves problems.",
+        "level": "p"
       },
       "style": {
         "marginBottom": 48,
@@ -60,12 +62,12 @@
     },
     {
       "id": "about-why-h",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "Why shop with us",
         "level": 2,
         "textAlign": "left",
-        "fontSize": 26
+        "fontSize": 26,
+        "html": "Why shop with us"
       },
       "style": {
         "marginBottom": 20
@@ -75,80 +77,188 @@
       "id": "about-why-grid",
       "component": "Grid",
       "props": {
-        "direction": "grid",
         "columns": 2,
         "rowGap": 12,
-        "columnGap": 32
+        "columnGap": 32,
+        "rows": 3
       },
       "style": {
         "marginBottom": 64
       },
       "children": [
         {
-          "id": "why-1",
-          "component": "Text",
+          "id": "b5o7ixs6",
+          "component": "Column",
           "props": {
-            "text": "✓  Curated selection of quality products",
-            "fontSize": 15,
-            "lineHeight": 1.5,
-            "color": "#111"
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
           },
-          "style": {}
+          "style": {
+            "colStart": 1,
+            "rowStart": 1
+          },
+          "children": [
+            {
+              "id": "why-1",
+              "component": "Text",
+              "props": {
+                "fontSize": 15,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "✓  Curated selection of quality products",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         },
         {
-          "id": "why-2",
-          "component": "Text",
+          "id": "b7i84428",
+          "component": "Column",
           "props": {
-            "text": "✓  Competitive, transparent pricing",
-            "fontSize": 15,
-            "lineHeight": 1.5,
-            "color": "#111"
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
           },
-          "style": {}
+          "style": {
+            "colStart": 2,
+            "rowStart": 1
+          },
+          "children": [
+            {
+              "id": "why-2",
+              "component": "Text",
+              "props": {
+                "fontSize": 15,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "✓  Competitive, transparent pricing",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         },
         {
-          "id": "why-3",
-          "component": "Text",
+          "id": "b3ohmrtz",
+          "component": "Column",
           "props": {
-            "text": "✓  Fast, tracked shipping",
-            "fontSize": 15,
-            "lineHeight": 1.5,
-            "color": "#111"
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
           },
-          "style": {}
+          "style": {
+            "colStart": 1,
+            "rowStart": 2
+          },
+          "children": [
+            {
+              "id": "why-3",
+              "component": "Text",
+              "props": {
+                "fontSize": 15,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "✓  Fast, tracked shipping",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         },
         {
-          "id": "why-4",
-          "component": "Text",
+          "id": "bbqiqnea",
+          "component": "Column",
           "props": {
-            "text": "✓  Secure payment processing",
-            "fontSize": 15,
-            "lineHeight": 1.5,
-            "color": "#111"
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
           },
-          "style": {}
+          "style": {
+            "colStart": 2,
+            "rowStart": 2
+          },
+          "children": [
+            {
+              "id": "why-4",
+              "component": "Text",
+              "props": {
+                "fontSize": 15,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "✓  Secure payment processing",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         },
         {
-          "id": "why-5",
-          "component": "Text",
+          "id": "bmoz8qno",
+          "component": "Column",
           "props": {
-            "text": "✓  Easy 30-day returns",
-            "fontSize": 15,
-            "lineHeight": 1.5,
-            "color": "#111"
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
           },
-          "style": {}
+          "style": {
+            "colStart": 1,
+            "rowStart": 3
+          },
+          "children": [
+            {
+              "id": "why-5",
+              "component": "Text",
+              "props": {
+                "fontSize": 15,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "✓  Easy 30-day returns",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         },
         {
-          "id": "why-6",
-          "component": "Text",
+          "id": "bu56byby",
+          "component": "Column",
           "props": {
-            "text": "✓  Real human support",
-            "fontSize": 15,
-            "lineHeight": 1.5,
-            "color": "#111"
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
           },
-          "style": {}
+          "style": {
+            "colStart": 2,
+            "rowStart": 3
+          },
+          "children": [
+            {
+              "id": "why-6",
+              "component": "Text",
+              "props": {
+                "fontSize": 15,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "✓  Real human support",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         }
       ]
     }

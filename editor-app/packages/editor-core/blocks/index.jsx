@@ -1,12 +1,12 @@
 export { default as Grid } from './Grid';
-export { default as Box } from './Box';
+export { default as Column } from './Column';
 export { default as Heading } from './Heading';
 export { default as Text } from './Text';
 export { default as Image } from './Image';
-export { default as Icon } from './Icon';
 export { default as Button } from './Button';
 export { default as Html } from './Html';
-export { default as ProductsCarousel } from './ProductsCarousel';
+export { default as ProductsList } from './ProductsList';
 export { default as NewsletterForm } from './NewsletterForm';
 export { default as HeroSlider } from './HeroSlider';
 export { default as ContactForm } from './ContactForm';
+export { default as Menu } from './Menu';

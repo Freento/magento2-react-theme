@@ -4,7 +4,7 @@ import vike from 'vike/plugin';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 
-import { EDITOR_BASE } from './buildId.js';
+import { EDITOR_BASE, EDITOR_BASE_PROD } from './buildId.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const HOST_ROOT = path.resolve(__dirname, '..');
@@ -17,7 +17,9 @@ export default defineConfig(({ mode }) => {
     : {};
 
   return {
-    base: EDITOR_BASE,
+    // Dev gets the per-process base (cache-busting), the build gets the fixed
+    // one - see buildId.js for why the id must not end up in a built URL.
+    base: mode === 'production' ? EDITOR_BASE_PROD : EDITOR_BASE,
     plugins: [
       {
         name: 'load-js-as-jsx',
@@ -38,6 +40,9 @@ export default defineConfig(({ mode }) => {
         loader: { '.js': 'jsx' },
       },
       include: ['@apollo/client', 'react-router-dom', 'graphql'],
+    },
+    ssr: {
+      noExternal: ['@apollo/client', 'editor-core'],
     },
     resolve: {
       dedupe: ['react', 'react-dom', '@apollo/client', 'react-router-dom'],

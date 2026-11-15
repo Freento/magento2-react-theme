@@ -10,6 +10,9 @@ import PencilIcon from '../ui/icons/PencilIcon';
 import { submitMagentoCheckout } from '../layout/MiniCart/magentoCheckout';
 import { src } from '../../lib/productImage';
 import { formatMoney as fmt } from '../../lib/money';
+import { MAX_QTY_DIGITS } from '../../lib/catalog';
+import { customOptionLines } from '../../lib/cartItemOptions';
+import { productPrefetchAttrs } from '../../lib/productLink';
 
 const CART_GRID = 'grid grid-cols-[1fr_110px_130px_110px_72px] gap-3';
 const QTY_BTN = 'w-8 h-full border-0 text-base text-ink [transition:background_120ms_ease] enabled:hover:bg-surface disabled:text-ink-2 disabled:cursor-not-allowed';
@@ -27,9 +30,8 @@ function CartQty({ item, isPending, onUpdateQuantity }) {
       setDraft(String(item.quantity));
       return;
     }
-    const next = Math.min(parsed, 9999);
-    setDraft(String(next));
-    if (next !== item.quantity) onUpdateQuantity(item.id, next);
+    setDraft(String(parsed));
+    if (parsed !== item.quantity) onUpdateQuantity(item.id, parsed);
   };
 
   return (
@@ -43,15 +45,17 @@ function CartQty({ item, isPending, onUpdateQuantity }) {
       >−</button>
       <input
         type="number"
+        name={`qty-${item.id}`}
+        autoComplete="off"
+        inputMode="numeric"
         value={draft}
         min="1"
-        max="9999"
         disabled={isPending}
-        onChange={(e) => setDraft(e.target.value)}
+        onChange={(e) => { if (e.target.value.length <= MAX_QTY_DIGITS) setDraft(e.target.value); }}
         onBlur={commit}
         onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
         aria-label="Quantity"
-        className="w-[42px] h-full border-0 p-0 text-center font-sans text-13 text-ink bg-transparent [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-inner-spin-button]:m-0 focus:outline-none focus:bg-surface disabled:text-ink-2"
+        className="w-12 h-full border-0 p-0 text-center font-sans text-13 text-ink bg-transparent [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-inner-spin-button]:m-0 focus:outline-none focus:bg-surface disabled:text-ink-2"
       />
       <button
         type="button"
@@ -67,6 +71,7 @@ function CartQty({ item, isPending, onUpdateQuantity }) {
 function CartLine({ item, isPending, onUpdateQuantity, onRemove }) {
   if (!item?.product) return null;
   const href = `/${item.product.url_key}${item.product.url_suffix || ''}`;
+  const prefetch = productPrefetchAttrs(item.product);
   const linkState = item.product?.id ? { resolved: {
     type: 'product',
     id: Number(item.product.id),
@@ -94,15 +99,20 @@ function CartLine({ item, isPending, onUpdateQuantity, onRemove }) {
       role="row"
     >
       <div className="cart-col-product flex items-center gap-3.5 min-w-0 max768:[grid-area:product]" role="cell">
-        <Link to={href} state={linkState} className="cart-row-img shrink-0" aria-label={`Open ${item.product.name}`}>
+        <Link to={href} state={linkState} {...prefetch} className="cart-row-img shrink-0" aria-label={`Open ${item.product.name}`}>
           <img className="w-[72px] h-[90px] object-cover rounded bg-surface block" src={src(item.configured_variant?.thumbnail || item.product.thumbnail)} alt={item.product.name} loading="lazy" />
         </Link>
         <div className="cart-row-info min-w-0">
-          <Link to={href} state={linkState} className="cart-row-name block font-medium text-ink no-underline leading-[1.35] hover:text-ink hover:underline hover:underline-offset-2">{item.product.name}</Link>
+          <Link to={href} state={linkState} {...prefetch} className="cart-row-name block font-medium text-ink no-underline leading-[1.35] hover:text-ink hover:underline hover:underline-offset-2">{item.product.name}</Link>
           <div className="cart-row-sku mt-0.5 text-xs text-ink-2">SKU {item.configured_variant?.sku || item.product.sku}</div>
           {(item.configurable_options || []).map((opt) => (
             <div key={opt.option_label} className="cart-row-option mt-0.5 text-xs text-ink-2">
               {opt.option_label}: {opt.value_label}
+            </div>
+          ))}
+          {customOptionLines(item).map((opt) => (
+            <div key={opt.uid} className="cart-row-option mt-0.5 text-xs text-ink-2 break-words">
+              {opt.label}: {opt.value}
             </div>
           ))}
         </div>
@@ -116,6 +126,7 @@ function CartLine({ item, isPending, onUpdateQuantity, onRemove }) {
         <Link
           to={href}
           state={editState}
+          {...prefetch}
           className="cart-row-edit inline-flex items-center justify-center w-[30px] h-[30px] bg-transparent border-0 rounded-pill text-ink-2 cursor-pointer [transition:color_120ms_ease,background_120ms_ease] hover:text-ink hover:bg-surface"
           aria-label={`Edit ${item.product.name}`}
           title="Edit item"
@@ -137,11 +148,81 @@ function CartLine({ item, isPending, onUpdateQuantity, onRemove }) {
   );
 }
 
+const SkLine = ({ className = '', bar }) => (
+  <span className={`block ${className}`}>
+    <span className={`skeleton inline-block align-middle ${bar}`} />
+  </span>
+);
+
+function CartSkeleton() {
+  return (
+    <div className="cart-layout grid grid-cols-[1fr_340px] gap-10 items-start max1024:grid-cols-[1fr_300px] max1024:gap-7 max768:grid-cols-1" aria-hidden="true">
+      <section className="cart-main">
+        <div className={`${CART_GRID} pb-3 border-b border-line text-2xs max768:hidden`}>
+          <SkLine bar="h-2.5 w-10" />
+          <SkLine bar="h-2.5 w-10" />
+          <SkLine bar="h-2.5 w-8" />
+          <SkLine bar="h-2.5 w-16" />
+          <span />
+        </div>
+        {[0, 1].map((i) => (
+          <div key={i} className={`${CART_GRID} items-center py-[18px] border-b border-line text-base max768:grid-cols-[1fr_auto] max768:[grid-template-areas:'product_product'_'qty_total'_'price_remove']`}>
+            <div className="flex items-center gap-3.5 min-w-0 max768:[grid-area:product]">
+              <span className="skeleton w-[72px] h-[90px] rounded shrink-0" />
+              <div className="min-w-0 flex-1">
+                <SkLine className="leading-[1.35]" bar="h-3.5 w-3/5 max-w-[220px] min-w-[120px]" />
+                <SkLine className="mt-0.5 text-xs" bar="h-2.5 w-20" />
+              </div>
+            </div>
+            <SkLine className="max768:[grid-area:price]" bar="h-3.5 w-14" />
+            <span className="skeleton w-[106px] h-9 rounded max768:[grid-area:qty]" />
+            <SkLine className="max768:[grid-area:total] max768:text-right" bar="h-3.5 w-14" />
+            <div className="flex items-center justify-end gap-1 max768:[grid-area:remove]">
+              <span className="skeleton w-[30px] h-[30px] rounded-pill" />
+              <span className="skeleton w-[30px] h-[30px] rounded-pill" />
+            </div>
+          </div>
+        ))}
+        <div className="mt-6 pt-5 border-t border-line">
+          <div className="mt-4 px-6 py-[22px] bg-bg border border-line rounded max480:px-4 max480:py-[18px]">
+            <SkLine className="mb-3.5 text-xs" bar="h-2.5 w-28" />
+            <div className="flex gap-2 items-stretch">
+              <span className="skeleton flex-1 h-11 rounded" />
+              <span className="skeleton w-[84px] h-11 rounded" />
+            </div>
+          </div>
+        </div>
+        <SkLine className="mt-5 text-sm" bar="h-3 w-36" />
+      </section>
+
+      <aside className="cart-summary sticky top-6 p-6 border border-line rounded-lg bg-bg">
+        <SkLine className="mb-4 text-lg" bar="h-4 w-24" />
+        <div className="mb-1 border-b border-line pb-3.5">
+          <SkLine className="text-base" bar="h-3.5 w-48" />
+        </div>
+        <div className="mt-[18px]">
+          <div className="flex justify-between py-1.5 text-base">
+            <SkLine bar="h-3.5 w-16" />
+            <SkLine bar="h-3.5 w-14" />
+          </div>
+          <div className="flex justify-between py-1.5 pt-3.5 mt-2 border-t border-line text-lg">
+            <SkLine bar="h-4 w-12" />
+            <SkLine bar="h-4 w-16" />
+          </div>
+        </div>
+        <span className="skeleton block w-full h-11 mt-[18px] rounded" />
+        <SkLine className="mt-2.5 text-xs text-center" bar="h-2.5 w-44" />
+      </aside>
+    </div>
+  );
+}
+
 export default function ShoppingCart() {
   const navigate = useNavigate();
   const {
     cartData,
     cartId,
+    cartInitialized,
     merging,
     error,
     pendingItems,
@@ -177,26 +258,11 @@ export default function ShoppingCart() {
     submitMagentoCheckout(cartData.id, { token, isAuthenticated });
   };
 
-  if (merging || (cartId && !cartData && !error)) {
+  if (merging || !cartInitialized || (cartId && !cartData && !error)) {
     return (
       <div className="cart-page py-10 max768:pt-4" aria-busy="true" aria-live="polite">
         <h1 className="page-title text-hero text-ink mb-6">Shopping Cart</h1>
-        <div className="cart-layout grid grid-cols-[1fr_340px] gap-10 items-start max1024:grid-cols-[1fr_300px] max1024:gap-7 max768:grid-cols-1">
-          <section className="cart-main">
-            {[0, 1].map((i) => (
-              <div className="cart-skel-item flex items-center gap-3.5 py-[18px] border-b border-line" key={i}>
-                <span className="skeleton cart-skel-img w-[72px] h-[90px] rounded shrink-0" />
-                <span className="skeleton cart-skel-name w-2/5 h-3.5 rounded" />
-                <span className="skeleton cart-skel-cell w-[70px] h-3.5 rounded ml-auto" />
-              </div>
-            ))}
-          </section>
-          <aside className="cart-summary sticky top-6 p-6 border border-line rounded-lg bg-bg">
-            {[0, 1, 2].map((i) => (
-              <span className="skeleton cart-skel-row block h-3.5 rounded mb-3" key={i} />
-            ))}
-          </aside>
-        </div>
+        <CartSkeleton />
       </div>
     );
   }

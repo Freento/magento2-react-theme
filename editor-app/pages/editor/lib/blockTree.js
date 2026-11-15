@@ -1,3 +1,4 @@
+import registry from 'editor-core/registry';
 import {generateId} from './color.js';
 import {simulateGridPlacement} from 'editor-core/renderer';
 
@@ -11,6 +12,15 @@ export function findBlock(blocks, id) {
     }
     return null;
 }
+
+// A system block is a built-in component (see `system` in its definition):
+// authors edit its settings, but only developers add or remove it.
+export const isSystemBlock = (block) => !!registry[block?.component]?.system;
+// True for the block itself or anything nested in it, so a container cannot be
+// used to delete or copy the system block it holds.
+export const holdsSystemBlock = (block) =>
+    !!block && (isSystemBlock(block) || (block.children || []).some(holdsSystemBlock));
+export const SYSTEM_BLOCK_NOTICE = 'This block contains a built-in component and cannot be deleted or duplicated';
 
 export function ancestorsOf(blocks, targetId) {
     const path = [];
@@ -54,6 +64,16 @@ export function removeBlockFromTree(blocks, blockId) {
     };
     const newBlocks = filter(blocks);
     return [newBlocks, removed];
+}
+
+export function pruneEmptyColumns(blocks) {
+    const out = [];
+    for (const b of blocks) {
+        const next = b.children ? {...b, children: pruneEmptyColumns(b.children)} : b;
+        if (next.component === 'Column' && !(next.children || []).length) continue;
+        out.push(next);
+    }
+    return out;
 }
 
 export function insertBlockInTree(blocks, parentId, index, block, rootId) {
@@ -105,6 +125,32 @@ export const applyCellPin = (block, cell) => {
         delete style.rowStart;
     }
     return {...block, style};
+};
+
+export const dropRedundantCellPins = (tree, parentId) => {
+    if (!parentId || parentId === 'root-page') return tree;
+    const parent = findBlock(tree, parentId);
+    if (!parent || parent.component !== 'Grid' || !parent.children?.length) return tree;
+    const sim = simulateGridPlacement(parent);
+    let mutated = false;
+    const newKids = parent.children.map((child, i) => {
+        const cc = sim.childCells[i];
+        const cur = child.style || {};
+        if (!cc || cur.colStart == null || cur.rowStart == null) return child;
+        if (Number(cur.colStart) !== cc.c || Number(cur.rowStart) !== cc.r) return child;
+        mutated = true;
+        const style = {...cur};
+        delete style.colStart;
+        delete style.rowStart;
+        return {...child, style};
+    });
+    if (!mutated) return tree;
+    const replace = (arr) => arr.map((b) => {
+        if (b.id === parent.id) return {...b, children: newKids};
+        if (b.children) return {...b, children: replace(b.children)};
+        return b;
+    });
+    return replace(tree);
 };
 
 export const pinSameCellSiblings = (tree, parentId, cell) => {

@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { sanitizeHtml } from '../lib/safeHtml.js';
 
 export default function Html({ html = '', css = '', className = '' }) {
   const rawId = useId();
@@ -6,8 +7,8 @@ export default function Html({ html = '', css = '', className = '' }) {
   const scopedCss = css ? scopeCss(css, `[data-html-block="${scopeId}"]`) : '';
   return (
     <div className={className} data-html-block={scopeId}>
-      {scopedCss && <style>{scopedCss}</style>}
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      {scopedCss && <style dangerouslySetInnerHTML={{ __html: scopedCss.replace(/<\/style/gi, '<\\/style') }} />}
+      <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }} />
     </div>
   );
 }

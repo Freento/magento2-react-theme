@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { findMatchingVariant, isSwatchable } from '../helpers/productVariants';
+import { findMatchingVariant, isSwatchable, isValueInStock } from '../helpers/productVariants';
 
 export default function useVariantSelection(product, isConfigurable, initialValueUids) {
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -53,7 +53,11 @@ export default function useVariantSelection(product, isConfigurable, initialValu
     ) || null;
   })();
 
+  const isOptionValueInStock = (attributeCode, valueIndex) =>
+    isValueInStock(product?.variants, selectedOptions, attributeCode, valueIndex);
+
   return {
+    isOptionValueInStock,
     selectedOptions,
     selectedVariant,
     handleOptionChange,

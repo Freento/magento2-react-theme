@@ -1,4 +1,7 @@
-const RESERVED = new Set(['page', 'sort', 'q']);
+export const FILTER_PREFIX = 'f.';
+
+const filterAttribute = (key) =>
+  (key.startsWith(FILTER_PREFIX) ? key.slice(FILTER_PREFIX.length) : null);
 
 export const getCategoryUid = (categoryId) => {
   if (!categoryId) return null;
@@ -8,12 +11,13 @@ export const getCategoryUid = (categoryId) => {
 export const parseActiveFilters = (urlParams, categoryId) => {
   const filters = {};
   for (const [key, value] of urlParams.entries()) {
-    if (RESERVED.has(key)) continue;
-    if (key === 'price') {
+    const attribute = filterAttribute(key);
+    if (!attribute) continue;
+    if (attribute === 'price') {
       const [from, to] = value.split('-');
       filters.price = { from: parseFloat(from), to: parseFloat(to) };
     } else {
-      filters[key] = value.includes(',') ? value.split(',') : value;
+      filters[attribute] = value.includes(',') ? value.split(',') : value;
     }
   }
   if (categoryId) {
@@ -23,7 +27,7 @@ export const parseActiveFilters = (urlParams, categoryId) => {
 };
 
 export const countActiveFilters = (urlParams) =>
-  Array.from(urlParams.entries()).filter(([key]) => !RESERVED.has(key)).length;
+  Array.from(urlParams.entries()).filter(([key]) => filterAttribute(key) !== null).length;
 
 export const countFilterValues = (filters) =>
   Object.entries(filters || {}).filter(([key, value]) => {
@@ -50,12 +54,12 @@ export const buildFilterParams = (newFilters, { categoryId, searchQuery, current
 
     if (key === 'price') {
       if (typeof value === 'object' && value.from && value.to) {
-        params.set('price', `${value.from}-${value.to}`);
+        params.set(`${FILTER_PREFIX}price`, `${value.from}-${value.to}`);
       }
     } else if (Array.isArray(value) && value.length > 0) {
-      params.set(key, value.join(','));
+      params.set(FILTER_PREFIX + key, value.join(','));
     } else if (value && !Array.isArray(value) && typeof value !== 'object') {
-      params.set(key, value.toString());
+      params.set(FILTER_PREFIX + key, value.toString());
     }
   });
 

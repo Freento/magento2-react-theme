@@ -3,60 +3,37 @@ export default {
     category: 'content',
     icon: '🖼',
     acceptsChildren: false,
-    // The link lives in the style layer but belongs with the block's own
-    // settings: every block offers one, and an author looks for it in the
-    // same place each time.
-    regroupStyleFields: { link: 'Image' },
-    allowedIn: ['page', 'Grid', 'Box'],
-    defaultProps: { src: 'https://placehold.co/600x300', alt: '', objectFit: 'cover', objectPosition: 'center center' },
+    allowedIn: ['page', 'Grid', 'Column'],
+    defaultProps: { src: 'https://placehold.co/600x300', href: '', alt: '', objectFit: 'cover', objectPosition: 'center center' },
     // Wrapper-level styleFields that don't apply to an image (no text =>
     // no fontSize/textAlign/textColor; borders/corner-radius are rarely
     // useful and clutter the panel) — hidden from Advanced for this block.
     hideStyleFields: [
+      'link',
       'fontFamily',
-      'fontSize',
       'textAlign',
       'color',
       'backgroundColor',
-      'backgroundImage',
-      'backgroundSize',
-      'backgroundPosition',
-      'backgroundOverlay',
       'borderSides',
       'borderStyle',
       'borderColor',
-      'borderWidth',
     ],
+    spacingSideBySide: true,
+    keepFieldOrder: true,
     propsSchema: {
       src: { label: 'Image', type: 'image', group: 'Image' },
-      alt: { label: 'Alt text', type: 'text', placeholder: 'Brand logo', group: 'Advanced' },
-      objectFit: {
-        label: 'Fit',
-        type: 'segmented',
-        options: [
-          { value: 'cover', label: '', icon: 'FitCover', title: 'Cover — fill box, crop overflow' },
-          { value: 'contain', label: '', icon: 'FitContain', title: 'Contain — fit inside, keep ratio' },
-          { value: 'fill', label: '', icon: 'FitFill', title: 'Fill — stretch to box' },
-          { value: 'none', label: '', icon: 'FitNone', title: 'None — original size' },
-        ],
+      href: { label: 'Link', type: 'link', placeholder: '/climbing', group: 'Image' },
+      alt: {
+        label: 'Alt text',
+        type: 'text',
+        placeholder: 'Brand logo',
+        warnIfEmpty: 'Describe the image for screen readers and search engines.',
         group: 'Image',
       },
-      objectPosition: {
-        label: 'Position',
-        type: 'segmented',
-        cols: 3,
-        options: [
-          { value: 'left top',       label: '↖', title: 'Top-left' },
-          { value: 'center top',     label: '↑', title: 'Top' },
-          { value: 'right top',      label: '↗', title: 'Top-right' },
-          { value: 'left center',    label: '←', title: 'Left' },
-          { value: 'center center',  label: '●', title: 'Center' },
-          { value: 'right center',   label: '→', title: 'Right' },
-          { value: 'left bottom',    label: '↙', title: 'Bottom-left' },
-          { value: 'center bottom',  label: '↓', title: 'Bottom' },
-          { value: 'right bottom',   label: '↘', title: 'Bottom-right' },
-        ],
-        group: 'Image',
+      customCss: {
+        label: 'Custom styles',
+        type: 'customCss',
+        group: 'Advanced',
       },
     },
 };

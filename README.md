@@ -49,21 +49,35 @@ Catalog images are served in WebP/AVIF — the most compact of the modern format
 
 All assets (JS, CSS, HTML, fonts) are compressed with Brotli at the maximum compression level during the build. The server serves ready-made `.br` files without spending CPU on on-the-fly compression — maximum compression with zero server load at request time.
 
-### Menu without a GraphQL request
+### Menu and footer in the server HTML
 
-The menu is either defined in the editor or loaded lazily: on mobile, only when the navigation panel is opened. On top of that, the category tree is cached in the browser for 24 hours. The result: the menu request never affects page rendering, and most of the time it doesn't happen at all.
+The menu and the footer arrive with the page as ready-made HTML, and the desktop dropdowns are already in the markup, just hidden until hover. The browser doesn't send a menu request on page load, and opening a dropdown costs nothing. If the menu is not in the server response, it is loaded lazily (on mobile, only when the navigation panel is opened) and the category tree is cached in the browser for 24 hours.
 
 ### Server-side rendering (SSR)
 
 The homepage, categories, and content pages arrive from the server as ready-made HTML. Users and search engine crawlers see content from the first byte, with no white screen and no "loading" state. Content pages are additionally prerendered at build time — the server delivers them as static files.
 
+Tablet and mobile settings of editor blocks are written into the HTML as CSS media rules, so a prerendered page already has the right layout on a phone before any JavaScript runs. Product carousels on content pages load in the browser, so a static page never shows stale products or guest prices to a logged-in customer.
+
 ### GraphQL over GET requests
 
 Requests to Magento go out as GET, which means they can be cached in Varnish or on a CDN — a repeat request never reaches PHP at all. Combined with Varnish this yields instant page responses. GET-based GraphQL is also much easier to warm with an FPC warmer — in the same amount of time you can warm 5–10 times more pages, because GraphQL responses are significantly faster than regular ones.
 
-### Other optimizations: CSS, fonts, and more
+### Critical CSS and a late app start
 
-Everything is tuned so there is no layout shift and the CWV score is 100 or close to it.
+Each page type gets only the CSS it needs inlined into the HTML; the full stylesheet loads without blocking rendering. The application itself starts after the largest image has been painted, so JavaScript doesn't compete with the content the user is waiting for.
+
+### Images that don't fight each other
+
+Only the first image on a category page gets high loading priority; the rest wait until it has loaded. On the product page the gallery thumbnails wait for the main image. The LCP image always gets the full bandwidth.
+
+### Other optimizations: CSS, fonts, caching, and more
+
+Hashed assets are cached in the browser for a year and fonts for a week. Breadcrumbs are rendered on the server, fonts don't trigger a scan of system fonts, and the markup keeps heading order and ARIA attributes in place. Everything is tuned so there is no layout shift and the CWV score is 100 or close to it.
+
+### Fresh code after every deployment
+
+When a new version of the theme is deployed while a visitor has the site open, the page notices that its code is outdated, shows a short notice, and refreshes itself. Nobody is left with a broken tab after a release.
 
 ---
 
@@ -90,6 +104,11 @@ We took a different path: the theme ships with its own visual editor built speci
 - **Local blocks for a single page.** Everything unique to a specific page lives right inside it and doesn't clutter the shared catalog.
 - **Flexible elements in any position.** A page is laid out with grids and sections, and anything can be dragged into any position: an image, a heading, text, a button, an HTML snippet. No rigid "image left, text right" templates.
 - **Ready-made widgets.** A slider, a product carousel, and similar large blocks are inserted in one move — and the preview immediately shows live store data: the carousel talks to the same GraphQL as the storefront.
+- **Text edited right on the page.** A text toolbar appears over the block itself: heading level, bold, italic, lists, links. When you add a link, the editor suggests pages of the store as you type.
+- **Grid presets and copy/paste.** A grid starts from a ready layout, and any block can be copied and pasted to another place or page.
+- **Custom styles per device.** Any block can get its own CSS, separately for desktop, tablet, and mobile.
+- **Blocks on category pages.** Banners and promo tiles can be placed above the product list of any category, and each category can show blocks, products, or both.
+- **Page management.** Pages can be created, duplicated, hidden, and deleted right in the editor; the page list has search and sorting.
 
 ### Why it's convenient to work with
 
@@ -105,11 +124,17 @@ We took a different path: the theme ships with its own visual editor built speci
 
 ### And for content management
 
-- **Change history for free.** Every save is a git commit with a clear description of what changed. You can always see who changed what, and any version of a page can be restored.
+- **Change history for free.** Every save and every page operation is a git commit with a clear description of what changed, pushed to the repository right away. You can always see who changed what, and any version of a page can be restored.
+- **Content goes live without a build.** The storefront reads saved pages from disk, so a content change needs no rebuild or restart.
+- **Safe for demos.** Saving can be switched off for a demo instance: the editor stays open to explore, but nothing can be changed.
 - **Content travels with the code.** Pages are files in the repository: they go through the same deployment pipeline as the theme code and move easily between environments (dev → staging → production) without database dumps.
 - **The editor is easy to extend.** A new block is a regular React component plus an entry in the block catalog. No need to learn Page Builder internals — a block is written in hours, including with AI assistance following the existing examples.
 
 If a project already has content in Page Builder, it is migrated once: pages are rebuilt in the editor from the available blocks, and from then on the content lives by the new scheme. It's usually quite fast.
+
+### Maintenance mode
+
+The storefront can be closed for maintenance with one switch in the editor or a single command. Visitors get a 503 response with a maintenance page that is edited in the editor like any other page, while the IP addresses you allow keep working with the full store.
 
 ---
 
@@ -124,3 +149,9 @@ Since requests go out as GET, they can be cached in Varnish. Regular cache warmi
 ### PHP on Swoole
 
 Classic PHP-FPM boots the application from scratch on every request. Swoole keeps Magento permanently loaded in memory: the startup cost disappears, and GraphQL response times drop several-fold.
+
+---
+
+## Magento version compatibility
+
+The theme works with several Magento versions. Blocks that need a newer backend hide themselves quietly on older ones; see [`docs/MAGENTO-COMPATIBILITY.md`](docs/MAGENTO-COMPATIBILITY.md).

@@ -26,13 +26,12 @@ const AuthNetCommunicator = () => {
 
             let messageSent = false;
 
-            for (const { target, name } of targets) {
+            for (const { target } of targets) {
                 if (target && target !== window) {
                     try {
                         target.postMessage(data, window.location.origin);
                         messageSent = true;
-                    } catch (e) {
-                        console.log(`🔧 Failed to send message to ${name}:`, e);
+                    } catch {
                     }
                 }
             }

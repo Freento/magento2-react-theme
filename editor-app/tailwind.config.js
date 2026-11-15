@@ -1,71 +1,54 @@
-import theme from '../tailwind.config.js';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import hostConfig from '../tailwind.config.js';
 
-/**
- * The editor embeds host storefront components (Header, ProductsCarousel,
- * NewsletterForm, ContactForm, Category preview…) whose Tailwind classes live
- * in the theme's `src/`. Reuse the theme's `theme`/`corePlugins`/`safelist`
- * verbatim, widen `content` to scan both the host source and the editor app,
- * and add the editor's own `e-*` design tokens so the editor UI itself can be
- * expressed as Tailwind utilities (colors prefixed `e-` to stay clear of the
- * storefront palette).
- */
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+
 export default {
-  ...theme,
+  presets: [hostConfig],
   content: [
-    '../src/**/*.{js,jsx}',
-    './pages/**/*.{js,jsx}',
-    './src/**/*.{js,jsx}',
-    './packages/**/*.{js,jsx}',
+    path.join(HERE, '../index.html'),
+    path.join(HERE, '../src/**/*.{js,jsx}'),
+    path.join(HERE, 'src/**/*.{js,jsx}'),
+    path.join(HERE, 'pages/**/*.{js,jsx}'),
+    path.join(HERE, 'packages/**/*.{js,jsx}'),
   ],
   theme: {
-    ...theme.theme,
     extend: {
-      ...theme.theme.extend,
       colors: {
-        ...theme.theme.extend.colors,
-        e: {
-          bg: '#F8F8F6',
-          surface: '#FFFFFF',
-          'surface-alt': '#F8F8F6',
-          'surface-hover': '#F2F2EF',
-          'surface-hover-strong': 'rgba(15, 23, 42, 0.08)',
-          'surface-sel': '#F2F2EF',
-          border: '#E8E8E5',
-          'border-strong': '#D8D8D4',
-          text: '#111111',
-          'text-muted': '#6B6B6B',
-          'text-soft': '#9A9A95',
-          'text-hover': '#262626',
-          primary: '#0F4C5C',
-          'primary-soft': '#EAF0F2',
-          'primary-border': '#0F4C5C',
-          danger: '#B91C1C',
-          'danger-soft': '#FFF5F5',
-          'danger-border': '#fca5a5',
-          success: '#16a34a',
-          info: '#1d4ed8',
-          black: '#000000',
-          shadow: '#0f172a',
-          accent: '#3b82f6',
-          'accent-strong': '#2563eb',
-          'code-bg': '#f3f4f6',
-          'code-bg-soft': '#f9fafb',
-          'code-border': '#d1d5db',
-          'code-text': '#1f2937',
-          'muted-2': '#6b7280',
-          dashed: '#c7cbd1',
-          'sel-soft': '#dfe7fd',
-        },
-      },
-      borderRadius: {
-        ...theme.theme.extend.borderRadius,
-        'e-sm': '4px',
-        e: '4px',
-        'e-lg': '6px',
-        'e-xl': '8px',
+        'ed-bg': '#F8F8F6',
+        'ed-surface': '#FFFFFF',
+        'ed-surface-hover': '#ECECE8',
+        'ed-surface-hover-strong': 'rgba(17, 17, 17, 0.08)',
+        'ed-border': '#B9B9B4',
+        'ed-border-strong': '#9E9E99',
+        'ed-text': '#111111',
+        'ed-text-hover': '#262626',
+        'ed-text-muted': '#424242',
+        'ed-text-soft': '#5A5A57',
+        'ed-primary': '#0F4C5C',
+        'ed-primary-dark': '#0b3a46',
+        'ed-primary-soft': '#EAF0F2',
+        'ed-danger': '#B91C1C',
+        'ed-danger-soft': '#FFF5F5',
+        'ed-danger-border': '#fca5a5',
+        'ed-success': '#0F4C5C',
+        'ed-info': '#0F4C5C',
+        'ed-accent': '#0F4C5C',
+        'ed-accent-strong': '#0b3a46',
+        'ed-code-bg': '#F2F2EF',
+        'ed-code-bg-soft': '#F8F8F6',
+        'ed-code-border': '#B9B9B4',
+        'ed-code-text': '#111111',
+        'ed-muted-2': '#424242',
+        'ed-dashed': '#9E9E99',
+        'ed-sel-soft': '#EAF0F2',
       },
       boxShadow: {
-        'e-pop': '0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 20px -6px rgba(0, 0, 0, 0.08)',
+        'ed-pop': '0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 20px -6px rgba(0, 0, 0, 0.08)',
+      },
+      fontFamily: {
+        'ed-mono': ["'SF Mono'", 'ui-monospace', 'Menlo', 'monospace'],
       },
     },
   },

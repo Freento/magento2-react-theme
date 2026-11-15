@@ -2,23 +2,15 @@ import {useBlockTreeAccess} from './useBlockTreeAccess.js';
 import {useBlockMutations} from './useBlockMutations.js';
 
 export function useBlockActions({
-                                    pageData,
-                                    setPageData,
-                                    footerData,
-                                    setFooterData,
+                                    areas,
+                                    setArea,
                                     selectedBlockId,
                                     setSelectedBlockId,
                                     setActiveTab,
                                     device,
+                                    showToast,
                                 }) {
-    const access = useBlockTreeAccess({
-        pageData,
-        setPageData,
-        footerData,
-        setFooterData,
-        selectedBlockId,
-        device,
-    });
+    const access = useBlockTreeAccess({areas, setArea, selectedBlockId, device});
 
     const mutations = useBlockMutations({
         getCurrentBlocks: access.getCurrentBlocks,
@@ -31,6 +23,8 @@ export function useBlockActions({
         device,
         setSelectedBlockId,
         setActiveTab,
+        showToast,
+        isDropAllowed: access.isDropAllowed,
     });
 
     return {...access, ...mutations};

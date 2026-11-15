@@ -1,12 +1,14 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import Menu from './Menu';
 import CompareIcon from '../ui/icons/CompareIcon';
+import { lazyWithNotice } from '../../lib/chunkLoad';
 
-const SearchBox = lazy(() => import('../search/SearchBox'));
+const SearchBox = lazyWithNotice(() => import('../search/SearchBox'));
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCompare } from '../../context/CompareContext';
+import useBackToClose from '../../hooks/useBackToClose';
 
 const Icon = {
   Search: (p) => (
@@ -44,7 +46,7 @@ const CART_COUNT =
 const NAV_LINK_UNDERLINE =
   "relative py-1.5 text-13 font-medium tracking-[0.02em] after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-px after:bg-ink after:origin-left after:scale-x-0 after:[transition:transform_200ms_ease] hover:after:scale-x-100";
 
-const Header = () => {
+const Header = ({ menuItems = null, menuSlot = null }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchClosing, setSearchClosing] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -59,6 +61,9 @@ const Header = () => {
       return false;
     });
   };
+
+  useBackToClose('search', searchOpen, closeSearch, () => openSearch());
+  useBackToClose('menu', mobileMenuOpen, () => setMobileMenuOpen(false), () => setMobileMenuOpen(true));
 
   useEffect(() => {
     if (!searchOpen && !mobileMenuOpen) return;
@@ -82,15 +87,15 @@ const Header = () => {
       </div>
 
       <header className="header sticky top-0 z-50 bg-bg/[0.96] [backdrop-filter:saturate(180%)_blur(12px)] border-b border-line text-ink p-0 shadow-none">
-        <nav className="nav max-w-container mx-auto px-gutter grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-[18px] max900:grid-cols-[auto_1fr] max900:gap-3 max900:h-14 max480:px-3 max480:h-[52px]">
+        <nav className={`nav max-w-container mx-auto px-gutter grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-[18px] max900:grid-cols-[auto_1fr] max900:gap-3 max900:h-14 max480:px-3 max480:h-[52px]${menuSlot ? ' max900:h-auto max480:h-auto' : ''}`}>
           <div className="nav-left flex items-center gap-3 min-w-0">
             <Link to="/" className="logo text-[16px] font-semibold tracking-[-0.01em] text-ink whitespace-nowrap hover:text-ink max900:mr-auto">
               SimpleShop<span className="logo-dot text-accent">.</span>
             </Link>
           </div>
 
-          <div className="desktop-menu justify-self-center max900:hidden">
-            <Menu />
+          <div className={`desktop-menu justify-self-center ${menuSlot ? 'pointer-events-auto max900:col-span-full max900:order-last max900:justify-self-stretch' : 'max900:hidden'}`}>
+            {menuSlot || <Menu items={menuItems} />}
           </div>
 
           <ul className="nav-links flex gap-[18px] list-none items-center justify-self-end max900:gap-[2px] max900:ml-auto">
@@ -153,6 +158,7 @@ const Header = () => {
 
       <Menu
         isMobile={true}
+        items={menuItems}
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />

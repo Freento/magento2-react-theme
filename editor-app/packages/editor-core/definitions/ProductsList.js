@@ -1,0 +1,75 @@
+export default {
+    label: 'Products List (Magento)',
+    category: 'domain',
+    requiresBackend: true,
+    icon: 'LayoutGrid',
+    acceptsChildren: false,
+    allowedIn: ['page', 'Grid', 'Column'],
+    hideStyleFields: ['link', 'fontFamily', 'borderRadius', 'color', 'backgroundColor', 'textAlign', 'borderSides', 'borderStyle', 'borderColor'],
+    spacingSideBySide: true,
+    defaultProps: {
+      title: 'Products',
+      dataSource: 'category',
+      categoryId: '',
+      products: [],
+      randomize: false,
+      appearance: 'carousel',
+      productsCount: 12,
+      columns: 4,
+    },
+    propsSchema: {
+      dataSource: {
+        label: 'Data source',
+        type: 'segmented',
+        group: 'Products List',
+        options: [
+          { value: 'category', label: 'Category' },
+          { value: 'products', label: 'Individual Products' },
+        ],
+      },
+      categoryId: {
+        label: 'Category',
+        type: 'category',
+        group: 'Products List',
+        showIf: (props) => props.dataSource !== 'products',
+      },
+      products: {
+        label: 'Specify products',
+        type: 'list',
+        group: 'Products List',
+        previewBySku: true,
+        itemSchema: {
+          sku: { label: 'SKU', type: 'text' },
+        },
+        showIf: (props) => props.dataSource === 'products',
+      },
+      randomize: { label: 'Randomize products order', type: 'boolean', group: 'Products List' },
+      appearance: {
+        label: 'Appearance',
+        type: 'segmented',
+        group: 'Products List',
+        options: [
+          { value: 'carousel', label: 'Carousel' },
+          { value: 'grid', label: 'Grid' },
+        ],
+      },
+      productsCount: {
+        label: 'Products count',
+        type: 'productsCount',
+        group: 'Products List',
+        showIf: (props) => props.dataSource !== 'products' && props.appearance === 'grid',
+      },
+      columns: {
+        label: 'Columns count',
+        type: 'number',
+        placeholder: '4',
+        group: 'Products List',
+        showIf: (props) => props.appearance === 'grid',
+      },
+      customCss: {
+        label: 'Custom styles',
+        type: 'customCss',
+        group: 'Advanced',
+      },
+    },
+};

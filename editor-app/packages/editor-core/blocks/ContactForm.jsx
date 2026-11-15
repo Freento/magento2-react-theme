@@ -5,7 +5,7 @@
 // that runs the contactUs mutation and hides itself on backends without
 // Magento_ContactGraphQl.
 //
-// Same dashed marker ProductsCarousel uses for the same reason — deliberately
+// Same dashed marker ProductsList uses for the same reason — deliberately
 // not a copy of the form, so nobody mistakes a dead replica for the real thing.
 export default function ContactForm({ heading = '' }) {
   return (

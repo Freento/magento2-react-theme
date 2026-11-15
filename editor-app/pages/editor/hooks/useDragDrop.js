@@ -2,8 +2,7 @@ import {useDragState} from './useDragState.js';
 import {useDropHandlers} from './useDropHandlers.js';
 
 export function useDragDrop({
-                                pageData,
-                                footerData,
+                                findBlockById,
                                 isDropAllowed,
                                 sideForBlockId,
                                 activeTarget,
@@ -11,13 +10,15 @@ export function useDragDrop({
                                 setBlocksFor,
                                 setSelectedBlockId,
                                 setActiveTab,
+                                showToast,
                             }) {
-    const state = useDragState({pageData, footerData});
+    const state = useDragState({findBlockById});
 
     const drop = useDropHandlers({
         dragType: state.dragType,
         dragData: state.dragData,
         dropTarget: state.dropTarget,
+        externalDrag: state.externalDrag,
         treeDropTarget: state.treeDropTarget,
         setTreeDropTarget: state.setTreeDropTarget,
         handleDragEnd: state.handleDragEnd,
@@ -29,6 +30,7 @@ export function useDragDrop({
         setBlocksFor,
         setSelectedBlockId,
         setActiveTab,
+        showToast,
     });
 
     return {...state, ...drop};

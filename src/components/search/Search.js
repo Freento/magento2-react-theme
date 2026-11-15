@@ -82,7 +82,7 @@ const Search = () => {
         );
     }
 
-    if (loading) {
+    if (loading && !data) {
         return <CategorySkeleton count={pageSize} />;
     }
 
@@ -101,7 +101,7 @@ const Search = () => {
     const totalPages = pageInfo.total_pages || 1;
 
     return (
-        <div className="category-page pt-10 max768:pt-4">
+        <div className="category-page">
             <h1 className="page-title text-hero text-ink mb-1.5 tracking-[-0.02em] max768:text-2xl max768:leading-[1.2]">Search results for &ldquo;{searchTerm}&rdquo;</h1>
             {totalCount > 0 && (
                 <div className="page-count-mobile hidden max768:block mt-1 mb-3.5 font-serif italic text-ink-2 text-md">

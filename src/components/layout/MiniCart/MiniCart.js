@@ -7,6 +7,7 @@ import MiniCartToasts from './MiniCartToasts';
 import { submitMagentoCheckout } from './magentoCheckout';
 import CloseIcon from '../../ui/icons/CloseIcon';
 import { formatMoney as formatMoneyShared } from '../../../lib/money';
+import useBackToClose from '../../../hooks/useBackToClose';
 
 const MC_BTN =
   'mc-btn inline-flex items-center justify-center w-full h-12 text-base font-medium tracking-[0.02em] rounded cursor-pointer transition-colors duration-med ease-[ease]';
@@ -23,6 +24,7 @@ const MiniCart = () => {
     cartData,
     isMiniCartOpen,
     closeMiniCart,
+    openMiniCart,
     updateQuantity,
     removeItem,
     loading,
@@ -33,6 +35,8 @@ const MiniCart = () => {
     clearLastRemoved,
   } = useCart();
   const { token, isAuthenticated } = useAuth();
+
+  useBackToClose('miniCart', isMiniCartOpen, closeMiniCart, openMiniCart);
 
   const checkoutMode = (import.meta.env?.VITE_CHECKOUT_MODE || 'react').toLowerCase();
 

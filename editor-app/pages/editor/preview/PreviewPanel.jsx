@@ -1,27 +1,45 @@
-import {useRef, useEffect, useCallback, useLayoutEffect} from 'react';
+import {useRef, useEffect, useCallback, useLayoutEffect, useState} from 'react';
 import {UI} from '../../../src/editor/Icon.jsx';
 import {DEVICE_WIDTHS} from '../lib/hostBlocks.jsx';
+import {iconBtn, btnSave} from '../lib/cls.js';
+import {SaveConfirmModal} from '../SaveConfirmModal.jsx';
+import {SiteSettingsModal} from '../SiteSettingsModal.jsx';
+import {SaveButton} from './SaveButton.jsx';
+import {useEditorUser, signOut} from '../../../src/editor/editorSession.jsx';
 
 export function PreviewPanel({
                                  device,
                                  onDeviceChange,
                                  dragType,
+                                 dragData,
+                                 externalDrag,
+                                 onFileDragStart,
                                  pages,
                                  pagePath,
-                                 pageData,
-                                 footerData,
+                                 areas,
                                  selectedBlockId,
                                  hoveredTreeId,
+                                 activeItem,
                                  onSelectFromFrame,
-                                 onDeselect,
                                  onDeleteFromFrame,
                                  onDuplicateFromFrame,
+                                 onCopyFromFrame,
+                                 onCutFromFrame,
+                                 onPasteFromFrame,
                                  onUpdatePropFromFrame,
+                                 onDropFromFrame,
+                                 onCellDeleteFromFrame,
+                                 onCellDuplicateFromFrame,
                                  isDirty,
                                  onSave,
-                                 onPush,
-                                 isPushing,
+                                 isSaving,
+                                 saveRun,
+                                 saveDisabled = false,
+                                 saveTooltip = null,
                                  canPush,
+                                 pushPreview,
+                                 pendingLabels,
+                                 onRefreshPushStatus,
                                  onUndo,
                                  onRedo,
                                  canUndo,
@@ -32,6 +50,29 @@ export function PreviewPanel({
                                  renderContent
                              }) {
     const ref = useRef(null);
+    const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
+    const [siteSettingsOpen, setSiteSettingsOpen] = useState(false);
+    const editorUser = useEditorUser();
+    const [siteSettings, setSiteSettings] = useState(() => (typeof window !== 'undefined' && window.__SITE_SETTINGS__) || null);
+    useEffect(() => {
+        let live = true;
+        fetch('/api/editor/site-settings', {cache: 'no-store'})
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data) => live && data && setSiteSettings(data))
+            .catch(() => {});
+        return () => { live = false; };
+    }, [siteSettingsOpen]);
+    const saveSiteSettings = async (next) => {
+        const res = await fetch('/api/editor/site-settings', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(next),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+        setSiteSettings(data);
+    };
+    const maintenanceOn = !!siteSettings?.maintenance?.enabled;
     const innerRef = useRef(null);
     const deviceWidth = DEVICE_WIDTHS[device];
 
@@ -59,21 +100,15 @@ export function PreviewPanel({
     return (
         <div
             ref={ref}
-            className="editor-preview flex flex-col flex-1 overflow-auto bg-e-bg relative z-0"
-            onClick={(e) => {
-                if (!e.target?.closest?.('[data-block-id]')) onDeselect?.();
-            }}
+            className="editor-preview flex flex-col flex-1 overflow-auto bg-ed-bg relative"
             onClickCapture={(e) => {
                 if (typeof window !== 'undefined' && window.__editorPicking) return;
                 const link = e.target.closest && e.target.closest('a');
                 if (!link) return;
-                // A container can be a link, and then every block inside it sits
-                // inside an anchor too. Selecting the nested block is what the
-                // author means by clicking it, so only a click on the block that
-                // owns the link follows it. Its own wrapper is outside the
-                // anchor; a nested block's is inside.
-                const hit = e.target.closest && e.target.closest('[data-block-id]');
-                if (hit && link.contains(hit)) return;
+                // A block's own link wrapper (BlockWrapper renders it right under
+                // the block root) is inert in the editor: clicks inside select.
+                if (link.parentElement?.hasAttribute('data-block-id')) return;
+                if (link.isContentEditable || link.querySelector('[contenteditable="true"]')) return;
                 const href = link.getAttribute('href');
                 if (!href || href.startsWith('#')) return;
                 e.preventDefault();
@@ -84,6 +119,12 @@ export function PreviewPanel({
                 const match = pages.find((p) => p.path === href);
                 if (match) setCurrentPageId(match.id);
             }}
+            onDragEnter={(e) => {
+                if (dragType) return;
+                const types = [...e.dataTransfer.types];
+                if (types.includes('Files')) onFileDragStart?.('Image');
+                else if (types.includes('text/plain')) onFileDragStart?.('Text');
+            }}
             onDragOver={(e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = dragType === 'new' ? 'copy' : 'move';
@@ -91,18 +132,27 @@ export function PreviewPanel({
             onDragLeave={() => setDropTarget(null)}
             onDrop={(e) => {
                 e.preventDefault();
-                handleDrop();
+                handleDrop({
+                    file: e.dataTransfer.files?.[0] || null,
+                    text: e.dataTransfer.getData('text/plain'),
+                });
             }}
         >
-            <div className="editor-preview-toolbar sticky top-0 z-[5] flex items-center gap-2.5 justify-center py-2 px-3 bg-e-code-bg border-b border-e-border">
-                <div className="device-switch inline-flex bg-e-surface border border-e-border rounded-e p-[3px] gap-0.5">
+            <div className="editor-preview-toolbar sticky top-0 z-[5] flex items-center gap-2.5 justify-center px-3 py-2 bg-ed-code-bg border-b border-solid border-ed-border">
+                <div className="device-switch inline-flex bg-ed-surface border border-solid border-ed-border rounded p-[3px] gap-0.5">
                     {devices.map((d) => (
                         <button
                             key={d.id}
                             type="button"
-                            className={`device-switch-item inline-flex items-center gap-1.5 py-1 px-2.5 h-7 border-none bg-transparent text-e-text-muted text-[12px] font-medium rounded-e-sm cursor-pointer transition-all duration-100 [&:hover:not(.active)]:text-e-text [&:hover:not(.active)]:bg-e-code-bg [&.active]:text-e-text [&.active]:bg-e-primary-soft [&.active]:shadow-[0_0_0_1px_#0F4C5C]${device === d.id ? ' active' : ''}`}
+                            className={
+                                'device-switch-item inline-flex items-center gap-1.5 px-2.5 py-1 h-7 border-none text-[12px] ' +
+                                'font-medium rounded cursor-pointer [transition:all_0.1s] ' +
+                                (device === d.id
+                                    ? 'active text-ed-text bg-ed-primary-soft shadow-[0_0_0_1px_#0F4C5C]'
+                                    : 'bg-transparent text-ed-text-muted hover:text-ed-text hover:bg-ed-code-bg')
+                            }
                             onClick={() => onDeviceChange(d.id)}
-                            title={d.label}
+                            data-tooltip={d.label} aria-label={d.label}
                         >
                             <d.Icon size={15} strokeWidth={1.75}/>
                             <span>{d.label}</span>
@@ -110,54 +160,96 @@ export function PreviewPanel({
                     ))}
                 </div>
                 {deviceWidth != null && (
-                    <span className="device-width-hint text-[11px] text-e-text-soft [font-family:'SF_Mono',ui-monospace,Menlo,monospace]">{deviceWidth}px</span>
+                    <span className="device-width-hint text-[11px] text-ed-text-soft font-ed-mono">{deviceWidth}px</span>
                 )}
                 <div className="editor-preview-toolbar-actions absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {editorUser && (
+                        <>
+                            <span
+                                className="editor-user inline-flex items-center gap-1 mr-1 text-[12px] text-ed-text-muted"
+                                data-tooltip={`Signed in as admin #${editorUser.id ?? '?'}`}
+                            >
+                                <UI.User size={14} strokeWidth={1.75}/>
+                                {editorUser.username}
+                            </span>
+                            <button
+                                type="button"
+                                className={iconBtn}
+                                onClick={signOut}
+                                data-tooltip="Sign out"
+                                aria-label="Sign out"
+                            >
+                                <UI.LogOut size={15} strokeWidth={1.75}/>
+                            </button>
+                        </>
+                    )}
                     <button
                         type="button"
-                        className="icon-btn w-7 h-7 inline-flex items-center justify-center border border-transparent bg-transparent text-e-text-muted rounded-e cursor-pointer transition-all duration-100 flex-shrink-0 enabled:hover:bg-e-surface-hover enabled:hover:text-e-text enabled:hover:border-e-border disabled:opacity-[0.35] disabled:cursor-not-allowed"
+                        className={iconBtn}
                         onClick={onUndo}
                         disabled={!canUndo}
-                        title="Undo"
+                        data-tooltip="Undo"
                         aria-label="Undo"
                     >
                         <UI.UndoArrow size={16} strokeWidth={1.75}/>
                     </button>
                     <button
                         type="button"
-                        className="icon-btn w-7 h-7 inline-flex items-center justify-center border border-transparent bg-transparent text-e-text-muted rounded-e cursor-pointer transition-all duration-100 flex-shrink-0 enabled:hover:bg-e-surface-hover enabled:hover:text-e-text enabled:hover:border-e-border disabled:opacity-[0.35] disabled:cursor-not-allowed"
+                        className={iconBtn}
                         onClick={onRedo}
                         disabled={!canRedo}
-                        title="Redo"
+                        data-tooltip="Redo"
                         aria-label="Redo"
                     >
                         <UI.RedoArrow size={16} strokeWidth={1.75}/>
                     </button>
                     <button
-                        className="btn-save h-8 px-[14px] text-[13px] font-medium border border-transparent rounded-e cursor-pointer transition-all duration-100 text-white bg-e-text inline-flex items-center gap-1.5 whitespace-nowrap enabled:hover:bg-e-text-hover disabled:bg-e-border disabled:text-e-text-soft disabled:cursor-default"
-                        onClick={onSave}
-                        disabled={!isDirty}
+                        type="button"
+                        className={maintenanceOn ? `${btnSave} !bg-ed-danger enabled:hover:!bg-ed-danger` : iconBtn}
+                        onClick={() => setSiteSettingsOpen(true)}
+                        data-tooltip={maintenanceOn ? 'Maintenance mode is on' : 'Site settings'}
+                        aria-label="Site settings"
                     >
-                        <UI.Save size={14} strokeWidth={2}/>
-                        Save
+                        <UI.Settings size={14} strokeWidth={2}/>
+                        {maintenanceOn && 'Maintenance on'}
                     </button>
-                    <span className="btn-tooltip-wrap relative inline-flex group">
-                <button
-                    className={`btn-save btn-push h-8 px-[14px] text-[13px] font-medium border rounded-e cursor-pointer transition-all duration-100 inline-flex items-center gap-1.5 whitespace-nowrap bg-transparent text-e-text-soft border-e-border [&.is-ready]:bg-e-text [&.is-ready]:text-white [&.is-ready]:border-e-text [&.is-ready]:enabled:hover:bg-e-text-hover disabled:bg-transparent disabled:text-e-text-soft disabled:border-e-border disabled:cursor-default${canPush && !isPushing ? ' is-ready' : ''}`}
-                    onClick={onPush}
-                    disabled={isPushing || !canPush}
-                >
-                  {isPushing ? 'Pushing…' : 'Push'}
-                </button>
-                <span className="btn-tooltip absolute top-[calc(100%+8px)] right-0 z-50 py-1.5 px-2.5 bg-e-text text-white text-[12px] font-medium leading-[1.3] whitespace-nowrap rounded-e shadow-e-pop opacity-0 pointer-events-none translate-y-[-2px] transition-[opacity,transform] duration-[120ms] group-hover:opacity-100 group-hover:translate-y-0 before:content-[''] before:absolute before:top-[-4px] before:right-[14px] before:w-2 before:h-2 before:bg-e-text before:rotate-45 before:rounded-[1px]" role="tooltip">
-                  {canPush ? 'Push all changes to production' : 'Nothing to push'}
-                </span>
-              </span>
+                    <SiteSettingsModal
+                        open={siteSettingsOpen}
+                        settings={siteSettings}
+                        onClose={() => setSiteSettingsOpen(false)}
+                        onSave={saveSiteSettings}
+                    />
+                    <span
+                        className="inline-flex"
+                        data-tooltip={saveDisabled && saveTooltip ? saveTooltip : undefined}
+                        aria-label={saveDisabled && saveTooltip ? `Save - ${saveTooltip}` : undefined}
+                    >
+                        <SaveButton
+                            isSaving={isSaving}
+                            saveRun={saveRun}
+                            disabled={saveDisabled || (!isDirty && !canPush)}
+                            onClick={() => {
+                                onRefreshPushStatus?.();
+                                setSaveConfirmOpen(true);
+                            }}
+                            onRetry={onSave}
+                        />
+                    </span>
+                    <SaveConfirmModal
+                        open={saveConfirmOpen}
+                        pending={pendingLabels}
+                        preview={pushPreview}
+                        onClose={() => setSaveConfirmOpen(false)}
+                        onConfirm={() => {
+                            setSaveConfirmOpen(false);
+                            onSave();
+                        }}
+                    />
                 </div>
             </div>
             {device === 'desktop' ? (
                 <div
-                    className="editor-preview-inner bg-e-surface min-h-full"
+                    className="editor-preview-inner bg-ed-surface min-h-full"
                     ref={innerRef}
                 >
                     {renderContent()}
@@ -166,14 +258,23 @@ export function PreviewPanel({
                 <DeviceFrame
                     device={device}
                     width={deviceWidth}
-                    pageData={pageData}
-                    footerData={footerData}
+                    areas={areas}
                     selectedBlockId={selectedBlockId}
                     hoveredTreeId={hoveredTreeId}
+                    activeItem={activeItem}
                     onSelectFromFrame={onSelectFromFrame}
                     onDeleteFromFrame={onDeleteFromFrame}
                     onDuplicateFromFrame={onDuplicateFromFrame}
+                    onCopyFromFrame={onCopyFromFrame}
+                    onCutFromFrame={onCutFromFrame}
+                    onPasteFromFrame={onPasteFromFrame}
                     onUpdatePropFromFrame={onUpdatePropFromFrame}
+                    dragType={dragType}
+                    dragData={dragData}
+                    externalDrag={externalDrag}
+                    onDropFromFrame={onDropFromFrame}
+                    onCellDeleteFromFrame={onCellDeleteFromFrame}
+                    onCellDuplicateFromFrame={onCellDuplicateFromFrame}
                 />
             )}
         </div>
@@ -183,26 +284,42 @@ export function PreviewPanel({
 function DeviceFrame({
                          device,
                          width,
-                         pageData,
-                         footerData,
+                         areas,
                          selectedBlockId,
                          hoveredTreeId,
+                         activeItem,
                          onSelectFromFrame,
                          onDeleteFromFrame,
                          onDuplicateFromFrame,
-                         onUpdatePropFromFrame
+                         onCopyFromFrame,
+                         onCutFromFrame,
+                         onPasteFromFrame,
+                         onUpdatePropFromFrame,
+                         dragType,
+                         dragData,
+                         externalDrag,
+                         onDropFromFrame,
+                         onCellDeleteFromFrame,
+                         onCellDuplicateFromFrame
                      }) {
     const iframeRef = useRef(null);
     const readyRef = useRef(false);
 
+    const postDragState = useCallback(() => {
+        const win = iframeRef.current?.contentWindow;
+        if (!win || !readyRef.current) return;
+        win.postMessage({type: 'dragState', dragType, dragData, external: externalDrag}, '*');
+    }, [dragType, dragData, externalDrag]);
+
     const postData = useCallback(() => {
         const win = iframeRef.current?.contentWindow;
         if (!win || !readyRef.current) return;
+        // The frame gets the whole area map, so a new region needs no change here.
         win.postMessage(
-            {type: 'pageData', pageData, footerData, selectedId: selectedBlockId, hoveredId: hoveredTreeId},
+            {type: 'pageData', areas, selectedId: selectedBlockId, hoveredId: hoveredTreeId, activeItem},
             '*'
         );
-    }, [pageData, footerData, selectedBlockId, hoveredTreeId]);
+    }, [areas, selectedBlockId, hoveredTreeId, activeItem]);
 
     useEffect(() => {
         const onMessage = (e) => {
@@ -212,28 +329,46 @@ function DeviceFrame({
             if (msg.type === 'frame-ready') {
                 readyRef.current = true;
                 postData();
+                postDragState();
             } else if (msg.type === 'select' && onSelectFromFrame) {
                 onSelectFromFrame(msg.id);
             } else if (msg.type === 'delete' && onDeleteFromFrame) {
                 onDeleteFromFrame(msg.id);
             } else if (msg.type === 'duplicate' && onDuplicateFromFrame) {
                 onDuplicateFromFrame(msg.id);
+            } else if (msg.type === 'copy' && onCopyFromFrame) {
+                onCopyFromFrame(msg.id);
+            } else if (msg.type === 'cut' && onCutFromFrame) {
+                onCutFromFrame(msg.id);
+            } else if (msg.type === 'paste' && onPasteFromFrame) {
+                onPasteFromFrame(msg.id);
             } else if (msg.type === 'updateProp' && onUpdatePropFromFrame) {
                 onUpdatePropFromFrame(msg.id, msg.key, msg.value);
+            } else if (msg.type === 'drop' && onDropFromFrame) {
+                onDropFromFrame(msg.drop || {});
+            } else if (msg.type === 'cellDelete' && onCellDeleteFromFrame) {
+                onCellDeleteFromFrame(msg.payload);
+            } else if (msg.type === 'cellDuplicate' && onCellDuplicateFromFrame) {
+                onCellDuplicateFromFrame(msg.payload);
             }
         };
         window.addEventListener('message', onMessage);
         return () => window.removeEventListener('message', onMessage);
-    }, [postData, onSelectFromFrame, onDeleteFromFrame, onDuplicateFromFrame, onUpdatePropFromFrame]);
+    }, [postData, postDragState, onSelectFromFrame, onDeleteFromFrame, onDuplicateFromFrame, onCopyFromFrame, onCutFromFrame, onPasteFromFrame, onUpdatePropFromFrame, onDropFromFrame, onCellDeleteFromFrame, onCellDuplicateFromFrame]);
 
     useEffect(() => {
         postData();
     }, [postData]);
 
+    useEffect(() => {
+        postDragState();
+    }, [postDragState]);
+
     return (
-        <div className="device-frame flex-1 flex flex-col items-center p-4 min-h-0 gap-2.5 overflow-auto [&_iframe]:flex-shrink-0 [&_iframe]:rounded-e-lg [&_iframe]:shadow-[0_4px_24px_rgba(0,0,0,0.08)] [&_iframe]:bg-e-surface [&_iframe]:block [&_iframe]:h-[calc(100vh-52px-32px)] [&_iframe]:max-h-full">
+        <div className="device-frame flex-1 flex flex-col items-center p-4 min-h-0 gap-2.5 overflow-auto">
             <iframe
                 ref={iframeRef}
+                className="shrink-0 rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] bg-ed-surface block max-h-full"
                 title={`Preview (${device})`}
                 src="/__preview__"
                 style={{width, height: '100%', border: 'none', background: '#fff'}}

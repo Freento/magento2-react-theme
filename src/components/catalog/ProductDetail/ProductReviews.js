@@ -9,7 +9,7 @@ const ProductReviews = ({ reviews, reviewCount, ratingSummary, onWriteReview }) 
   <div className="reviews-section py-2">
     <div className="reviews-header flex justify-between items-start mb-6 gap-4 max768:flex-col max768:items-stretch">
       <div>
-        <h3 className="text-13 tracking-[0.12em] uppercase font-medium text-ink mb-1.5">Customer Reviews</h3>
+        <h2 className="text-13 tracking-[0.12em] uppercase font-medium text-ink mb-1.5">Customer Reviews</h2>
         {reviewCount > 0 && (
           <div className="rating-summary flex items-center gap-2.5 mt-1.5 text-13 text-ink-2">
             <div className="stars-display flex gap-[2px]">
@@ -56,7 +56,7 @@ const ProductReviews = ({ reviews, reviewCount, ratingSummary, onWriteReview }) 
                 </p>
               </div>
             </div>
-            <h4 className="review-summary text-[16px] font-medium text-ink mt-0 mb-1.5 tracking-[-0.01em]">{review.summary}</h4>
+            <h3 className="review-summary text-[16px] font-medium text-ink mt-0 mb-1.5 tracking-[-0.01em]">{review.summary}</h3>
             <p className="review-text text-ink-2 leading-[1.6] m-0 text-base">{review.text}</p>
           </div>
         ))}

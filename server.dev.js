@@ -10,10 +10,14 @@ import { resolveUrl, toRouteHint } from './server/resolveUrl.js';
 import { readRouteAreas, routeAreaPaths, findRouteArea } from './server/routeAreas.js';
 import { readCustomerTokenCookie } from './server/customerToken.js';
 import { ssrDebugEnabled, mergeStats, applyDebugHeaders, logSsrStats, writeSsrStats } from './server/ssrDebug.js';
+import { basicAuth } from './server/basicAuth.js';
+import { editorAuth, hasEditorSession, isEditorGuarded } from './server/editorAuth.js';
+import { isMaintenanceFor, MAINTENANCE_PAGE_PATH } from './server/siteSettings.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = __dirname;
-const PORT      = Number(process.env.PORT || 5173);
+// DEV_PORT lets a dev copy and a prod copy share one .env layout; PORT is the fallback.
+const PORT      = Number(process.env.DEV_PORT || process.env.PORT || 5173);
 const PAGES_DIR = path.join(ROOT, 'editor-app/content/pages');
 const ROUTES_DIR = path.join(ROOT, 'editor-app/content/routes');
 
@@ -36,14 +40,36 @@ const readAllPages = () => {
   }
   return out;
 };
-const findPageByPath = (p) => p ? readAllPages().find((j) => j.path === p) || null : null;
+const isPublished = (j) => !!j && !j.hidden;
+const findPageByPath = (p) => p ? readAllPages().find((j) => j.path === p && isPublished(j)) || null : null;
 const collectEditorPagesByPath = () => {
   const map = {};
-  for (const j of readAllPages()) if (j.path && !j.path.startsWith('/__')) map[j.path] = j;
+  for (const j of readAllPages()) {
+    if (j.path && !j.path.startsWith('/__') && isPublished(j)) map[j.path] = j;
+  }
   return map;
 };
 
+const EDITOR_APP_URL = process.env.EDITOR_APP_URL || `http://localhost:${process.env.EDITOR_PORT || 3100}`;
+const EDITOR_ENABLED = String(process.env.EDITOR_ENABLED ?? 'on').toLowerCase() !== 'off';
+
+// Same list as server.prod.js - both guards and the proxy filter have to cover
+// exactly the same paths.
+const EDITOR_PATHS = ['/editor', '/__preview__', '/api/editor', '/api/render', '/_editor'];
+const isEditorPath = (p) => EDITOR_PATHS.some((base) => p === base || p.startsWith(`${base}/`));
+
+// Same three conditions as the guard mounted further down.
+const editorGuarded =
+  EDITOR_ENABLED && Boolean(EDITOR_APP_URL) && isEditorGuarded();
+
 const app = express();
+
+// Split by path, exactly as in server.prod.js: one Authorization header cannot
+// answer two guards, so stacking them locks /editor out entirely.
+const siteGuard = basicAuth({ passes: hasEditorSession });
+app.use((req, res, next) =>
+  (editorGuarded && isEditorPath(req.path) ? next() : siteGuard(req, res, next)));
+
 app.use(compression());
 
 const targetHost = new URL(GRAPHQL_TARGET).host;
@@ -76,18 +102,33 @@ const magentoProxy = createProxyMiddleware({
 });
 app.use(magentoProxy);
 
-const EDITOR_APP_URL = process.env.EDITOR_APP_URL;
-const EDITOR_ENABLED = String(process.env.EDITOR_ENABLED ?? 'on').toLowerCase() !== 'off';
+const mediaProxy = createProxyMiddleware({
+  target: GRAPHQL_TARGET,
+  changeOrigin: true,
+  secure: !GRAPHQL_INSECURE,
+  pathFilter: (p) => p.startsWith('/media/catalog/'),
+  on: {
+    proxyRes: (proxyRes) => {
+      delete proxyRes.headers['set-cookie'];
+      if (proxyRes.statusCode === 200) {
+        proxyRes.headers['cache-control'] = 'public, max-age=31536000, immutable';
+      }
+    },
+  },
+});
+app.use(mediaProxy);
+
 if (EDITOR_ENABLED && EDITOR_APP_URL) {
+  // Off by default, so local development is unaffected; here for parity with
+  // production, where the same credentials guard the same paths. Note it covers
+  // the HTTP chain only - vite's HMR websocket upgrade bypasses Express.
+  app.use(EDITOR_PATHS, editorAuth());
+
   app.use(createProxyMiddleware({
     target: EDITOR_APP_URL,
     changeOrigin: true,
     ws: true,
-    pathFilter: (p) =>
-      p === '/editor' || p.startsWith('/editor/') ||
-      p === '/__preview__' || p.startsWith('/__preview__/') ||
-      p.startsWith('/api/editor') || p.startsWith('/api/render') ||
-      p.startsWith('/_editor/'),
+    pathFilter: isEditorPath,
   }));
 }
 
@@ -126,8 +167,20 @@ app.get('*', async (req, res, next) => {
     );
     const { renderApp } = await viteDevServer.ssrLoadModule('/src/entry-server.jsx');
 
+    if (isMaintenanceFor(req)) {
+      const initialData = { maintenance: true, maintenancePage: readAllPages().find((j) => j.path === MAINTENANCE_PAGE_PATH) || null };
+      const { html: appHtml, apolloState } = await renderApp(req.url, initialData, { graphqlUri: GRAPHQL_URI });
+      const json = JSON.stringify({ ...initialData, apolloCache: apolloState }).replace(/</g, '\\u003c');
+      res.set('Cache-Control', 'no-store');
+      return res.status(503).type('html').end(template.replace(
+        '<div id="root"></div>',
+        `<div id="root">${appHtml}</div>\n    <script type="application/json" id="__INITIAL_DATA__">${json}</script>`,
+      ));
+    }
+
     const pageData    = findPageByPath(pathname);
     const footerData  = findPageByPath('/__footer__');
+    const menuData    = findPageByPath('/__menu__');
     const editorPages = collectEditorPagesByPath();
 
     const resolvedUrl = pageData ? null : await resolveUrl(pathname);
@@ -141,7 +194,7 @@ app.get('*', async (req, res, next) => {
     const routeArea = findRouteArea(routeDocs, pathname);
 
     const initialData = {
-      pageData, footerData, editorPages, routeHint, resolvedUrl,
+      pageData, footerData, menuData, editorPages, routeHint, resolvedUrl,
       routeArea, routeAreaPaths: routeAreaPaths(routeDocs),
     };
     // Same as prod: render as the customer when their cookie is present, with one
@@ -156,13 +209,13 @@ app.get('*', async (req, res, next) => {
       rendered = await renderApp(req.url, initialData, { graphqlUri: GRAPHQL_URI, debug });
       debugStats = debug ? mergeStats(rejected.stats, rendered.stats) : null;
     }
-    const { html: appHtml, apolloState, personalized } = rendered;
+    const { html: appHtml, apolloState, breadcrumbs, personalized } = rendered;
 
-    const initialJson = JSON.stringify({ ...initialData, apolloCache: apolloState, personalized })
+    const initialJson = JSON.stringify({ ...initialData, apolloCache: apolloState, breadcrumbs, personalized })
       .replace(/</g, '\\u003c');
     const html = template.replace(
       '<div id="root"></div>',
-      `<script>window.__INITIAL_DATA__=${initialJson}</script>\n    <div id="root">${appHtml}</div>`,
+      `<div id="root">${appHtml}</div>\n    <script type="application/json" id="__INITIAL_DATA__">${initialJson}</script>`,
     );
     applyDebugHeaders(res, debugStats, performance.now() - startedAt);
     logSsrStats(req, debugStats, performance.now() - startedAt);

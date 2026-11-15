@@ -15,8 +15,11 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialAuthState);
+// `initialToken` is known before any effect runs — from the request cookie on the
+// server, from document.cookie in the browser — so components can tell a guest
+// from a customer on the very first render instead of querying blind.
+export const AuthProvider = ({ children, initialToken = null }) => {
+  const [state, dispatch] = useReducer(authReducer, initialToken, (token) => ({ ...initialAuthState, token }));
   const actions = useAuthActions(state, dispatch);
 
   const value = { ...state, ...actions };

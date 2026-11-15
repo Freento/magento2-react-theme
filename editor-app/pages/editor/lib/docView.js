@@ -11,6 +11,9 @@ export const bareRouteId = (id) => (isRouteId(id) ? id.slice(ROUTE_ID_PREFIX.len
 
 export const areasForDoc = (doc) => ROUTE_AREAS[doc?.route?.type] || [];
 
+export const docEndpoint = (id) =>
+  isRouteId(id) ? `/api/editor/routes/${bareRouteId(id)}` : `/api/editor/pages/${id}`;
+
 /**
  * Presents a route document to the editing hooks as if it were a page.
  *

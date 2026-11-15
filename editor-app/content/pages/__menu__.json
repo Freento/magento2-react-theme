@@ -1,0 +1,150 @@
+{
+  "title": "Menu",
+  "path": "/__menu__",
+  "style": {
+    "padding": "0",
+    "maxWidth": "none",
+    "width": "100%"
+  },
+  "blocks": [
+    {
+      "id": "menu",
+      "component": "Menu",
+      "props": {
+        "items": [
+          {
+            "label": "What's New",
+            "href": "/what-is-new.html",
+            "children": []
+          },
+          {
+            "label": "Women",
+            "href": "/women.html",
+            "children": [
+              {
+                "label": "Tops",
+                "href": "/women/tops-women.html",
+                "children": [
+                  {
+                    "label": "Jackets",
+                    "href": "/women/tops-women/jackets-women.html"
+                  },
+                  {
+                    "label": "Hoodies & Sweatshirts",
+                    "href": "/women/tops-women/hoodies-and-sweatshirts-women.html"
+                  },
+                  {
+                    "label": "Tees",
+                    "href": "/women/tops-women/tees-women.html"
+                  },
+                  {
+                    "label": "Bras & Tanks",
+                    "href": "/women/tops-women/tanks-women.html"
+                  }
+                ]
+              },
+              {
+                "label": "Bottoms",
+                "href": "/women/bottoms-women.html",
+                "children": [
+                  {
+                    "label": "Pants",
+                    "href": "/women/bottoms-women/pants-women.html"
+                  },
+                  {
+                    "label": "Shorts",
+                    "href": "/women/bottoms-women/shorts-women.html"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Men",
+            "href": "/men.html",
+            "children": [
+              {
+                "label": "Tops",
+                "href": "/men/tops-men.html",
+                "children": [
+                  {
+                    "label": "Jackets",
+                    "href": "/men/tops-men/jackets-men.html"
+                  },
+                  {
+                    "label": "Hoodies & Sweatshirts",
+                    "href": "/men/tops-men/hoodies-and-sweatshirts-men.html"
+                  },
+                  {
+                    "label": "Tees",
+                    "href": "/men/tops-men/tees-men.html"
+                  },
+                  {
+                    "label": "Tanks",
+                    "href": "/men/tops-men/tanks-men.html"
+                  }
+                ]
+              },
+              {
+                "label": "Bottoms",
+                "href": "/men/bottoms-men.html",
+                "children": [
+                  {
+                    "label": "Pants",
+                    "href": "/men/bottoms-men/pants-men.html"
+                  },
+                  {
+                    "label": "Shorts",
+                    "href": "/men/bottoms-men/shorts-men.html"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Gear",
+            "href": "/gear.html",
+            "children": [
+              {
+                "label": "Bags",
+                "href": "/gear/bags.html",
+                "children": []
+              },
+              {
+                "label": "Fitness Equipment",
+                "href": "/gear/fitness-equipment.html",
+                "children": []
+              },
+              {
+                "label": "Watches",
+                "href": "/gear/watches.html",
+                "children": []
+              }
+            ]
+          },
+          {
+            "label": "Training",
+            "href": "/training.html",
+            "children": [
+              {
+                "label": "Video Download",
+                "href": "/training/training-video.html",
+                "children": []
+              }
+            ]
+          },
+          {
+            "label": "Sale",
+            "href": "/sale.html",
+            "children": []
+          },
+          {
+            "label": "Gift Cards",
+            "href": "/gift-cards.html",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

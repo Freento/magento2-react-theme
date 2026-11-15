@@ -210,6 +210,16 @@ const ensureSink = (file) => {
   return sinkState;
 };
 
+export const closeSsrSink = async () => {
+  while (sinkState === 'opening') {
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  flushPending();
+  const stream = sinkStream;
+  if (!stream) return;
+  await new Promise((resolve) => stream.end(resolve));
+};
+
 /**
  * Appends one NDJSON record describing this SSR. No-op unless SSR_DEBUG_FILE is set
  * and SSR_DEBUG is something other than `off`.

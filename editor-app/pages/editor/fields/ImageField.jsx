@@ -1,85 +1,93 @@
 import {useRef, useState} from 'react';
 import {UI} from '../../../src/editor/Icon.jsx';
+import {fieldInputCore} from '../lib/cls.js';
+import {addPendingUpload, pendingFileName, uploadedUrl, validateImageFile} from '../lib/pendingUploads.js';
+
+const imageFieldBtn =
+    'image-field-btn h-[30px] border border-solid border-ed-dashed bg-ed-surface rounded text-[12.5px] font-medium ' +
+    '[font-family:inherit] cursor-pointer [transition:all_0.1s] inline-flex items-center justify-center gap-1.5 ' +
+    'disabled:opacity-60 disabled:cursor-default';
 
 export function ImageField({value, onChange}) {
     const inputRef = useRef(null);
-    const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
+    const pendingName = pendingFileName(value);
 
     const pick = () => inputRef.current?.click();
 
-    const handleFile = async (e) => {
+    const [dragOver, setDragOver] = useState(false);
+    const acceptFile = (file) => {
+        if (!file) return;
+        const invalid = validateImageFile(file);
+        setError(invalid);
+        if (!invalid) onChange(addPendingUpload(file));
+    };
+    const handleFile = (e) => {
         const file = e.target.files?.[0];
         e.target.value = '';
-        if (!file) return;
-        setError('');
-        const ext = (file.name.match(/\.[^.]+$/)?.[0] || '').toLowerCase();
-        const allowed = ['.avif', '.webp'];
-        if (!allowed.includes(ext)) {
-            setError(`Only AVIF or WebP allowed — "${file.name}" is ${ext || 'unknown'}.`);
-            return;
-        }
-        setUploading(true);
-        try {
-            const fd = new FormData();
-            fd.append('file', file);
-            const res = await fetch('/api/editor/upload', {method: 'POST', body: fd});
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.error || 'Upload failed');
-            }
-            const {url} = await res.json();
-            onChange(url);
-        } catch (err) {
-            setError(err.message || 'Upload failed');
-        } finally {
-            setUploading(false);
-        }
+        acceptFile(file);
+    };
+    const onDragOver = (e) => {
+        if (![...e.dataTransfer.types].includes('Files')) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        setDragOver(true);
+    };
+    const onDrop = (e) => {
+        e.preventDefault();
+        setDragOver(false);
+        acceptFile(e.dataTransfer.files?.[0]);
     };
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="image-field flex flex-col gap-2">
             <div
-                className="group relative w-full h-[110px] border border-dashed border-e-dashed rounded-e bg-e-code-bg-soft cursor-pointer overflow-hidden flex items-center justify-center transition-colors duration-100 hover:border-e-primary hover:bg-e-primary-soft"
+                className={`image-field-preview${value ? '' : ' empty'} group relative w-full h-[110px] border border-dashed rounded bg-ed-code-bg-soft cursor-pointer overflow-hidden flex items-center justify-center [transition:border-color_0.1s,background_0.1s] hover:border-ed-primary hover:bg-ed-primary-soft ${dragOver ? 'border-ed-primary bg-ed-primary-soft' : 'border-ed-dashed'}`}
                 onClick={pick}
-                title="Upload image"
+                onDragOver={onDragOver}
+                onDragEnter={onDragOver}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={onDrop}
+                data-tooltip="Upload image or drop a file here" aria-label="Upload image"
             >
                 {value ? (
-                    <img src={value} alt="" className="max-w-full max-h-full object-contain block"/>
+                    <img className="max-w-full max-h-full object-contain block" src={value} alt=""/>
                 ) : (
-                    <span className="text-e-muted-2 text-[12px] font-medium inline-flex items-center gap-1.5 group-hover:text-e-primary">
+                    <span className="image-field-placeholder text-ed-muted-2 text-[12px] font-medium inline-flex items-center gap-1.5 group-hover:text-ed-primary">
             <UI.Plus size={18} strokeWidth={2}/>
             Upload
           </span>
                 )}
             </div>
-            <div className="flex flex-col gap-1.5">
-                <div className="flex gap-1.5">
-                    <button type="button"
-                            className="flex-1 h-[30px] border border-e-dashed bg-e-surface text-e-text rounded-e text-[12.5px] font-medium cursor-pointer transition-all duration-100 inline-flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-default enabled:hover:border-e-primary enabled:hover:text-e-primary enabled:hover:bg-e-primary-soft"
-                            onClick={pick} disabled={uploading}>
-                        {uploading ? 'Uploading…' : (value ? 'Replace' : 'Choose file')}
+            <div className="image-field-controls flex flex-col gap-1.5">
+                <div className="image-field-actions flex gap-1.5">
+                    <button
+                        type="button"
+                        className={`${imageFieldBtn} flex-1 text-ed-text enabled:hover:border-ed-primary enabled:hover:text-ed-primary enabled:hover:bg-ed-primary-soft`}
+                        onClick={pick}
+                    >
+                        {value ? 'Replace' : 'Choose file'}
                     </button>
                     {value && (
                         <button
                             type="button"
-                            className="flex-none w-[30px] h-[30px] p-0 border border-e-dashed bg-e-surface text-e-text rounded-e text-[12.5px] font-medium cursor-pointer transition-all duration-100 inline-flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-default enabled:hover:bg-e-danger-soft enabled:hover:border-e-danger-border enabled:hover:text-e-danger"
+                            className={`${imageFieldBtn} danger flex-none w-[30px] p-0 text-ed-text enabled:hover:bg-ed-danger-soft enabled:hover:border-ed-danger-border enabled:hover:text-ed-danger`}
                             onClick={() => onChange('')}
-                            title="Clear"
+                            data-tooltip="Clear" aria-label="Clear"
                         >
                             <UI.Close size={14} strokeWidth={2}/>
                         </button>
                     )}
                 </div>
                 <input
-                    className="field-input !h-7 text-[12px] !font-['SF_Mono',ui-monospace,Menlo,monospace]"
+                    className={`${fieldInputCore} image-field-url w-full h-7 px-2 font-ed-mono`}
                     type="text"
-                    placeholder="or paste URL"
-                    value={value || ''}
+                    placeholder={pendingName ? `${pendingName} — uploads on Save` : 'or paste URL'}
+                    value={pendingName ? '' : uploadedUrl(value) || value || ''}
                     onChange={(e) => onChange(e.target.value)}
                 />
-                <div className="text-[11px] text-e-text-muted mt-0.5">Allowed formats: AVIF, WebP</div>
-                {error && <div className="text-[11.5px] text-e-danger bg-e-danger-soft rounded-e px-1.5 py-1">{error}</div>}
+                <div className="image-field-hint text-[11px] text-ed-text-muted mt-0.5">Allowed formats: AVIF, WebP</div>
+                {error && <div className="image-field-error text-[11.5px] text-ed-danger bg-ed-danger-soft rounded px-1.5 py-1">{error}</div>}
             </div>
             <input
                 ref={inputRef}

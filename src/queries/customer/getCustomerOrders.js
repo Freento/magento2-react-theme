@@ -1,9 +1,9 @@
 import { gql } from '@apollo/client';
 
-const customerOrdersQuery = (extraFields) => gql`
+const customerOrdersQuery = (extraFields, sortArg) => gql`
   query getCustomerOrders($pageSize: Int!, $currentPage: Int!) {
     customer {
-      orders(pageSize: $pageSize, currentPage: $currentPage) {
+      orders(pageSize: $pageSize, currentPage: $currentPage${sortArg}) {
         items {
           id
           number
@@ -93,10 +93,20 @@ const customerOrdersQuery = (extraFields) => gql`
   }
 `;
 
-export const GET_CUSTOMER_ORDERS = customerOrdersQuery('');
-
-export const GET_CUSTOMER_ORDERS_WITH_COUPONS = customerOrdersQuery(`
+const COUPONS_FIELDS = `
           applied_coupons {
             code
           }
-`);
+`;
+
+const NEWEST_FIRST_SORT = ', sort: { sort_field: CREATED_AT, sort_direction: DESC }';
+
+const customerOrdersQueries = new Map();
+
+export const getCustomerOrdersQuery = ({ withCoupons = false, withSort = false } = {}) => {
+  const key = `${withCoupons}:${withSort}`;
+  if (!customerOrdersQueries.has(key)) {
+    customerOrdersQueries.set(key, customerOrdersQuery(withCoupons ? COUPONS_FIELDS : '', withSort ? NEWEST_FIRST_SORT : ''));
+  }
+  return customerOrdersQueries.get(key);
+};

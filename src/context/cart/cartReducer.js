@@ -6,6 +6,7 @@ export const initialCartState = {
   loading: false,
   merging: false,
   error: null,
+  attention: null,
   pendingItems: new Set(),
   lastRemoved: null,
 };
@@ -26,6 +27,8 @@ export const cartReducer = (state, action) => {
       return { ...state, merging: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
+    case 'SET_ATTENTION':
+      return { ...state, attention: action.payload };
     case 'ADD_PENDING_ITEM': {
       const next = new Set(state.pendingItems);
       next.add(action.payload);

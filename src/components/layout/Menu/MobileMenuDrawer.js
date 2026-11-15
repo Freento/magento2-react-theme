@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { getTileIcon } from './menuTileIcons';
+import MenuTileIcon from './MenuTileIcon';
+import MenuLink from './MenuLink';
+import { catUrl } from './menuItems';
 
 const SUBLIST_ITEM =
   'flex items-center justify-between w-full py-4 bg-transparent border-0 border-b border-line text-md font-medium text-ink no-underline text-left cursor-pointer transition-colors duration-fast ease-[ease] hover:text-ink-2';
 
-const TILE_BASE =
+export const TILE_BASE =
   'mobile-menu-tile flex flex-col items-center justify-center gap-2.5 py-5 px-3 border border-line rounded bg-bg text-ink text-[13px] font-medium tracking-normal normal-case no-underline transition-colors duration-fast ease-[ease] aspect-[5/4] text-center';
 
 const ACCOUNT_ITEM =
@@ -24,6 +26,10 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
     if (!el) return;
     if (isOpen) el.removeAttribute('inert');
     else el.setAttribute('inert', '');
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) setSubmenuPath([]);
   }, [isOpen]);
 
   const closeAndReset = () => {
@@ -77,22 +83,15 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
         <div className="mobile-menu-body flex-1 overflow-y-auto p-5">
           {inSubmenu ? (
             <ul className="mobile-menu-sublist list-none p-0 m-0 flex flex-col">
-              <li>
-                <Link
-                  to={`/${current.url_path}${current.url_suffix || ''}`}
-                  data-prefetch="category"
-                  data-prefetch-id={current.id}
-                  state={{ resolved: {
-                    type: 'category',
-                    id: Number(current.id),
-                    path: `${current.url_path}${current.url_suffix || ''}`,
-                  }}}
+              {catUrl(current) !== '#' && <li>
+                <MenuLink
+                  item={current}
                   onClick={closeAndReset}
                   className="mobile-menu-sublist-all flex items-center justify-between w-full py-4 border-0 border-b border-line font-medium no-underline text-left cursor-pointer text-ink-2 tracking-[0.04em] uppercase text-sm"
                 >
                   View all {current.name}
-                </Link>
-              </li>
+                </MenuLink>
+              </li>}
               {childCategories.map((child) => {
                 const hasKids = (child.children || []).some((c) => c.include_in_menu);
                 return (
@@ -109,15 +108,8 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                         </svg>
                       </button>
                     ) : (
-                      <Link
-                        to={`/${child.url_path}${child.url_suffix || ''}`}
-                        data-prefetch="category"
-                        data-prefetch-id={child.id}
-                        state={{ resolved: {
-                          type: 'category',
-                          id: Number(child.id),
-                          path: `${child.url_path}${child.url_suffix || ''}`,
-                        }}}
+                      <MenuLink
+                        item={child}
                         onClick={closeAndReset}
                         className={SUBLIST_ITEM}
                       >
@@ -125,7 +117,7 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                         <svg className="text-ink-2 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <polyline points="9 6 15 12 9 18" />
                         </svg>
-                      </Link>
+                      </MenuLink>
                     )}
                   </li>
                 );
@@ -142,30 +134,17 @@ const MobileMenuDrawer = ({ mainCategories, isOpen, onClose, mobileTilesLoading 
                 ))}
                 {!mobileTilesLoading && mainCategories.map((category) => {
                   const hasKids = (category.children || []).some((c) => c.include_in_menu);
-                  const TileEl = hasKids ? 'button' : Link;
+                  const TileEl = hasKids ? 'button' : MenuLink;
                   const tileProps = hasKids
                     ? { type: 'button', onClick: () => setSubmenuPath([category]) }
-                    : { to: `/${category.url_path}${category.url_suffix || ''}`, onClick: closeAndReset, 'data-prefetch': 'category', 'data-prefetch-id': category.id };
+                    : { item: category, onClick: closeAndReset };
                   return (
                     <TileEl
                       key={category.id}
                       className={`${TILE_BASE} cursor-pointer hover:border-ink hover:bg-surface hover:text-ink`}
                       {...tileProps}
                     >
-                      <svg
-                        className="mobile-menu-tile-icon text-ink shrink-0 transition-colors duration-fast ease-[ease]"
-                        width="28"
-                        height="28"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        {getTileIcon(category.name)}
-                      </svg>
+                      <MenuTileIcon category={category} />
                       <span className="mobile-menu-tile-label leading-[1.25]">{category.name}</span>
                     </TileEl>
                   );

@@ -16,6 +16,12 @@ export const GET_PRODUCT_DETAILS = gql`
                 media_gallery {
                     thumb: url(width: 150)
                     w900: url(width: 900)
+                    full: url
+                    label
+                    disabled
+                }
+                image {
+                    w900: url(width: 900)
                     label
                 }
                 price_range {
@@ -99,7 +105,9 @@ export const GET_PRODUCT_DETAILS = gql`
                             media_gallery {
                                 thumb: url(width: 150)
                                 w900: url(width: 900)
+                                full: url
                                 label
+                                disabled
                             }
                             image {
                                 w900: url(width: 900)

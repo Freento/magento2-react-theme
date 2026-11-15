@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { GET_AUTOCOMPLETE_RESULTS } from '../../queries/search';
 import { src } from '../../lib/productImage';
+import { productPrefetchAttrs } from '../../lib/productLink';
 
 const POPULAR_SEARCHES = ['Hoodie', 'Pants', 'Shorts', 'Tee', 'Tank', 'Bag'];
 
@@ -54,6 +55,8 @@ const SearchBox = ({ onClose, autoFocus = false }) => {
   };
 
   const products = data?.products?.items || [];
+  const totalCount = data?.products?.total_count ?? products.length;
+  const searchUrl = `/search?q=${encodeURIComponent(searchTerm.trim())}`;
   const showSuggestions = autoFocus || (focused && !searchTerm && !showResults);
 
   return (
@@ -122,6 +125,7 @@ const SearchBox = ({ onClose, autoFocus = false }) => {
                   id: Number(product.id),
                   path: `${product.url_key}${product.url_suffix || ''}`,
                 }}}
+                {...productPrefetchAttrs(product)}
                 className={SB_RESULT}
                 onClick={() => {
                   setShowResults(false);
@@ -141,6 +145,23 @@ const SearchBox = ({ onClose, autoFocus = false }) => {
                 </div>
               </Link>
             ))}
+            {!loading && !error && products.length > 0 && (
+              <div className="sb-footer sticky bottom-0 flex items-center justify-between gap-3 py-2.5 px-3.5 bg-surface text-13">
+                <span className="sb-count text-ink-2 tabular-nums">
+                  {totalCount === 1 ? '1 result' : `${totalCount} results`}
+                </span>
+                <Link
+                  to={searchUrl}
+                  className="sb-view-all font-medium text-ink underline decoration-line underline-offset-[3px] transition-colors duration-fast ease-[ease] hover:decoration-ink"
+                  onClick={() => {
+                    setShowResults(false);
+                    onClose && onClose();
+                  }}
+                >
+                  View all results
+                </Link>
+              </div>
+            )}
           </>
         )}
       </div>

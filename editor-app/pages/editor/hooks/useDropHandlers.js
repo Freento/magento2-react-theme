@@ -6,6 +6,7 @@ export function useDropHandlers({
                                     dragType,
                                     dragData,
                                     dropTarget,
+                                    externalDrag,
                                     treeDropTarget,
                                     setTreeDropTarget,
                                     handleDragEnd,
@@ -17,33 +18,21 @@ export function useDropHandlers({
                                     setBlocksFor,
                                     setSelectedBlockId,
                                     setActiveTab,
+                                    showToast,
                                 }) {
     const cell = useCellActions({
         sideForBlockId,
         activeTarget,
         getBlocksFor,
         setBlocksFor,
-    });
-
-    const tree = useTreeDrop({
-        dragType,
-        dragData,
-        treeDropTarget,
-        setTreeDropTarget,
-        handleDragEnd,
-        isDropAllowed,
-        sideForBlockId,
-        activeTarget,
-        getBlocksFor,
-        setBlocksFor,
-        setSelectedBlockId,
-        setActiveTab,
+        showToast,
     });
 
     const canvas = useCanvasDrop({
         dragType,
         dragData,
         dropTarget,
+        externalDrag,
         handleDragEnd,
         draggedComponent,
         isDropAllowed,
@@ -53,6 +42,16 @@ export function useDropHandlers({
         setBlocksFor,
         setSelectedBlockId,
         setActiveTab,
+        showToast,
+    });
+
+    const tree = useTreeDrop({
+        dragType,
+        dragData,
+        treeDropTarget,
+        setTreeDropTarget,
+        handleDragEnd,
+        applyDrop: canvas.applyDrop,
     });
 
     return {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { renderPageBlocks, useActiveDevices } from 'editor-core/renderer';
 import { useSyncBreadcrumbs } from '../../context/BreadcrumbContext';
 import { storefrontBlocks as blocks } from './editorBlocks';
@@ -7,8 +7,7 @@ import NotFound from './NotFound';
 export default function EditorPageRoute({ slug, editorPages = {}, ssrHint }) {
   const devices = useActiveDevices(undefined, ssrHint);
   const path = slug === 'home' ? '/' : `/${slug}`;
-  const initial = editorPages[path] || null;
-  const [page] = useState(initial);
+  const page = editorPages[path] || null;
 
   // CMS/editor pages get a static "Home > {title}" trail. The home page itself
   // shows none (null is inert). Hook must run before any early return.

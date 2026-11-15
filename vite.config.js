@@ -32,6 +32,18 @@ const serveEditorUploads = () => ({
   },
 });
 
+// Identifies one client build. Baked into the bundle as __APP_BUILD_ID__ and written
+// next to it as build-id.json, which server.prod.js serves at /__build-id: a page that
+// fails to load one of its code-split modules compares the two to tell a deploy from
+// any other failure (src/lib/chunkLoad.js).
+const buildIdFile = (id) => ({
+  name: 'build-id-file',
+  apply: 'build',
+  generateBundle() {
+    this.emitFile({ type: 'asset', fileName: 'build-id.json', source: JSON.stringify({ id }) });
+  },
+});
+
 export default defineConfig(({ mode, isSsrBuild }) => {
   const env = loadEnv(mode, process.cwd(), '');
   if (!env.GRAPHQL_ORIGIN) {
@@ -46,10 +58,11 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     [graphqlPath]:           { target: graphqlOrigin, changeOrigin: true, secure: !graphqlInsecure },
     '/customer/ajax':        { target: graphqlOrigin, changeOrigin: true, secure: !graphqlInsecure },
     '/checkout/index':       { target: graphqlOrigin, changeOrigin: true, secure: !graphqlInsecure },
+    '/media/catalog':        { target: graphqlOrigin, changeOrigin: true, secure: !graphqlInsecure },
   };
 
   const editorEnabled = String(env.EDITOR_ENABLED ?? 'on').toLowerCase() !== 'off';
-  const editorTarget = env.EDITOR_APP_URL || 'http://localhost:3100';
+  const editorTarget = env.EDITOR_APP_URL || `http://localhost:${env.EDITOR_PORT || 3100}`;
   const editorProxyTargets = editorEnabled ? {
     '^/editor(/|$)':      { target: editorTarget, changeOrigin: true, ws: true },
     '^/__preview__(/|$)': { target: editorTarget, changeOrigin: true, ws: true },
@@ -58,7 +71,12 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     '^/api/render(/|$)':  { target: editorTarget, changeOrigin: true },
   } : {};
 
+  const buildId = Date.now().toString(36);
+
   return {
+    define: {
+      __APP_BUILD_ID__: JSON.stringify(buildId),
+    },
     build: {
       sourcemap: 'hidden',
       ...(isSsrBuild && {
@@ -75,6 +93,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
         }
       },
       serveEditorUploads(),
+      ...(isSsrBuild ? [] : [buildIdFile(buildId)]),
       react(),
       // Pre-compress static assets at build time so nginx's brotli_static
       // serves the ready *.br files instead of running brotli on every
@@ -107,11 +126,13 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     server: {
       host: true,
       ...(env.VITE_ALLOWED_HOST ? { allowedHosts: [env.VITE_ALLOWED_HOST] } : {}),
-      hmr: { port: 24680 },
+      // Dedicated HMR port so sibling Vite projects do not collide; override per copy via .env.
+      hmr: { port: Number(env.HMR_PORT) || 24680 },
       proxy: {
         ...(shouldProxy ? magentoProxyTargets : {
           '/customer/ajax':          magentoProxyTargets['/customer/ajax'],
           '/checkout/index':         magentoProxyTargets['/checkout/index'],
+          '/media/catalog':          magentoProxyTargets['/media/catalog'],
         }),
         ...editorProxyTargets,
       }

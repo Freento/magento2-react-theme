@@ -1,40 +1,37 @@
+/*
+ * Preview-canvas rules that target the THEME's markup rendered inside
+ * .preview-chrome (storefront chrome, editor-core block wrappers, page JSON
+ * content) — deliberately plain CSS, not utilities: the elements below are not
+ * rendered by editor-app JSX. The .preview-chrome root font styles moved to
+ * utilities on the wrapper in PreviewChrome.jsx.
+ */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;600;700&display=swap");
-
-:root {
-    --pc-text: #333333;
-    --pc-font: "Inter", sans-serif;
-    --pc-font-heading: "Montserrat", sans-serif;
-    --pc-main-max: 1400px;
-    --pc-container-max: 1200px;
-}
 
 body {
     margin: 0;
 }
 
-.preview-chrome {
-    font-family: var(--pc-font);
-    line-height: 1.5;
-    color: var(--pc-text);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.preview-chrome,
-.preview-chrome *,
-.preview-chrome *::before,
-.preview-chrome *::after {
+/* The storefront resets with `* { margin: 0; padding: 0 }` — specificity zero,
+   so block CSS overrides it freely. Scoping it to .preview-chrome would give it
+   a class's weight and flatten every block on the canvas (`margin: 0 auto` on
+   .banner-tiles, the header's gutters). :where() keeps the scope
+   without the specificity, so the canvas cascades like the storefront. */
+:where(
+        .preview-chrome,
+        .preview-chrome *,
+        .preview-chrome *::before,
+        .preview-chrome *::after
+    ) {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: all 0.3s ease;
 }
 
 .preview-chrome main {
-    max-width: var(--pc-main-max);
+    max-width: 1400px;
     width: 100%;
     margin: 0 auto;
-    padding: 20px;
+    padding: 0 20px;
 }
 @media (max-width: 768px) {
     .preview-chrome main {
@@ -51,7 +48,7 @@ body {
 .preview-chrome h4,
 .preview-chrome h5,
 .preview-chrome h6 {
-    font-family: var(--pc-font-heading);
+    font-family: "Montserrat", sans-serif;
     font-weight: 600;
 }
 
@@ -67,7 +64,7 @@ body {
 }
 
 .preview-chrome .container {
-    max-width: var(--pc-container-max);
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -89,4 +86,13 @@ body {
 .preview-chrome .header-bottom {
     width: 100%;
     margin-left: 0;
+}
+
+.global-block-badge {
+  transition: opacity 0.15s;
+}
+
+.global-block:has([data-overlay-row]) > .global-block-badge {
+  opacity: 0;
+  pointer-events: none !important;
 }

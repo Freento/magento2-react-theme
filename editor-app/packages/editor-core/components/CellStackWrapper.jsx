@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { OverlayIconBtn, IconGripVertical, IconCopy, IconX } from '../overlay/icons.jsx';
+import { OverlayIconBtn, IconGripVertical, IconCopy, IconX, useHoverTip } from '../overlay/icons.jsx';
 
 export function CellStackWrapper({ parentId, cell, group, kids, childOptions, options, renderBlock }) {
   const [hovered, setHovered] = useState(false);
+  const cellTip = useHoverTip('Drag cell');
   const isEditing = !!childOptions.onSelect;
   const isSelected = options.selectedId && group.some((idx) => kids[idx]?.id === options.selectedId);
   const isTreeHovered = options.hoveredId && group.some((idx) => kids[idx]?.id === options.hoveredId);
@@ -14,11 +15,13 @@ export function CellStackWrapper({ parentId, cell, group, kids, childOptions, op
   const outline = isSelected
     ? '2px solid #0F4C5C'
     : isTreeHovered
-    ? '2px solid #9A9A95'
+    ? '2px solid #6F6F6B'
     : hovered
-    ? '2px dashed #9A9A95'
+    ? '2px dashed #6F6F6B'
     : '2px solid transparent';
   const dropSide = isDropActive ? childOptions.dropTarget?.side : null;
+  const showControls = isEditing && hovered;
+  const locked = !!childOptions.isLocked && group.some((idx) => childOptions.isLocked(kids[idx]));
   return (
     <div
       data-cell-stack={`${parentId}:${cell.r}-${cell.c}`}
@@ -34,11 +37,34 @@ export function CellStackWrapper({ parentId, cell, group, kids, childOptions, op
         e.stopPropagation();
         const dragId = childOptions.isDragging;
         if (!dragId) return;
+        const cur = childOptions.dropTarget;
+        const emit = (dt) => {
+          if (
+            cur &&
+            cur.parentId === dt.parentId &&
+            cur.index === dt.index &&
+            cur.side === dt.side &&
+            cur.cell?.r === dt.cell?.r &&
+            cur.cell?.c === dt.cell?.c
+          ) return;
+          childOptions.onDropTargetChange(dt);
+        };
         const r = e.currentTarget.getBoundingClientRect();
-        const side = (e.clientX - r.left) < r.width / 2 ? 'left' : 'right';
-        childOptions.onDropTargetChange({ parentId, index: 0, cell, side });
+        if (dragId === 'cell') {
+          const side = (e.clientX - r.left) < r.width / 2 ? 'left' : 'right';
+          emit({ parentId, index: 0, cell, side });
+          return;
+        }
+        const blockEls = [...e.currentTarget.querySelectorAll(':scope > [data-block-id]')];
+        let pos = blockEls.length;
+        for (let i = 0; i < blockEls.length; i++) {
+          const br = blockEls[i].getBoundingClientRect();
+          if (e.clientY < br.top + br.height / 2) { pos = i; break; }
+        }
+        const index = pos < group.length ? group[pos] : group[group.length - 1] + 1;
+        emit({ parentId, index, cell });
       } : undefined}
-      onMouseEnter={isEditing ? () => setHovered(true) : undefined}
+      onMouseOver={isEditing ? (e) => setHovered(e.target?.closest?.('[data-block-id],[data-cell-stack]') === e.currentTarget) : undefined}
       onMouseLeave={isEditing ? () => setHovered(false) : undefined}
       style={{
         display: 'flex',
@@ -73,23 +99,25 @@ export function CellStackWrapper({ parentId, cell, group, kids, childOptions, op
           }}
         />
       )}
-      {isEditing && (hovered || isSelected) && (
+      {showControls && (
         <>
           <span
-            title="Drag cell"
-            aria-label="Cell drag handle"
+            ref={cellTip.ref}
+            aria-label="Drag cell"
+            {...cellTip.hoverProps}
             style={{
               position: 'absolute', top: 0, right: 50,
               width: 22, height: 22,
-              background: '#ffffff', border: '1px solid #e5e7eb', color: '#525252',
+              background: '#ffffff', border: '1px solid #B9B9B4', color: '#424242',
               borderRadius: 4, cursor: 'grab', zIndex: 12,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               userSelect: 'none', pointerEvents: 'auto',
             }}
           >
             <IconGripVertical />
+            {cellTip.tip}
           </span>
-          {childOptions.onCellDuplicate && (
+          {childOptions.onCellDuplicate && !locked && (
             <div
               style={{ position: 'absolute', top: 0, right: 25, zIndex: 12 }}
               onMouseDown={(e) => e.stopPropagation()}
@@ -103,7 +131,7 @@ export function CellStackWrapper({ parentId, cell, group, kids, childOptions, op
               </OverlayIconBtn>
             </div>
           )}
-          {childOptions.onCellDelete && (
+          {childOptions.onCellDelete && !locked && (
             <div
               style={{ position: 'absolute', top: 0, right: 0, zIndex: 12 }}
               onMouseDown={(e) => e.stopPropagation()}
@@ -125,6 +153,7 @@ export function CellStackWrapper({ parentId, cell, group, kids, childOptions, op
           ...childOptions,
           myCell: cell,
           inStack: true,
+          stackLast: idx === group[group.length - 1],
         })
       )}
     </div>

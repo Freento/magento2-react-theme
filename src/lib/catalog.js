@@ -16,3 +16,5 @@ export const categoryProductsVariables = (categoryId, { filters, sort, page = 1 
   if (sort) vars.sort = sort;
   return vars;
 };
+
+export const MAX_QTY_DIGITS = 5;

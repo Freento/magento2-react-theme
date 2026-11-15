@@ -15,23 +15,37 @@ export const CONFIGURABLE_CARD_FIELDS = gql`
         }
       }
     }
-    variants {
-      attributes {
-        code
-        value_index
-      }
-      product {
+  }
+`;
+
+export const GET_CARD_VARIANTS = gql`
+  query getCardVariants($sku: String!) {
+    products(filter: { sku: { eq: $sku } }) {
+      items {
+        __typename
         id
-        sku
-        stock_status
-        small_image {
-          w450: url(width: 450)
-        }
-        price_range {
-          minimum_price {
-            final_price {
-              currency
-              value
+        uid
+        ... on ConfigurableProduct {
+          variants {
+            attributes {
+              code
+              value_index
+            }
+            product {
+              id
+              sku
+              stock_status
+              small_image {
+                w450: url(width: 450)
+              }
+              price_range {
+                minimum_price {
+                  final_price {
+                    currency
+                    value
+                  }
+                }
+              }
             }
           }
         }

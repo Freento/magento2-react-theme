@@ -4,13 +4,13 @@
   "blocks": [
     {
       "id": "contact-title",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "Contact Us",
         "level": 1,
         "textAlign": "left",
         "fontSize": 44,
-        "letterSpacing": "-0.02em"
+        "letterSpacing": "-0.02em",
+        "html": "Contact Us"
       },
       "style": {
         "marginTop": 40,
@@ -21,10 +21,11 @@
       "id": "contact-lead",
       "component": "Text",
       "props": {
-        "text": "Questions, feedback, or a partnership idea — we read everything that lands in our inbox and reply within one business day.",
         "fontSize": 18,
         "lineHeight": 1.6,
-        "color": "#6B6B6B"
+        "color": "#6B6B6B",
+        "html": "Questions, feedback, or a partnership idea — we read everything that lands in our inbox and reply within one business day.",
+        "level": "p"
       },
       "style": {
         "marginBottom": 48,
@@ -33,12 +34,12 @@
     },
     {
       "id": "contact-cs-h",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "Customer Service",
         "level": 2,
         "textAlign": "left",
-        "fontSize": 26
+        "fontSize": 26,
+        "html": "Customer Service"
       },
       "style": {
         "marginBottom": 16
@@ -48,61 +49,209 @@
       "id": "contact-cs-grid",
       "component": "Grid",
       "props": {
-        "direction": "grid",
         "columns": 3,
         "rowGap": 16,
-        "columnGap": 32
+        "columnGap": 32,
+        "rows": 2
       },
       "style": {
         "marginBottom": 48
       },
       "children": [
         {
-          "id": "cs-email-label",
-          "component": "Heading",
-          "props": { "text": "Email", "level": 4, "fontSize": 12, "textTransform": "uppercase", "letterSpacing": "0.1em", "color": "#6B6B6B" },
-          "style": { "marginBottom": 6 }
+          "id": "btzhirby",
+          "component": "Column",
+          "props": {
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
+          },
+          "style": {
+            "colStart": 1,
+            "rowStart": 1
+          },
+          "children": [
+            {
+              "id": "cs-email-label",
+              "component": "Text",
+              "props": {
+                "level": 4,
+                "fontSize": 12,
+                "textTransform": "uppercase",
+                "letterSpacing": "0.1em",
+                "color": "#6B6B6B",
+                "html": "Email"
+              },
+              "style": {
+                "marginBottom": 6
+              }
+            }
+          ]
         },
         {
-          "id": "cs-phone-label",
-          "component": "Heading",
-          "props": { "text": "Phone", "level": 4, "fontSize": 12, "textTransform": "uppercase", "letterSpacing": "0.1em", "color": "#6B6B6B" },
-          "style": { "marginBottom": 6 }
+          "id": "brdmqc3r",
+          "component": "Column",
+          "props": {
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 1
+          },
+          "children": [
+            {
+              "id": "cs-phone-label",
+              "component": "Text",
+              "props": {
+                "level": 4,
+                "fontSize": 12,
+                "textTransform": "uppercase",
+                "letterSpacing": "0.1em",
+                "color": "#6B6B6B",
+                "html": "Phone"
+              },
+              "style": {
+                "marginBottom": 6
+              }
+            }
+          ]
         },
         {
-          "id": "cs-hours-label",
-          "component": "Heading",
-          "props": { "text": "Hours", "level": 4, "fontSize": 12, "textTransform": "uppercase", "letterSpacing": "0.1em", "color": "#6B6B6B" },
-          "style": { "marginBottom": 6 }
+          "id": "b9957jfl",
+          "component": "Column",
+          "props": {
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
+          },
+          "style": {
+            "colStart": 3,
+            "rowStart": 1
+          },
+          "children": [
+            {
+              "id": "cs-hours-label",
+              "component": "Text",
+              "props": {
+                "level": 4,
+                "fontSize": 12,
+                "textTransform": "uppercase",
+                "letterSpacing": "0.1em",
+                "color": "#6B6B6B",
+                "html": "Hours"
+              },
+              "style": {
+                "marginBottom": 6
+              }
+            }
+          ]
         },
         {
-          "id": "cs-email",
-          "component": "Text",
-          "props": { "text": "support@example.com", "href": "mailto:support@example.com", "fontSize": 16, "lineHeight": 1.5, "color": "#111", "textDecoration": "underline" },
-          "style": {}
+          "id": "b1yc8cap",
+          "component": "Column",
+          "props": {
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
+          },
+          "style": {
+            "colStart": 1,
+            "rowStart": 2
+          },
+          "children": [
+            {
+              "id": "cs-email",
+              "component": "Text",
+              "props": {
+                "fontSize": 16,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "textDecoration": "underline",
+                "html": "<a class=\"plain\" href=\"mailto:support@example.com\">support@example.com</a>",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         },
         {
-          "id": "cs-phone",
-          "component": "Text",
-          "props": { "text": "1-800-123-4567", "fontSize": 16, "lineHeight": 1.5, "color": "#111" },
-          "style": {}
+          "id": "bk1007cv",
+          "component": "Column",
+          "props": {
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
+          },
+          "style": {
+            "colStart": 2,
+            "rowStart": 2
+          },
+          "children": [
+            {
+              "id": "cs-phone",
+              "component": "Text",
+              "props": {
+                "fontSize": 16,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "1-800-123-4567",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         },
         {
-          "id": "cs-hours",
-          "component": "Text",
-          "props": { "text": "Mon–Fri, 9 AM – 6 PM EST", "fontSize": 16, "lineHeight": 1.5, "color": "#111" },
-          "style": {}
+          "id": "bm9hdb0h",
+          "component": "Column",
+          "props": {
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "start"
+          },
+          "style": {
+            "colStart": 3,
+            "rowStart": 2
+          },
+          "children": [
+            {
+              "id": "cs-hours",
+              "component": "Text",
+              "props": {
+                "fontSize": 16,
+                "lineHeight": 1.5,
+                "color": "#111",
+                "html": "Mon–Fri, 9 AM – 6 PM EST",
+                "level": "p"
+              },
+              "style": {}
+            }
+          ]
         }
       ]
     },
     {
       "id": "contact-biz-h",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "Business Inquiries",
         "level": 2,
         "textAlign": "left",
-        "fontSize": 26
+        "fontSize": 26,
+        "html": "Business Inquiries"
       },
       "style": {
         "marginBottom": 12
@@ -112,12 +261,12 @@
       "id": "contact-biz-body",
       "component": "Text",
       "props": {
-        "text": "Partnerships, press, and wholesale: business@example.com",
-        "href": "mailto:business@example.com",
         "fontSize": 16,
         "lineHeight": 1.6,
         "color": "#111",
-        "textDecoration": "underline"
+        "textDecoration": "underline",
+        "html": "<a class=\"plain\" href=\"mailto:business@example.com\">Partnerships, press, and wholesale: business@example.com</a>",
+        "level": "p"
       },
       "style": {
         "marginBottom": 48
@@ -125,12 +274,12 @@
     },
     {
       "id": "contact-addr-h",
-      "component": "Heading",
+      "component": "Text",
       "props": {
-        "text": "Mailing Address",
         "level": 2,
         "textAlign": "left",
-        "fontSize": 26
+        "fontSize": 26,
+        "html": "Mailing Address"
       },
       "style": {
         "marginBottom": 12
@@ -140,11 +289,12 @@
       "id": "contact-addr-line1",
       "component": "Text",
       "props": {
-        "text": "SimpleShop HQ",
         "fontSize": 16,
         "lineHeight": 1.6,
         "color": "#111",
-        "fontWeight": 600
+        "fontWeight": 600,
+        "html": "SimpleShop HQ",
+        "level": "p"
       },
       "style": {
         "marginBottom": 4
@@ -154,10 +304,11 @@
       "id": "contact-addr-line2",
       "component": "Text",
       "props": {
-        "text": "123 Commerce Street, Suite 100",
         "fontSize": 16,
         "lineHeight": 1.6,
-        "color": "#333"
+        "color": "#333",
+        "html": "123 Commerce Street, Suite 100",
+        "level": "p"
       },
       "style": {}
     },
@@ -165,10 +316,11 @@
       "id": "contact-addr-line3",
       "component": "Text",
       "props": {
-        "text": "New York, NY 10001",
         "fontSize": 16,
         "lineHeight": 1.6,
-        "color": "#333"
+        "color": "#333",
+        "html": "New York, NY 10001",
+        "level": "p"
       },
       "style": {}
     },
@@ -176,10 +328,11 @@
       "id": "contact-addr-line4",
       "component": "Text",
       "props": {
-        "text": "United States",
         "fontSize": 16,
         "lineHeight": 1.6,
-        "color": "#333"
+        "color": "#333",
+        "html": "United States",
+        "level": "p"
       },
       "style": {
         "marginBottom": 48
@@ -190,7 +343,7 @@
       "component": "ContactForm",
       "props": {
         "heading": "Write Us",
-        "intro": "Jot us a note and we\u2019ll get back to you as quickly as possible.",
+        "intro": "Jot us a note and we’ll get back to you as quickly as possible.",
         "buttonText": "Submit"
       },
       "style": {

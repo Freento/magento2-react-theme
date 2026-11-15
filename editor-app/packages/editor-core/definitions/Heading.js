@@ -1,11 +1,13 @@
 export default {
     label: 'Heading',
+    deprecated: true,
     category: 'content',
     icon: 'H',
     acceptsChildren: false,
-    // Has an href of its own; a second anchor around it would nest.
-    hideStyleFields: ['link'],
-    allowedIn: ['page', 'Grid', 'Box'],
+    allowedIn: ['page', 'Grid', 'Column'],
+    hideStyleFields: ['link', 'fontFamily', 'backgroundColor', 'borderRadius', 'borderSides', 'borderStyle', 'borderColor'],
+    spacingSideBySide: true,
+    keepFieldOrder: true,
     defaultProps: {
       text: 'Heading',
       href: '',
@@ -33,48 +35,6 @@ export default {
         resetOnChange: ['fontSize'],
         group: 'Heading',
       },
-      href: { label: 'Link', type: 'text', placeholder: '/about-us', group: 'Heading' },
-      fontFamily: {
-        label: 'Font',
-        type: 'fontFamily',
-        inlineNumber: { key: 'fontSize', placeholder: '32', suffix: 'px', width: 64 },
-        group: 'Heading',
-      },
-      fontSize: { label: 'Size (px or em)', type: 'text', placeholder: '32px', group: 'Heading' },
-      fontWeight: { label: 'Weight', type: 'fontWeight', group: 'Heading' },
-      fontStyle: {
-        label: 'Style',
-        type: 'segmented',
-        options: [
-          { value: 'normal', label: '', icon: 'StyleNormal', title: 'Regular' },
-          { value: 'italic', label: '', icon: 'StyleItalic', title: 'Italic' },
-        ],
-        group: 'Heading',
-      },
-      textDecoration: {
-        label: 'Decoration',
-        type: 'segmented',
-        options: [
-          { value: 'none', label: '', icon: 'DecorNone', title: 'None' },
-          { value: 'underline', label: '', icon: 'DecorUnderline', title: 'Underline' },
-          { value: 'line-through', label: '', icon: 'DecorLineThrough', title: 'Strikethrough' },
-          { value: 'overline', label: '', icon: 'DecorOverline', title: 'Overline' },
-        ],
-        group: 'Heading',
-      },
-      textTransform: {
-        label: 'Case',
-        type: 'segmented',
-        options: [
-          { value: 'none', label: '', icon: 'CaseMixed', title: 'As typed' },
-          { value: 'uppercase', label: '', icon: 'CaseUpper', title: 'UPPERCASE' },
-          { value: 'lowercase', label: '', icon: 'CaseLower', title: 'lowercase' },
-          { value: 'capitalize', label: '', icon: 'CaseCap', title: 'Capitalize Words' },
-        ],
-        group: 'Heading',
-      },
-      letterSpacing: { label: 'Letter spacing', type: 'letterSpacing', group: 'Heading' },
-      color: { label: 'Text color', type: 'color', group: 'Heading' },
       textAlign: {
         label: 'Alignment',
         type: 'segmented',
@@ -82,8 +42,17 @@ export default {
           { value: 'left', label: '', icon: 'AlignLeft' },
           { value: 'center', label: '', icon: 'AlignCenter' },
           { value: 'right', label: '', icon: 'AlignRight' },
+          { value: 'justify', label: '', icon: 'AlignJustify' },
         ],
         group: 'Heading',
+      },
+      color: { label: 'Text color', type: 'color', fallback: '#000000', group: 'Heading' },
+      fontWeight: { label: 'Weight', type: 'fontWeight', group: 'Heading' },
+      backgroundImage: { label: 'Background', type: 'background', group: 'Advanced' },
+      customCss: {
+        label: 'Custom styles',
+        type: 'customCss',
+        group: 'Advanced',
       },
     },
 };

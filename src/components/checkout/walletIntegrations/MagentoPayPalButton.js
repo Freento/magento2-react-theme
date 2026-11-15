@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { CREATE_PAYPAL_EXPRESS_TOKEN } from '../../../queries/checkout';
+import { CREATE_PAYPAL_EXPRESS_TOKEN, CREATE_PAYPAL_EXPRESS_TOKEN_WITH_AGREEMENT } from '../../../queries/checkout';
+import SaveForLaterCheckbox from '../SaveForLaterCheckbox';
 
 const MagentoPayPalButton = ({
     cartId,
     code = 'paypal_express',
     onSuccess,
     onError,
-    disabled = false
+    disabled = false,
+    showBillingAgreement = false
 }) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [signAgreement, setSignAgreement] = useState(false);
     const [createPayPalToken] = useMutation(CREATE_PAYPAL_EXPRESS_TOKEN);
+    const [createPayPalTokenWithAgreement] = useMutation(CREATE_PAYPAL_EXPRESS_TOKEN_WITH_AGREEMENT);
 
     const handlePayPalClick = async () => {
         if (disabled) return;
@@ -19,7 +23,8 @@ const MagentoPayPalButton = ({
 
         try {
             const useCredit = code === 'paypal_express_bml';
-            const result = await createPayPalToken({
+            const createToken = showBillingAgreement && signAgreement ? createPayPalTokenWithAgreement : createPayPalToken;
+            const result = await createToken({
                 variables: {
                     cartId,
                     code: 'paypal_express',
@@ -53,6 +58,15 @@ const MagentoPayPalButton = ({
 
     return (
         <div className="magento-paypal-container">
+            {showBillingAgreement && (
+                <SaveForLaterCheckbox
+                    className="mb-3"
+                    label="Sign a billing agreement to streamline further purchases with PayPal"
+                    checked={signAgreement}
+                    onChange={setSignAgreement}
+                    disabled={disabled || isLoading}
+                />
+            )}
             <button
                 className="magento-paypal-button magento-paypal-button-static bg-[#0070ba] text-white border-0 rounded px-6 py-3 text-[16px] font-semibold flex items-center justify-center gap-2 w-full [transition:background-color_0.2s] min-h-12"
                 onClick={handlePayPalClick}

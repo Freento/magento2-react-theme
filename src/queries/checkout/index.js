@@ -1,8 +1,10 @@
 export { APPLY_COUPON_TO_CART } from './applyCouponToCart';
-export { CREATE_PAYPAL_EXPRESS_TOKEN } from './createPaypalExpressToken';
+export { CREATE_PAYPAL_EXPRESS_TOKEN, CREATE_PAYPAL_EXPRESS_TOKEN_WITH_AGREEMENT } from './createPaypalExpressToken';
 export { GET_AUTHNET_HOSTED_PAYMENT_PARAMS } from './getAuthnetHostedPaymentParams';
 export { GET_AVAILABLE_PAYMENT_METHODS } from './getAvailablePaymentMethods';
 export { GET_AVAILABLE_SHIPPING_METHODS } from './getAvailableShippingMethods';
+export { GET_BRAINTREE_CHECKOUT_CONFIG } from './getBraintreeCheckoutConfig';
+export { GET_PAYPAL_BILLING_AGREEMENT_SIGNUP } from './getPaypalBillingAgreementSignup';
 export { GET_COUNTRIES } from './getCountries';
 export { GET_TOKENBASE_CHECKOUT_CONFIG } from './getTokenbaseCheckoutConfig';
 export { PLACE_ORDER } from './placeOrder';

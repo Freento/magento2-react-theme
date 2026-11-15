@@ -1,1 +1,1 @@
-export { GET_PRODUCTS_CAROUSEL } from './getProductsCarousel';
+export { GET_PRODUCTS_LIST } from './getProductsList';

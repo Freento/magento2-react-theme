@@ -21,12 +21,11 @@ import usePaymentSubmit from './hooks/usePaymentSubmit';
 import useCheckoutPaymentHandlers from './hooks/useCheckoutPaymentHandlers';
 import { isCartAuthError, getInitialStep } from './checkoutHelpers';
 import { loadBraintreeClient } from './lib/braintree';
+import CheckoutSkeleton from './CheckoutSkeleton';
+import { isStoredCode } from '../../lib/storedCards';
 
 const CONTAINER_CLS = 'checkout-container max-w-container mx-auto px-gutter pt-8 pb-20 text-ink';
 const TITLE_CLS = 'checkout-title font-sans text-2xl font-semibold tracking-[-0.02em] leading-tight mb-7';
-const SKEL_STEP_CLS = 'skeleton co-skel-step h-3.5 rounded';
-const SKEL_CONN_CLS = 'skeleton co-skel-conn grow-0 shrink-0 basis-12 h-px bg-line-strong animate-none';
-const SKEL_FIELD_CLS = 'skeleton co-skel-field h-11 rounded';
 
 const Checkout = () => {
   const { cartData, cartId, cartInitialized, loading: cartLoading, merging: cartMerging, clearCart, loadCart } = useCart();
@@ -216,10 +215,10 @@ const Checkout = () => {
     handlePayPalSuccess,
     handlePayPalError,
     handlePayPalCancel,
-    handleAcceptJsToken,
     handleAuthorizeNetTransactionComplete,
     handleAuthorizeNetTransactionError,
     googlePayPlaceOrder,
+    paypalPlaceOrder,
     dismissErrorKey,
   } = useCheckoutPaymentHandlers({ state, actions, mutations, cartId, user, clearCart, navigate });
 
@@ -238,7 +237,7 @@ const Checkout = () => {
   useEffect(() => {
     if (state.currentStep !== 3 || state.selectedPayment) return;
     const first = paymentMethods.data?.cart?.available_payment_methods
-      ?.find((m) => m.code !== 'braintree_cc_vault');
+      ?.find((m) => !isStoredCode(m.code));
     if (first?.code) handlePaymentMethodSelect(first.code);
   }, [state.currentStep, state.selectedPayment, paymentMethods.data, handlePaymentMethodSelect]);
 
@@ -254,30 +253,7 @@ const Checkout = () => {
       <div className={CONTAINER_CLS}>
         <h1 className={TITLE_CLS}>Checkout</h1>
 
-        <div className="co-skel-steps flex items-center gap-3.5 pb-5 mb-7 border-b border-line" aria-hidden="true">
-          <span className={`${SKEL_STEP_CLS} w-[120px] opacity-70`} />
-          <span className={SKEL_CONN_CLS} />
-          <span className={`${SKEL_STEP_CLS} w-24`} />
-          <span className={SKEL_CONN_CLS} />
-          <span className={`${SKEL_STEP_CLS} w-24`} />
-        </div>
-
-        <div className="co-skel-section bg-bg border border-line rounded p-7 grid gap-4 max640:px-4 max640:py-5" aria-busy="true" aria-live="polite">
-          <span className="skeleton co-skel-h w-2/5 h-[22px]" />
-          <span className={SKEL_FIELD_CLS} />
-          <div className="co-skel-row grid grid-cols-2 gap-4 max640:grid-cols-1">
-            <span className={SKEL_FIELD_CLS} />
-            <span className={SKEL_FIELD_CLS} />
-          </div>
-          <span className={SKEL_FIELD_CLS} />
-          <div className="co-skel-row co-skel-row-3 grid grid-cols-3 gap-4 max640:grid-cols-1">
-            <span className={SKEL_FIELD_CLS} />
-            <span className={SKEL_FIELD_CLS} />
-            <span className={SKEL_FIELD_CLS} />
-          </div>
-          <span className={SKEL_FIELD_CLS} />
-          <span className="skeleton co-skel-btn h-11 mt-2 rounded" />
-        </div>
+        <CheckoutSkeleton />
       </div>
     );
   }
@@ -355,7 +331,6 @@ const Checkout = () => {
                 handlePayPalSuccess={handlePayPalSuccess}
                 handlePayPalError={handlePayPalError}
                 handlePayPalCancel={handlePayPalCancel}
-                onAcceptJsToken={handleAcceptJsToken}
                 tokenbaseConfig={data.tokenbaseConfig}
                 onTransactionComplete={handleAuthorizeNetTransactionComplete}
                 onTransactionError={handleAuthorizeNetTransactionError}
@@ -363,6 +338,8 @@ const Checkout = () => {
                 braintreeLoadClient={loadBraintreeClient}
                 onBraintreeHostedReady={onBraintreeHostedReady}
                 googlePayPlaceOrder={googlePayPlaceOrder}
+                paypalPlaceOrder={paypalPlaceOrder}
+                braintreeConfig={data.braintreeConfig}
                 googlePayMerchantId={import.meta.env.VITE_GOOGLE_PAY_MERCHANT_ID}
                 googlePayEnvironment={import.meta.env.VITE_GOOGLE_PAY_ENV || 'TEST'}
                 placeOrderDisabled={!state.useSameAsShipping && state.billingEditing}
@@ -371,6 +348,7 @@ const Checkout = () => {
                 saveCard={state.saveCard}
                 onSaveCardChange={actions.setSaveCard}
                 canSaveCard={!!user}
+                billingAgreementSignup={data.billingAgreementSignup}
                 billingBlock={(
                   <CheckoutBillingAddress
                     cartData={cartData}

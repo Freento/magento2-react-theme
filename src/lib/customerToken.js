@@ -8,6 +8,14 @@ const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefine
 
 export const readCustomerToken = () => readCookie(TOKEN_COOKIE);
 
+// The token as the SSR server sees it (server/customerToken.js): an expired JWT
+// counts as none. Both sides start the auth state from this, so they agree on
+// whether the first render belongs to a customer.
+export const readLiveCustomerToken = () => {
+  const token = readCustomerToken();
+  return token && !isJwtExpired(token) ? token : null;
+};
+
 // False means the browser refused the cookie — with nothing behind it, that is a
 // failed sign-in, so callers must surface it.
 export const writeCustomerToken = (token) => {

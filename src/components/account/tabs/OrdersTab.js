@@ -215,28 +215,28 @@ const OrdersTab = ({
             <div key={`sk-${i}`} className="contents" role="row" aria-hidden="true">
               <span role="cell" className="p-4 border-t border-line text-sm text-ink flex items-center gap-2 min-w-0 tabular-nums">
                 <span className="hidden">Order #</span>
-                <span className="skeleton w-20 h-3.5 max768:w-[100px]" />
+                <span><span className="skeleton inline-block align-middle w-20 h-3.5 max768:w-[100px]" /></span>
               </span>
               <span role="cell" className="p-4 border-t border-line text-sm flex items-center gap-2 min-w-0 text-ink-2 overflow-hidden text-ellipsis whitespace-nowrap">
                 <span className="hidden">Date</span>
-                <span className="skeleton w-[90px] h-3 max768:w-[100px]" />
+                <span><span className="skeleton inline-block align-middle w-[90px] h-3 max768:w-[100px]" /></span>
               </span>
               <span role="cell" className="p-4 border-t border-line text-sm flex items-center gap-2 min-w-0 text-ink-2 overflow-hidden text-ellipsis whitespace-nowrap">
                 <span className="hidden">Ship to</span>
-                <span className="skeleton w-[70%] h-3 max768:w-[140px]" />
+                <span><span className="skeleton inline-block align-middle w-[120px] h-3 max768:w-[140px]" /></span>
               </span>
               <span role="cell" className="p-4 border-t border-line text-sm text-ink flex items-center gap-2 min-w-0 tabular-nums font-semibold">
                 <span className="hidden">Total</span>
-                <span className="skeleton w-[60px] h-3.5 max768:w-[100px]" />
+                <span><span className="skeleton inline-block align-middle w-[60px] h-3.5 max768:w-[100px]" /></span>
               </span>
               <span role="cell" className="p-4 border-t border-line text-sm text-ink flex items-center gap-2 min-w-0">
                 <span className="hidden">Status</span>
-                <span className="skeleton w-[70px] h-[22px] rounded-sm max768:w-20 max768:h-5" />
+                <span><span className="skeleton inline-block align-middle w-[70px] h-3.5 max768:w-20" /></span>
               </span>
               <span role="cell" className="p-4 border-t border-line text-sm text-ink flex items-center min-w-0 justify-end gap-1">
-                <span className="skeleton w-[38px] h-3 max768:w-[100px]" />
+                <span><span className="skeleton inline-block align-middle w-[38px] h-3 max768:w-[100px]" /></span>
                 <span className="text-ink-2 px-1 select-none" aria-hidden="true">·</span>
-                <span className="skeleton w-[38px] h-3 max768:w-[100px]" />
+                <span><span className="skeleton inline-block align-middle w-[38px] h-3 max768:w-[100px]" /></span>
               </span>
             </div>
           ))}

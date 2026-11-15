@@ -4,6 +4,8 @@ import { UPDATE_CUSTOMER_PROFILE } from '../../../queries/customer';
 
 const NewsletterTab = ({ customer, onSuccess, onError }) => {
   const [isSubscribed, setIsSubscribed] = useState(!!customer.is_subscribed);
+  // The answer carries is_subscribed back on the customer, which the cache keeps
+  // as one entry (Customer has an empty key), so the profile updates by itself.
   const [updateCustomer, { loading }] = useMutation(UPDATE_CUSTOMER_PROFILE);
 
   useEffect(() => {

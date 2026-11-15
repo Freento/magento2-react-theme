@@ -39,13 +39,14 @@ export const CompareProvider = ({ children }) => {
     } catch { /* storage unavailable */ }
   }, []);
 
-  const { data, loading, refetch } = useQuery(GET_COMPARE_LIST, {
+  const { data, loading, error, refetch } = useQuery(GET_COMPARE_LIST, {
     variables: { uid },
     skip: !uid,
-    onError: (err) => {
-      if (err?.graphQLErrors?.length) storeUid(null);
-    },
   });
+
+  useEffect(() => {
+    if (error?.graphQLErrors?.length) storeUid(null);
+  }, [error, storeUid]);
 
   const [createCompareList] = useMutation(CREATE_COMPARE_LIST);
   const [addProductsToCompareList] = useMutation(ADD_PRODUCTS_TO_COMPARE_LIST);

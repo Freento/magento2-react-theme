@@ -1,7 +1,7 @@
 import React from 'react';
 import { selectedLabel } from './helpers/productVariants';
 
-const ProductOptions = ({ swatchOptions, buttonOptions, selectedOptions, onOptionChange }) => (
+const ProductOptions = ({ swatchOptions, buttonOptions, selectedOptions, onOptionChange, isValueInStock = () => true }) => (
   <>
     {swatchOptions.map((option) => (
       <div key={option.id} className="option-group mb-[22px]">
@@ -12,6 +12,7 @@ const ProductOptions = ({ swatchOptions, buttonOptions, selectedOptions, onOptio
         <div className="swatches flex gap-2.5" role="radiogroup" aria-label={option.label}>
           {option.values.map((v) => {
             const selected = Number(selectedOptions[option.attribute_code]) === Number(v.value_index);
+            const inStock = isValueInStock(option.attribute_code, v.value_index);
             const bg = v.swatch_data?.value && v.swatch_data.value.startsWith('#')
               ? v.swatch_data.value
               : (v.label || '').toLowerCase();
@@ -19,7 +20,7 @@ const ProductOptions = ({ swatchOptions, buttonOptions, selectedOptions, onOptio
               <button
                 key={v.value_index}
                 type="button"
-                className="swatch w-8 h-8 rounded-pill border border-ink/[0.12] cursor-pointer p-0 outline outline-2 outline-offset-2 outline-transparent [transition:outline-color_120ms_ease] hover:outline-ink/[0.35] aria-pressed:!outline-ink"
+                className={`swatch w-8 h-8 rounded-pill border border-ink/[0.12] cursor-pointer p-0 outline outline-2 outline-offset-2 outline-transparent [transition:outline-color_120ms_ease] ${inStock ? 'hover:outline-success aria-pressed:!outline-ink' : 'out-of-stock hover:outline-sale aria-pressed:!outline-sale'}`}
                 aria-pressed={selected}
                 aria-label={v.label}
                 title={v.label}
@@ -42,11 +43,12 @@ const ProductOptions = ({ swatchOptions, buttonOptions, selectedOptions, onOptio
           <div className="sizes flex flex-wrap gap-2" role="radiogroup" aria-label={option.label}>
             {option.values.map((v) => {
               const selected = Number(selectedOptions[option.attribute_code]) === Number(v.value_index);
+              const inStock = isValueInStock(option.attribute_code, v.value_index);
               return (
                 <button
                   key={v.value_index}
                   type="button"
-                  className="size-btn min-w-[48px] h-10 px-3 py-0 border border-line rounded text-13 font-medium bg-bg text-ink cursor-pointer transition-colors duration-fast ease-[ease] hover:enabled:border-ink aria-pressed:!bg-ink aria-pressed:!text-bg aria-pressed:!border-ink disabled:text-ink-2 disabled:bg-surface disabled:cursor-not-allowed disabled:relative disabled:after:content-[''] disabled:after:absolute disabled:after:left-[8%] disabled:after:right-[8%] disabled:after:top-1/2 disabled:after:h-px disabled:after:bg-line disabled:after:-rotate-12"
+                  className={`size-btn min-w-[48px] h-10 px-3 py-0 border border-line rounded text-13 font-medium bg-bg text-ink cursor-pointer transition-colors duration-fast ease-[ease] ${inStock ? 'hover:enabled:border-success hover:enabled:shadow-[inset_0_0_0_1px_theme(colors.success.DEFAULT)] aria-pressed:!bg-ink aria-pressed:!text-bg aria-pressed:!border-ink' : 'out-of-stock hover:enabled:border-sale hover:enabled:shadow-[inset_0_0_0_1px_theme(colors.sale)] aria-pressed:!bg-sale aria-pressed:!text-bg aria-pressed:!border-sale'} disabled:text-ink-2 disabled:bg-surface disabled:cursor-not-allowed disabled:relative disabled:after:content-[''] disabled:after:absolute disabled:after:left-[8%] disabled:after:right-[8%] disabled:after:top-1/2 disabled:after:h-px disabled:after:bg-line disabled:after:-rotate-12`}
                   aria-pressed={selected}
                   onClick={() => onOptionChange(option.attribute_code, v.value_index)}
                 >

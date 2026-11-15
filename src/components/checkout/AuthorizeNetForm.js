@@ -22,10 +22,6 @@ const AuthorizeNetForm = ({
     }
   };
 
-  const handleIframeCancel = () => {
-    console.log('Payment cancelled by user');
-  };
-
   return (
     <div className="authorizenet-form border border-line rounded p-[22px] mt-3.5 bg-bg">
       <h4 className={CARD_FORM_TITLE_CLS}>Secure Credit Card Payment</h4>
@@ -36,7 +32,6 @@ const AuthorizeNetForm = ({
         customerInfo={{ email: guestEmail }}
         onTransactionComplete={handleIframeTransactionComplete}
         onTransactionError={handleIframeTransactionError}
-        onCancel={handleIframeCancel}
         isVisible={true}
       />
     </div>

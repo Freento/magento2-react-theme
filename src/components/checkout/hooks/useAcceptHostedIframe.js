@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLazyQuery, useMutation } from '@apollo/client';
-import { GET_AUTHNET_HOSTED_PAYMENT_PARAMS, SYNC_AUTHNET_HOSTED_FORM } from '../../../queries/checkout';
+import { useLazyQuery } from '@apollo/client';
+import { GET_AUTHNET_HOSTED_PAYMENT_PARAMS } from '../../../queries/checkout';
 
 const parseQueryString = (str) => {
   const vars = str.split('&');
@@ -35,8 +35,6 @@ export default function useAcceptHostedIframe({
   const formRef = useRef(null);
 
   const [getHostedParamsQuery] = useLazyQuery(GET_AUTHNET_HOSTED_PAYMENT_PARAMS);
-  // eslint-disable-next-line no-unused-vars
-  const [syncHostedFormMutation] = useMutation(SYNC_AUTHNET_HOSTED_FORM);
 
   // Handle transaction response from iframe
   const handleTransactionResponse = async (params) => {
@@ -82,6 +80,7 @@ export default function useAcceptHostedIframe({
             amount: response.amount,
             response,
             iframeSessionId,
+            saveCard: ['true', true].includes(responseData.createPaymentProfileResponse?.success),
           });
         }
       } else {
@@ -148,7 +147,6 @@ export default function useAcceptHostedIframe({
         event.origin === 'https://test.authorize.net' ||
         event.origin === 'https://accept.authorize.net' ||
         event.origin.includes('authorize.net') ||
-        event.origin === 'https://arbsession.loc:3000' ||
         event.origin === window.location.origin
       ) {
         let messageData = event.data;
@@ -173,8 +171,7 @@ export default function useAcceptHostedIframe({
           if (event.source && typeof event.source.postMessage === 'function') {
             try {
               event.source.postMessage({ received: true, originalData: messageData }, event.origin);
-            } catch (e) {
-              console.log('Could not send acknowledgment back to iframe:', e);
+            } catch {
             }
           }
         }

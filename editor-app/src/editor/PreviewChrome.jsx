@@ -1,45 +1,54 @@
 import { useEffect, useState } from 'react';
+import { getClientApolloClient } from '@host/apollo/client';
+import { menuItemsOf } from '@host/components/layout/Menu/menuItems';
 import '../styles/previewChrome.css';
-// The preview renders host storefront components; in the tablet/mobile iframe
-// this is a separate document, so it needs the host Tailwind layer imported
-// here (Vite dedupes it with the editor shell's copy in the same document).
 import '@host/styles/tailwind.css';
 
 const CHROME_PAGES = {
   '/__footer__': { hideFooter: true, label: 'Global Block' },
+  '/__menu__': { hideMenu: true, label: 'Global Block' },
 };
 
 function GlobalBlock({ id, label, onEdit, children }) {
   return (
     <div
+      className="global-block"
       data-global-block={id}
-      style={{
-        position: 'relative',
-        outline: '2px dashed #0F4C5C',
-        outlineOffset: -2,
-      }}
+      style={{ position: 'relative' }}
     >
       <div
-        onClick={onEdit}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          border: '3px dashed #0F4C5C',
+          pointerEvents: 'none',
+          zIndex: 998,
+        }}
+      />
+      <div
+        className="global-block-badge"
+        onClick={(e) => { e.stopPropagation(); onEdit?.(); }}
         title={`Edit ${label}`}
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
-          background: '#111111',
+          background: '#0F4C5C',
           color: '#fff',
           fontSize: 10,
-          fontWeight: 500,
+          fontWeight: 600,
           padding: '4px 10px',
           borderRadius: '0 0 4px 0',
-          zIndex: 20,
+          zIndex: 999,
           cursor: 'pointer',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          boxShadow: 'none',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+          pointerEvents: 'auto',
         }}
       >
         {label}
@@ -53,7 +62,27 @@ function LiveChromeBlocker({ children }) {
   return <div style={{ pointerEvents: 'none' }}>{children}</div>;
 }
 
-export default function PreviewChrome({ children, pagePath, onEditGlobal, footerContent }) {
+function EmptyRegion() {
+  return (
+    <div
+      style={{
+        minHeight: 56,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#6F6F6B',
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+      }}
+    >
+      Empty global block
+    </div>
+  );
+}
+
+export default function PreviewChrome({ children, pagePath, onEditGlobal, footerContent, menuContent, menuData }) {
   const flags = CHROME_PAGES[pagePath] || {};
   const [chrome, setChrome] = useState(null);
 
@@ -72,10 +101,9 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
     let cancelled = false;
     (async () => {
       try {
-        const [apollo, routerDom, clientMod, cartMod, authMod, breadcrumbMod, wishlistMod, compareMod, headerMod] = await Promise.all([
+        const [apollo, routerDom, cartMod, authMod, breadcrumbMod, wishlistMod, compareMod, headerMod] = await Promise.all([
           import('@apollo/client'),
           import('react-router-dom'),
-          import('@host/apollo/client'),
           import('@host/context/CartContext'),
           import('@host/context/AuthContext'),
           import('@host/context/BreadcrumbContext'),
@@ -87,7 +115,7 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
         setChrome({
           ApolloProvider: apollo.ApolloProvider,
           BrowserRouter: routerDom.BrowserRouter,
-          apolloClient: clientMod.getClientApolloClient(),
+          apolloClient: getClientApolloClient(),
           CartProvider: cartMod.CartProvider,
           AuthProvider: authMod.AuthProvider,
           BreadcrumbProvider: breadcrumbMod.BreadcrumbProvider,
@@ -104,7 +132,7 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
 
   if (!chrome) {
     return (
-      <div className="preview-chrome" style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>
+      <div className="preview-chrome font-['Inter',sans-serif] leading-base text-[#424242] antialiased isolate" style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>
         Loading preview…
       </div>
     );
@@ -116,21 +144,27 @@ export default function PreviewChrome({ children, pagePath, onEditGlobal, footer
     Header,
   } = chrome;
   const footerLabel = CHROME_PAGES['/__footer__'].label;
+  const menuLabel = CHROME_PAGES['/__menu__'].label;
+  const menuSlot = !flags.hideMenu && menuContent !== undefined && menuContent !== null ? (
+    <GlobalBlock id="__menu__" label={menuLabel} onEdit={() => onEditGlobal?.('/__menu__')}>
+      {menuContent || <EmptyRegion />}
+    </GlobalBlock>
+  ) : null;
 
   return (
-    <div className="preview-chrome">
+    <div className="preview-chrome font-['Inter',sans-serif] leading-base text-[#424242] antialiased isolate">
       <ApolloProvider client={apolloClient}>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
                 <CompareProvider>
                   <BreadcrumbProvider>
-                    <LiveChromeBlocker><Header /></LiveChromeBlocker>
+                    <LiveChromeBlocker><Header menuItems={menuItemsOf(menuData)} menuSlot={menuSlot} /></LiveChromeBlocker>
                     {children}
-                    {!flags.hideFooter && footerContent && (
+                    {!flags.hideFooter && footerContent !== undefined && footerContent !== null && (
                       <GlobalBlock id="__footer__" label={footerLabel} onEdit={() => onEditGlobal?.('/__footer__')}>
-                        {footerContent}
+                        {footerContent || <EmptyRegion />}
                       </GlobalBlock>
                     )}
                   </BreadcrumbProvider>

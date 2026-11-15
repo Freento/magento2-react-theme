@@ -1,0 +1,68 @@
+{
+  "title": "Maintenance",
+  "path": "/__maintenance__",
+  "blocks": [
+    {
+      "id": "maint-bg",
+      "component": "Grid",
+      "props": {
+        "columns": 1,
+        "rows": 1,
+        "rowGap": 16,
+        "columnGap": 16,
+        "alignItems": "center",
+        "justifyItems": "stretch",
+        "padding": "64px max(16px, calc((100% - 1200px) / 2))",
+        "customCss": "min-height: 100vh;",
+        "backgroundImage": ""
+      },
+      "style": {
+        "fullWidth": true,
+        "backgroundColor": "#F8F9FA"
+      },
+      "children": [
+        {
+          "id": "bmrhyx9d",
+          "component": "Column",
+          "props": {
+            "gap": 0,
+            "flex": 1,
+            "direction": "column",
+            "alignX": "stretch",
+            "alignY": "center"
+          },
+          "style": {
+            "colStart": 1,
+            "rowStart": 1
+          },
+          "children": [
+            {
+              "id": "maint-title",
+              "component": "Text",
+              "props": {
+                "html": "We'll be back soon",
+                "level": 1,
+                "color": "",
+                "textAlign": "center"
+              },
+              "style": {
+                "marginBottom": 16
+              }
+            },
+            {
+              "id": "maint-text",
+              "component": "Text",
+              "props": {
+                "html": "<span style=\"font-size:16px\">Our store is down for scheduled maintenance. Please check back in a few minutes.</span>",
+                "level": "p",
+                "color": "",
+                "textAlign": "center"
+              },
+              "style": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

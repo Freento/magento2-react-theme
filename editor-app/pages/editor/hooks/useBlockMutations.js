@@ -1,6 +1,7 @@
 import {useCallback} from 'react';
 import registry from 'editor-core/registry';
-import {cloneBlockDeep} from '../lib/blockTree.js';
+import { readCopiedBlock, writeCopiedBlock } from 'editor-core/lib/blockClipboard';
+import {cloneBlockDeep, pruneEmptyColumns, findBlock, findBlockLocation, insertBlockInTree, holdsSystemBlock, SYSTEM_BLOCK_NOTICE} from '../lib/blockTree.js';
 import {generateId} from '../lib/color.js';
 
 export function useBlockMutations({
@@ -14,24 +15,18 @@ export function useBlockMutations({
                                       device,
                                       setSelectedBlockId,
                                       setActiveTab,
+                                      showToast,
+                                      isDropAllowed,
                                   }) {
-    const handleSelect = useCallback((id, options = {}) => {
+    const handleSelect = useCallback((id) => {
         setSelectedBlockId(id);
-        if (!options.keepTab) setActiveTab('settings');
-        if (options.scrollIntoView && id) {
-            let attempts = 0;
-            const tryScroll = () => {
-                const el = document.querySelector(`[data-block-id="${id}"]`);
-                if (el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
-                else if (++attempts < 10) requestAnimationFrame(tryScroll);
-            };
-            requestAnimationFrame(tryScroll);
-        }
+        setActiveTab('settings');
     }, []);
 
     const addBlock = useCallback(
         (componentName) => {
             const reg = registry[componentName];
+            if (!reg || reg.system) return;
             const newBlock = {
                 id: generateId(),
                 component: componentName,
@@ -56,23 +51,37 @@ export function useBlockMutations({
         [getCurrentBlocks, setCurrentBlocks]
     );
 
+    // Deleting or copying is refused for a system block and for any container
+    // that holds one; the buttons are hidden too, this covers every other path.
+    const isProtected = useCallback(
+        (id) => {
+            const side = sideForBlockId(id);
+            const block = side ? findBlock(getBlocksFor(side), id) : null;
+            if (!holdsSystemBlock(block)) return false;
+            showToast?.(SYSTEM_BLOCK_NOTICE, 'info');
+            return true;
+        },
+        [sideForBlockId, getBlocksFor, showToast]
+    );
+
     const deleteBlock = useCallback(
         (id) => {
+            if (isProtected(id)) return;
             const removeFromTree = (blocks) =>
                 blocks
                     .filter((b) => b.id !== id)
                     .map((b) => (b.children ? {...b, children: removeFromTree(b.children)} : b));
             const side = sideForBlockId(id);
-            if (side) setBlocksFor(side, removeFromTree(getBlocksFor(side)));
-            else setCurrentBlocks(removeFromTree(getCurrentBlocks()));
+            setBlocksFor(side, pruneEmptyColumns(removeFromTree(getBlocksFor(side))));
             if (selectedBlockId === id) setSelectedBlockId(null);
         },
-        [getCurrentBlocks, setCurrentBlocks, sideForBlockId, getBlocksFor, setBlocksFor, selectedBlockId]
+        [sideForBlockId, getBlocksFor, setBlocksFor, selectedBlockId, isProtected]
     );
 
 
     const duplicateBlock = useCallback(
         (id) => {
+            if (isProtected(id)) return;
             let inserted = null;
             const dupInTree = (blocks, parentComponent) => {
                 const out = [];
@@ -93,11 +102,63 @@ export function useBlockMutations({
                 return out;
             };
             const side = sideForBlockId(id);
-            if (side) setBlocksFor(side, dupInTree(getBlocksFor(side), null));
-            else setCurrentBlocks(dupInTree(getCurrentBlocks(), null));
+            setBlocksFor(side, dupInTree(getBlocksFor(side), null));
             if (inserted) setSelectedBlockId(inserted.id);
         },
-        [getCurrentBlocks, setCurrentBlocks, sideForBlockId, getBlocksFor, setBlocksFor, cloneBlockDeep]
+        [sideForBlockId, getBlocksFor, setBlocksFor, cloneBlockDeep, isProtected]
+    );
+
+    const copyBlock = useCallback(
+        (id = selectedBlockId) => {
+            if (!id) return false;
+            const side = sideForBlockId(id);
+            const block = side ? findBlock(getBlocksFor(side), id) : null;
+            if (!block) return false;
+            if (holdsSystemBlock(block)) { showToast?.(SYSTEM_BLOCK_NOTICE, 'info'); return false; }
+            if (!writeCopiedBlock(block)) return false;
+            showToast?.(`${registry[block.component]?.label || block.component} copied`, 'success', 1800);
+            return true;
+        },
+        [selectedBlockId, sideForBlockId, getBlocksFor, showToast]
+    );
+
+    const cutBlock = useCallback(
+        (id = selectedBlockId) => {
+            if (!id || !copyBlock(id)) return false;
+            deleteBlock(id);
+            return true;
+        },
+        [selectedBlockId, copyBlock, deleteBlock]
+    );
+
+    const pasteBlock = useCallback(
+        (targetId = selectedBlockId) => {
+            const copied = readCopiedBlock();
+            if (!copied) { showToast?.('Nothing to paste', 'info', 1800); return false; }
+            const rootId = 'root-page';
+            let side = targetId ? sideForBlockId(targetId) : null;
+            let blocks = side ? getBlocksFor(side) : getCurrentBlocks();
+            let loc = targetId ? findBlockLocation(blocks, targetId, rootId) : null;
+            if (!loc) { side = null; blocks = getCurrentBlocks(); loc = {parentId: rootId, index: blocks.length - 1}; }
+            if (isDropAllowed && !isDropAllowed(copied.component, loc.parentId === rootId ? null : loc.parentId)) {
+                showToast?.(`${registry[copied.component]?.label || copied.component} cannot go here`, 'error', 4000);
+                return false;
+            }
+            const block = cloneBlockDeep(copied);
+            if (loc.parentId !== rootId && block.style) {
+                const s = {...block.style};
+                delete s.colStart;
+                delete s.rowStart;
+                block.style = s;
+            }
+            const next = insertBlockInTree(blocks, loc.parentId, loc.index + 1, block, rootId);
+            if (side) setBlocksFor(side, next);
+            else setCurrentBlocks(next);
+            setSelectedBlockId(block.id);
+            setActiveTab?.('settings');
+            return true;
+        },
+        [selectedBlockId, sideForBlockId, getBlocksFor, getCurrentBlocks, setBlocksFor, setCurrentBlocks, setSelectedBlockId, setActiveTab, showToast, isDropAllowed]
     );
 
     const writeField = useCallback(
@@ -122,9 +183,11 @@ export function useBlockMutations({
                     if (b.children) return {...b, children: upd(b.children)};
                     return b;
                 });
-            setCurrentBlocks((prev) => upd(prev));
+            const side = sideForBlockId(id);
+            if (side) setBlocksFor(side, (prev) => upd(prev));
+            else setCurrentBlocks((prev) => upd(prev));
         },
-        [device, setCurrentBlocks]
+        [device, sideForBlockId, setBlocksFor, setCurrentBlocks]
     );
 
     const updateBlockProp = useCallback(
@@ -200,6 +263,9 @@ export function useBlockMutations({
         addBlock,
         deleteBlock,
         duplicateBlock,
+        copyBlock,
+        cutBlock,
+        pasteBlock,
         writeField,
         updateBlockProp,
         updateBlockStyle,

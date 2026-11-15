@@ -1,6 +1,8 @@
 import React from 'react';
+import useBackToClose from '../../../hooks/useBackToClose';
 
 const ChangePasswordModal = ({ open, onClose, data, onChange, onSubmit }) => {
+  useBackToClose('passwordModal', open, onClose);
   if (!open) return null;
 
   return (

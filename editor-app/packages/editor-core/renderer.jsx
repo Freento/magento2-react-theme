@@ -1,6 +1,8 @@
 import * as defaultBlocks from './blocks/index-runtime';
 import registry from './registry-runtime.js';
 import { resolveBlockForDevices } from './lib/devices.js';
+import { responsiveCssFor } from './lib/responsiveCss.js';
+import { customCssFor } from './lib/customCss.js';
 import { simulateGridPlacement } from './lib/grid.js';
 import { CellStackWrapper } from './components/CellStackWrapper.jsx';
 import { BlockWrapper } from './components/BlockWrapper.jsx';
@@ -24,22 +26,21 @@ export function renderBlock(rawBlock, index, parentId, options = {}) {
 
   const isEditing = !!options.onSelect;
   const isGrid = block.component === 'Grid';
-  // A container that lays its children out side by side wants the tail drop
-  // zone beside them, not under them.
-  const isRowParent = block.props?.direction === 'row';
-  const gridLinear = isGrid && (block.props?.direction === 'column' || block.props?.direction === 'row');
   const gridCols = isGrid ? Math.max(1, Number(block.props?.columns) || 1) : null;
+  const isRowParent = block.component === 'Column' && block.props?.direction === 'row';
   const childOptions = {
     ...options,
     inGrid: isGrid,
-    horizontal: isGrid,
-    gridLinear,
+    horizontal: isGrid || isRowParent,
     gridCols,
     totalCount: (block.children || []).length,
+    myCell: undefined,
+    inStack: false,
+    stackLast: false,
   };
   let childCells = null;
-  if (isGrid && !gridLinear) {
-    childCells = simulateGridPlacement(block).childCells;
+  if (isGrid) {
+    childCells = simulateGridPlacement(block, options.devices).childCells;
   }
   let childElements;
   if (childCells) {
@@ -92,12 +93,13 @@ export function renderBlock(rawBlock, index, parentId, options = {}) {
         blockId: block.id,
         isSelected: options.selectedId === block.id,
         onUpdateProp: options.onUpdateProp,
+        activeItem: options.selectedId === block.id ? options.activeItem || null : null,
       }
     : null;
 
   return (
     <BlockWrapper key={block.id} block={block} index={index} parentId={parentId} {...options}>
-      <Component {...block.props} {...(editorMeta ? { _editor: editorMeta } : {})}>
+      <Component {...block.props} _style={block.style} {...(isGrid ? { _blockId: block.id } : {})} {...(editorMeta ? { _editor: editorMeta } : {})}>
         {childElements}
         {isEditing && isGrid && (!options.validateDrop || options.validateDrop(block.id)) && (
           <GridGhosts
@@ -105,6 +107,7 @@ export function renderBlock(rawBlock, index, parentId, options = {}) {
             dropTarget={options.dropTarget}
             onDropTargetChange={options.onDropTargetChange}
             isDragging={options.isDragging}
+            devices={options.devices}
           />
         )}
         {options.isDragging && !isGrid && registry[block.component]?.acceptsChildren &&
@@ -131,7 +134,7 @@ function renderBlockList(blockList, options = {}, targetName, parentId) {
 
   if (blockList.length === 0) {
     return active && dropAllowedHere
-      ? <EmptyDropZone isDragging={isDragging} dropTarget={options.dropTarget} parentId={parentId} onDropTargetChange={options.onDropTargetChange} />
+      ? <EmptyDropZone isDragging={isDragging} dropTarget={options.dropTarget} parentId={parentId} onDropTargetChange={options.onDropTargetChange} target={targetName} />
       : null;
   }
 
@@ -145,6 +148,7 @@ function renderBlockList(blockList, options = {}, targetName, parentId) {
         onDropTargetChange={options.onDropTargetChange}
         dropTarget={options.dropTarget}
         horizontal={false}
+        target={targetName}
       />
     );
   }
@@ -167,6 +171,11 @@ function wrapDropOptions(options) {
   };
 }
 
+const responsiveStyle = (page, options) => {
+  const css = [options.onSelect ? null : responsiveCssFor(page?.blocks), customCssFor(page?.blocks)].filter(Boolean).join('');
+  return css ? <style key="responsive-css" dangerouslySetInnerHTML={{ __html: css }} /> : null;
+};
+
 export function renderPage(page, options = {}) {
   const targetName = options.editingTarget || 'page';
   const opts = wrapDropOptions(options);
@@ -175,6 +184,7 @@ export function renderPage(page, options = {}) {
       className="editor-core-page"
       style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px', ...(page?.style || {}) }}
     >
+      {responsiveStyle(page, options)}
       {renderBlockList(page?.blocks || [], opts, targetName, 'root-page')}
     </div>
   );
@@ -183,5 +193,5 @@ export function renderPage(page, options = {}) {
 export function renderPageBlocks(page, options = {}) {
   const targetName = options.editingTarget || 'page';
   const opts = wrapDropOptions(options);
-  return renderBlockList(page?.blocks || [], opts, targetName, 'root-page');
+  return [responsiveStyle(page, options), renderBlockList(page?.blocks || [], opts, targetName, 'root-page')];
 }

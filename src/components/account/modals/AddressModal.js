@@ -1,4 +1,5 @@
 import React from 'react';
+import useBackToClose from '../../../hooks/useBackToClose';
 import AddressFormFields from '../AddressFormFields';
 
 const AddressModal = ({
@@ -13,6 +14,7 @@ const AddressModal = ({
   optionalZipCountries,
   onSave,
 }) => {
+  useBackToClose('addressModal', open, onClose);
   if (!open) return null;
 
   return (

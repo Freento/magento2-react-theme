@@ -4,9 +4,13 @@ import MagentoPayPalButton from './walletIntegrations/MagentoPayPalButton';
 import AuthorizeNetForm from './AuthorizeNetForm';
 import BraintreeGooglePayButton from './walletIntegrations/BraintreeGooglePayButton';
 import BraintreeHostedFields from './walletIntegrations/BraintreeHostedFields';
-import { GET_CUSTOMER_PAYMENT_TOKENS } from '../../queries/customer';
-import { cardBrand, parseTokenDetails } from '../../lib/storedCards';
+import BraintreePayPalButton from './walletIntegrations/BraintreePayPalButton';
+import SaveForLaterCheckbox from './SaveForLaterCheckbox';
+import { GET_CUSTOMER_PAYMENT_TOKENS, GET_PAYPAL_BILLING_AGREEMENTS, GET_TOKENBASE_CARDS } from '../../queries/customer';
+import { AUTHNETCIM_STORED_CODE, BILLING_AGREEMENT_CODE, isStoredCode, isVaultCode, tokenbaseCardLabel, tokenLabel, vaultCodeOf } from '../../lib/storedCards';
 import CardBrandIcon from '../ui/icons/CardBrandIcon';
+import PaymentTokenIcon from '../ui/icons/PaymentTokenIcon';
+import PayPalLogoIcon from '../ui/icons/PayPalLogoIcon';
 import {
     FORM_SECTION_CLS,
     FORM_TITLE_CLS,
@@ -36,13 +40,14 @@ const PaymentMethodsForm = ({
     handlePayPalSuccess,
     handlePayPalError,
     handlePayPalCancel,
-    onAcceptJsToken,
     tokenbaseConfig,
     onTransactionComplete,
     onTransactionError,
     guestEmail,
     onBraintreeHostedReady,
     googlePayPlaceOrder,
+    paypalPlaceOrder,
+    braintreeConfig = null,
     googlePayMerchantId,
     googlePayEnvironment,
     billingBlock = null,
@@ -52,6 +57,7 @@ const PaymentMethodsForm = ({
     saveCard = false,
     onSaveCardChange,
     canSaveCard = false,
+    billingAgreementSignup = 'never',
 }) => {
     const renderIntegration = (methodCode) => {
         if (methodCode === 'paypal_express' || methodCode === 'paypal_express_bml') {
@@ -62,6 +68,7 @@ const PaymentMethodsForm = ({
                     onSuccess={handlePayPalSuccess}
                     onError={handlePayPalError}
                     disabled={paymentLoading}
+                    showBillingAgreement={canSaveCard && billingAgreementSignup === 'ask' && !hasMethod(BILLING_AGREEMENT_CODE)}
                 />
             );
         }
@@ -72,7 +79,6 @@ const PaymentMethodsForm = ({
                     cardData={cardData}
                     setCardData={setCardData}
                     errors={errors}
-                    onAcceptJsToken={onAcceptJsToken}
                     tokenbaseConfig={tokenbaseConfig}
                     cartData={cartData}
                     onTransactionComplete={onTransactionComplete}
@@ -91,6 +97,23 @@ const PaymentMethodsForm = ({
                     totalAmount={cartData?.prices?.grand_total?.value || 0}
                     currencyCode={cartData?.prices?.grand_total?.currency || 'USD'}
                     disabled={paymentLoading}
+                    showSaveForLater={canSaveCard && hasMethod('braintree_googlepay_vault')}
+                />
+            );
+        }
+
+        if (methodCode === 'braintree_paypal' && paypalPlaceOrder) {
+            return (
+                <BraintreePayPalButton
+                    setPaymentAndPlaceOrder={paypalPlaceOrder}
+                    totalAmount={cartData?.prices?.grand_total?.value || 0}
+                    currencyCode={cartData?.prices?.grand_total?.currency || 'USD'}
+                    shippingAddress={cartData?.shipping_addresses?.[0] || null}
+                    environment={braintreeConfig?.environment}
+                    merchantCountry={braintreeConfig?.paypalMerchantCountry}
+                    buttonStyle={braintreeConfig?.paypalButtonStyle}
+                    disabled={paymentLoading}
+                    showSaveForLater={canSaveCard && hasMethod('braintree_paypal_vault')}
                 />
             );
         }
@@ -99,16 +122,13 @@ const PaymentMethodsForm = ({
             return (
                 <>
                     <BraintreeHostedFields onReady={onBraintreeHostedReady} />
-                    {canSaveCard && (
-                        <label className="save-card-toggle flex items-center gap-2.5 mt-3 mb-1 text-sm text-ink cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="w-4 h-4 accent-ink cursor-pointer"
-                                checked={saveCard}
-                                onChange={(e) => onSaveCardChange?.(e.target.checked)}
-                            />
-                            Save this card for later use
-                        </label>
+                    {canSaveCard && hasMethod('braintree_cc_vault') && (
+                        <SaveForLaterCheckbox
+                            className="mt-3 mb-1"
+                            label="Save this card for later use"
+                            checked={saveCard}
+                            onChange={onSaveCardChange}
+                        />
                     )}
                 </>
             );
@@ -121,28 +141,75 @@ const PaymentMethodsForm = ({
         code === 'paypal_express'
         || code === 'paypal_express_bml'
         || code === 'authnetcim'
-        || code === 'braintree_googlepay';
+        || code === 'braintree_googlepay'
+        || code === 'braintree_paypal';
 
     const availableMethods = paymentMethodsData?.cart?.available_payment_methods || [];
-    const vaultAvailable = availableMethods.some((m) => m.code === 'braintree_cc_vault');
+    const availableCodes = new Set(availableMethods.map((m) => m.code));
+    const hasMethod = (code) => availableCodes.has(code);
+    const vaultAvailable = availableMethods.some((m) => isVaultCode(m.code));
     const { data: tokensData, loading: tokensLoading } = useQuery(GET_CUSTOMER_PAYMENT_TOKENS, {
         skip: !vaultAvailable || !canSaveCard,
         fetchPolicy: 'cache-and-network',
+        errorPolicy: 'all',
     });
-    const tokensPending = vaultAvailable && canSaveCard && !tokensData && tokensLoading;
+    const agreementsAvailable = hasMethod(BILLING_AGREEMENT_CODE);
+    const { data: agreementsData, loading: agreementsLoading } = useQuery(GET_PAYPAL_BILLING_AGREEMENTS, {
+        skip: !agreementsAvailable || !canSaveCard,
+        fetchPolicy: 'cache-and-network',
+        errorPolicy: 'ignore',
+    });
+    const cimAvailable = hasMethod('authnetcim');
+    const { data: cimData, loading: cimLoading } = useQuery(GET_TOKENBASE_CARDS, {
+        skip: !cimAvailable || !canSaveCard,
+        fetchPolicy: 'cache-and-network',
+        errorPolicy: 'ignore',
+    });
+    const tokensPending = (vaultAvailable && canSaveCard && !tokensData && tokensLoading)
+        || (agreementsAvailable && canSaveCard && !agreementsData && agreementsLoading)
+        || (cimAvailable && canSaveCard && !cimData && cimLoading);
+    const cimCards = cimAvailable
+        ? (cimData?.tokenBaseCards || []).filter((card) => card.active && card.method === 'authnetcim' && card.hash)
+        : [];
     const vaultTokens = vaultAvailable
         ? (tokensData?.customerPaymentTokens?.items || [])
-            .filter((t) => t.payment_method_code === 'braintree')
+            .filter((t) => t?.public_hash && availableCodes.has(vaultCodeOf(t)))
         : [];
-    const newMethods = availableMethods.filter((m) => m.code !== 'braintree_cc_vault');
-    const vaultSelected = selectedPayment === 'braintree_cc_vault';
+    const agreements = agreementsAvailable ? (agreementsData?.customerPaypalBillingAgreements || []) : [];
+    const storedItems = [
+        ...vaultTokens.map((token) => ({
+            key: token.public_hash,
+            code: vaultCodeOf(token),
+            label: tokenLabel(token),
+            source: token.payment_method_code === 'braintree_googlepay' ? 'Google Pay' : token.payment_method_code === 'braintree_paypal' ? 'PayPal' : 'Braintree',
+            icon: <PaymentTokenIcon token={token} className="shrink-0" />,
+        })),
+        ...cimCards.map((card) => ({
+            key: card.hash,
+            code: AUTHNETCIM_STORED_CODE,
+            label: tokenbaseCardLabel(card),
+            source: 'Authorize.Net',
+            icon: <CardBrandIcon type={card.additional?.cc_type} className="shrink-0" />,
+        })),
+        ...agreements.map((agreement) => ({
+            key: String(agreement.id),
+            code: BILLING_AGREEMENT_CODE,
+            label: `PayPal billing agreement ${agreement.reference_id || ''}`.trim(),
+            source: 'PayPal',
+            icon: <PayPalLogoIcon className="shrink-0" />,
+        })),
+    ];
+    const newMethods = availableMethods.filter((m) => !isStoredCode(m.code));
+    const storedSelected = isStoredCode(selectedPayment);
 
     useEffect(() => {
-        if (!vaultSelected || !vaultTokens.length) return;
-        if (!vaultTokens.some((t) => t.public_hash === selectedVaultHash)) {
-            onVaultSelect?.(vaultTokens[0].public_hash);
+        if (!storedSelected) return;
+        const ofMethod = storedItems.filter((item) => item.code === selectedPayment);
+        if (!ofMethod.length) return;
+        if (!ofMethod.some((item) => item.key === selectedVaultHash)) {
+            onVaultSelect?.(ofMethod[0].key);
         }
-    }, [vaultSelected, vaultTokens, selectedVaultHash, onVaultSelect]);
+    }, [storedSelected, storedItems, selectedPayment, selectedVaultHash, onVaultSelect]);
 
     const selectedBlock = (methodCode) => (
         <div className="payment-method-body mt-4 pt-4 border-t border-line cursor-default" onClick={(e) => e.stopPropagation()}>
@@ -180,33 +247,33 @@ const PaymentMethodsForm = ({
                 </div>
             ) : availableMethods.length > 0 ? (
                 <div className="payment-methods-list grid gap-2 mb-2">
-                    {vaultTokens.map((token) => {
-                        const details = parseTokenDetails(token.details);
-                        const isSelected = vaultSelected && selectedVaultHash === token.public_hash;
+                    {storedItems.map((item) => {
+                        const isSelected = selectedPayment === item.code && selectedVaultHash === item.key;
                         return (
-                            <React.Fragment key={token.public_hash}>
+                            <React.Fragment key={`${item.code}:${item.key}`}>
                                 <div
                                     className={`payment-method-item ${METHOD_ITEM_CLS} ${isSelected ? METHOD_ITEM_ON : METHOD_ITEM_OFF}`}
                                     onClick={() => {
-                                        handlePaymentMethodSelect('braintree_cc_vault');
-                                        onVaultSelect?.(token.public_hash);
+                                        handlePaymentMethodSelect(item.code);
+                                        onVaultSelect?.(item.key);
                                     }}
                                 >
                                     <div className="payment-method-content flex items-center gap-5">
                                         <div className={`${RADIO_BTN_CLS} ${isSelected ? RADIO_BTN_ON : RADIO_BTN_OFF}`} />
-                                        <CardBrandIcon type={details.type} className="shrink-0" />
-                                        <h3 className="payment-method-title mb-0.5 font-sans text-base font-medium tracking-[-0.005em] text-ink leading-[1.35]">
-                                            {cardBrand(details)}
-                                            {details.maskedCC && ` ending ${details.maskedCC}`}
-                                            {details.expirationDate && ` (expires: ${details.expirationDate})`}
-                                        </h3>
+                                        {item.icon}
+                                        <div className="min-w-0">
+                                            <h3 className="payment-method-title mb-0.5 font-sans text-base font-medium tracking-[-0.005em] text-ink leading-[1.35] [overflow-wrap:anywhere]">
+                                                {item.label}
+                                            </h3>
+                                            <p className="payment-method-source m-0 text-xs text-ink-2">{item.source}</p>
+                                        </div>
                                     </div>
-                                    {isSelected && selectedBlock('braintree_cc_vault')}
+                                    {isSelected && selectedBlock(item.code)}
                                 </div>
                             </React.Fragment>
                         );
                     })}
-                    {vaultTokens.length > 0 && (
+                    {storedItems.length > 0 && (
                         <h3 className="payment-methods-group-title mt-4 mb-1 text-sm font-medium tracking-[0.04em] uppercase text-ink-2">Select a new payment method</h3>
                     )}
                     {newMethods.map((method) => {

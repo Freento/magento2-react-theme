@@ -9,63 +9,84 @@
   "areas": {
     "category-top": [
       {
-        "id": "promo-collection-performance",
-        "component": "Box",
+        "id": "promo-collection-performance-grid",
+        "component": "Grid",
         "props": {
-          "direction": "column",
-          "gap": 8,
-          "alignX": "stretch",
-          "alignY": "end"
+          "columns": 1,
+          "rows": 1,
+          "rowGap": 0,
+          "columnGap": 0,
+          "customCss": "",
+          "backgroundImage": ""
         },
         "style": {
-          "padding": "32px",
-          "borderRadius": "8px",
-          "height": "260px",
-          "backgroundImage": "/uploads/promo-collection-performance.avif",
-          "backgroundSize": "cover",
-          "backgroundPosition": "center center",
-          "backgroundOverlay": 0.35,
-          "link": "",
           "marginBottom": 16
         },
         "children": [
           {
-            "id": "promo-collection-performance-title",
-            "component": "Heading",
+            "id": "promo-collection-performance",
+            "component": "Column",
             "props": {
-              "text": "You're the best",
-              "level": 2,
-              "color": "#ffffff",
-              "fontSize": "26px",
-              "fontWeight": "bold"
-            }
-          },
-          {
-            "id": "promo-collection-performance-subtitle",
-            "component": "Text",
-            "props": {
-              "text": "Make a strong statement with Luma Performance sportswear",
-              "fontSize": 15,
-              "lineHeight": 1.4,
-              "color": "#f0f0f0"
-            }
-          }
-        ],
-        "responsive": {
-          "mobile": {
+              "direction": "column",
+              "gap": 8,
+              "alignX": "stretch",
+              "alignY": "end",
+              "flex": 1
+            },
             "style": {
-              "height": "260px"
+              "padding": "32px",
+              "borderRadius": "8px",
+              "height": "260px",
+              "backgroundImage": "/uploads/promo-collection-performance.avif",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center center",
+              "backgroundOverlay": 0.35,
+              "link": "",
+              "colStart": 1,
+              "rowStart": 1
+            },
+            "children": [
+              {
+                "id": "promo-collection-performance-title",
+                "component": "Text",
+                "props": {
+                  "level": 2,
+                  "color": "#ffffff",
+                  "fontSize": "26px",
+                  "fontWeight": "bold",
+                  "html": "You're the best"
+                }
+              },
+              {
+                "id": "promo-collection-performance-subtitle",
+                "component": "Text",
+                "props": {
+                  "fontSize": 15,
+                  "lineHeight": 1.4,
+                  "color": "#f0f0f0",
+                  "html": "Make a strong statement with Luma Performance sportswear",
+                  "level": "p"
+                }
+              }
+            ],
+            "responsive": {
+              "mobile": {
+                "style": {
+                  "height": "260px"
+                }
+              }
             }
           }
-        }
+        ]
       },
       {
         "id": "collections-performance-new-products",
-        "component": "ProductsCarousel",
+        "component": "ProductsList",
         "props": {
           "title": "New Arrivals",
-          "eyebrow": "",
-          "skus": [
+          "dataSource": "products",
+          "categoryId": "",
+          "products": [
             {
               "sku": "WSH03"
             },
@@ -82,9 +103,10 @@
               "sku": "WJ04"
             }
           ],
-          "pageSize": 5,
-          "itemsPerSlide": 5,
-          "source": "skus"
+          "randomize": false,
+          "appearance": "carousel",
+          "productsCount": 5,
+          "columns": 4
         },
         "style": {
           "width": "100%",

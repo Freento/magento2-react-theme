@@ -3,26 +3,38 @@ export default {
     category: 'layout',
     icon: 'ColumnsH',
     acceptsChildren: true,
+    backgroundOnContent: true,
     allowedIn: ['page'],
     disallowedAncestors: ['Grid'],
+    regroupStyleFields: { margin: 'Grid', padding: 'Grid' },
+    spacingSideBySide: true,
+    hideStyleFields: ['backgroundColor', 'textAlign', 'fontFamily', 'borderRadius', 'borderSides', 'borderStyle', 'borderColor'],
     defaultProps: {
-      direction: 'grid',
       columns: 3,
-      rows: 0,
+      rows: 1,
       rowGap: 16,
       columnGap: 16,
-      alignItems: 'stretch',
-      justifyItems: 'stretch',
+      customCss: '',
+      backgroundImage: '',
     },
     propsSchema: {
-      direction: {
-        label: 'Layout',
-        type: 'segmented',
-        options: [
-          { value: 'grid', label: 'Grid', icon: 'Square' },
-          { value: 'column', label: 'Stacked', icon: 'Rows' },
-          { value: 'row', label: 'In a row', icon: 'ColumnsH' },
-        ],
+      // Editable here as well as from the canvas arrows, because the inspector
+      // is where a tablet/mobile override gets set (the same field with another
+      // device selected writes into `responsive`).
+      columns: {
+        label: 'Columns',
+        type: 'presetNumber',
+        presets: [1, 2, 3, 4, 5],
+        min: 1,
+        max: 12,
+        group: 'Grid',
+      },
+      rows: {
+        label: 'Rows',
+        type: 'presetNumber',
+        presets: [1, 2, 3, 4, 5],
+        min: 1,
+        max: 50,
         group: 'Grid',
       },
       rowGap: {
@@ -34,27 +46,12 @@ export default {
         ],
         group: 'Grid',
       },
-      alignItems: {
-        label: 'Vertical alignment',
-        type: 'segmented',
-        options: [
-          { value: 'start', label: '', icon: 'AlignTop' },
-          { value: 'center', label: '', icon: 'AlignMiddle' },
-          { value: 'end', label: '', icon: 'AlignBottom' },
-          { value: 'stretch', label: 'Stretch' },
-        ],
-        group: 'Grid',
-      },
-      justifyItems: {
-        label: 'Horizontal alignment',
-        type: 'segmented',
-        options: [
-          { value: 'start', label: '', icon: 'AlignLeft' },
-          { value: 'center', label: '', icon: 'AlignCenter' },
-          { value: 'end', label: '', icon: 'AlignRight' },
-          { value: 'stretch', label: 'Stretch' },
-        ],
-        group: 'Grid',
+      backgroundImage: { label: 'Background', type: 'background', group: 'Advanced' },
+      customCss: {
+        label: 'Custom styles',
+        type: 'customCss',
+        placeholder: 'align-items: center;\nborder: 1px solid #ddd;',
+        group: 'Advanced',
       },
     },
 };
