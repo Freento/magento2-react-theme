@@ -12,6 +12,21 @@ Below is exactly what the theme does and why it delivers.
 
 ---
 
+## Live demo
+
+See the theme running on a real Magento 2 store:
+
+- **Storefront:** [react-m2-theme.freento.com](https://react-m2-theme.freento.com/)
+- **Editor:** [react-m2-theme.freento.com/editor](https://react-m2-theme.freento.com/editor) — open to everyone. You can add, move, and edit blocks freely; saving is switched off, so nothing you do changes the demo.
+
+The same theme with a different look — each of these is built in the editor from the same set of blocks:
+
+- [Alternative design 1](https://react-m2-theme-alt1.freento.com/)
+- [Alternative design 2](https://react-m2-theme-alt2.freento.com/)
+- [Alternative design 3](https://react-m2-theme-alt3.freento.com/)
+
+---
+
 ## What makes the theme fast
 
 ### One GraphQL request per page
@@ -96,6 +111,8 @@ The main rule for customizations is to keep the bundle size within the defined l
 Page Builder is the usual stumbling block for headless storefronts. Its content is stored in the Magento database as HTML with service markup, it needs a separate request (which hurts performance), and rendering that markup in a React application is a pain of its own: either insert it "as is" and live with extremely heavy markup that is hard to style, or parse it into something lighter and maintain compatibility with every Page Builder update. On top of that, the editor itself is heavy and sluggish to work with.
 
 We took a different path: the theme ships with its own visual editor built specifically for this theme. It opens at a separate URL, closed to other users. We put a lot of effort into making it genuinely pleasant to work with.
+
+You can try it right now in the [demo editor](https://react-m2-theme.freento.com/editor): editing works, saving is switched off.
 
 ### What you can do in it
 
